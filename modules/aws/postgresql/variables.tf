@@ -43,6 +43,7 @@ variable "postgresql_additional_users" {
     password = string
     database = string
   }))
+  default = []
 }
 
 variable "postgresql_extensions" {
