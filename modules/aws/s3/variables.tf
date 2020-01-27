@@ -8,3 +8,9 @@ variable "tags" {
   type = map(string)
   default = {}
 }
+
+variable "public" {
+  description = "AWS s3 bucket is exposed publicly"
+  type = bool
+  default = false
+}

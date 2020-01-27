@@ -5,7 +5,7 @@ variable "name" {
 
 variable "tags" {
   description = "Tags for kafka cluster"
-  type = map(strings)
+  type = map(string)
   default = {}
 }
 
