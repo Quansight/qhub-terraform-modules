@@ -7,3 +7,12 @@ variable "labels" {
   description = "Additional labs to apply for all resources deployed"
   type        = map(string)
 }
+
+variable "secrets" {
+  description = "map of with map of key value secrets to store in kuberentes secrets"
+  type = list(object({
+    name = string
+    data = map(string)
+  }))
+  default = []
+}

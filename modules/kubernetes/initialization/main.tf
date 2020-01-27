@@ -10,15 +10,14 @@ resource "kubernetes_namespace" "main" {
 
 
 resource "kubernetes_secret" "main" {
+  count = length(var.secrets)
+
   metadata {
-    name      = "test-secret"
+    name      = var.secrets[count.index].name
     namespace = var.namespace
   }
 
-  data = {
-    username = "admin"
-    password = "P4ssw0rd"
-  }
+  data = var.secrets[count.index].data
 
   type = "Opaque"
 }
