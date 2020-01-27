@@ -1,8 +1,6 @@
 resource "kubernetes_namespace" "main" {
   metadata {
-    labels = {
-      mylabel = "label-value"
-    }
+    labels = merge({}, var.labels)
 
     name = var.namespace
   }
@@ -15,6 +13,7 @@ resource "kubernetes_secret" "main" {
   metadata {
     name      = var.secrets[count.index].name
     namespace = var.namespace
+    labels = merge({}, var.labels)
   }
 
   data = var.secrets[count.index].data

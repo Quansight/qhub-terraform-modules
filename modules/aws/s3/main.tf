@@ -1,4 +1,4 @@
-resource "aws_s3_bucket" "private" {
+resource "aws_s3_bucket" "main" {
   bucket = "${var.name}-bucket"
   acl    = var.public ? "public-read" : "private"
 

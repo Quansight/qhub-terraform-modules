@@ -1,11 +1,11 @@
-output "postgresql_credentials" {
+output "credentials" {
   description = "connection string for master database connection"
   value = {
     username = aws_rds_cluster.main.master_username
     password = aws_rds_cluster.main.master_password
     database = aws_rds_cluster.main.database_name
-    host     = aws_rds_cluster.main.endpoint
-    port     = aws_rds_cluster.main.port
+    host = aws_rds_cluster.main.endpoint
+    port = aws_rds_cluster.main.port
   }
 }
 
