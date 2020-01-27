@@ -1,26 +1,26 @@
 variable "name" {
   description = "Prefix name to assign to efs resource"
-  type = string
+  type        = string
 }
 
 variable "tags" {
   description = "Additional tags to apply to resource"
-  type = map(string)
-  default = {}
+  type        = map(string)
+  default     = {}
 }
 
 variable "efs_throughput" {
   description = "Throughput mode for EFS filesystem (busting|provisioned)"
-  type = string
-  default = "bursing"
+  type        = string
+  default     = "bursing"
 }
 
 variable "efs_subnets" {
   description = "AWS VPC subnets to use for efs"
-  type = list(string)
+  type        = list(string)
 }
 
 variable "efs_security_groups" {
   description = "AWS security groups"
-  type = list(string)
+  type        = list(string)
 }

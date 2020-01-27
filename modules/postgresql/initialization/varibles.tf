@@ -10,6 +10,6 @@ variable "postgresql_additional_users" {
 
 variable "postgresql_extensions" {
   description = "Postgresql extensions to enable"
-  type = list(string)
-  default = [ ]
+  type        = list(string)
+  default     = []
 }

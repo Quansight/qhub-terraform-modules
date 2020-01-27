@@ -4,12 +4,12 @@ resource "kubernetes_persistent_volume" "main" {
   }
 
   spec = {
-    capacity = var.nfs_capacity
-    accessModes = [ "ReadWriteMany" ]
+    capacity                      = var.nfs_capacity
+    accessModes                   = ["ReadWriteMany"]
     persistentVolumeRecliamPolicy = "Retain"
     nfs = {
       server = var.nfs_server_address
-      path = "/"
+      path   = "/"
     }
   }
 }

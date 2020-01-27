@@ -1,9 +1,9 @@
 resource "aws_vpc" "main" {
   cidr_block = var.vpc_cidr_block
 
-  enable_dns_support = true
+  enable_dns_support   = true
   enable_dns_hostnames = true
-  enable_classiclink = false
+  enable_classiclink   = false
 
   tags = merge({ Name = "${var.name}-vpc" }, var.tags, var.vpc_additional_tags)
 }
@@ -12,8 +12,8 @@ resource "aws_subnet" "main" {
   count = length(var.aws_availability_zones)
 
   availability_zone = var.aws_availability_zones[count.index]
-  cidr_block = cidrsubnet(var.vpc_cidr_block, 8, count.index)
-  vpc_id = aws_vpc.main.id
+  cidr_block        = cidrsubnet(var.vpc_cidr_block, 8, count.index)
+  vpc_id            = aws_vpc.main.id
 
   tags = merge({ Name = "${var.name}-subnet-${count.index}" }, var.tags, var.vpc_subnet_additional_tags)
 }
@@ -38,21 +38,21 @@ resource "aws_route_table" "main" {
 resource "aws_route_table_association" "main" {
   count = length(var.aws_availability_zones)
 
-  subnet_id = aws_subnet.main[count.index].id
+  subnet_id      = aws_subnet.main[count.index].id
   route_table_id = aws_route_table.main.id
 }
 
 resource "aws_security_group" "main" {
-  name = "${var.name}-security-group"
+  name        = "${var.name}-security-group"
   description = "Main security group for infrastructure deployment"
 
   vpc_id = aws_vpc.main.id
 
   egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
-    cidr_blocks = [ "0.0.0.0/0" ]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = merge({ Name = "${var.name}-security-group" }, var.tags)

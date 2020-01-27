@@ -19,18 +19,18 @@ data "aws_iam_policy_document" "main" {
 
     effect = "Allow"
 
-    actions = var.allowed_policy_actions
+    actions   = var.allowed_policy_actions
     resources = var.allowed_policy_resources
   }
 }
 
 resource "aws_iam_policy" "main" {
-  name = "${var.name}-iam-policy"
-  path = "/"
+  name   = "${var.name}-iam-policy"
+  path   = "/"
   policy = data.aws_iam_policy_document.main.json
 }
 
 resource "aws_iam_user_policy_attachment" "main" {
-  user = aws_iam_user.main.name
+  user       = aws_iam_user.main.name
   policy_arn = aws_iam_policy.main.arn
 }

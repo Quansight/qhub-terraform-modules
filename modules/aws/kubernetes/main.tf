@@ -1,13 +1,13 @@
 resource "aws_eks_cluster" "main" {
-  name = "${var.name}-cluster"
+  name     = "${var.name}-cluster"
   role_arn = aws_iam_role.cluster.arn
 
   vpc_config {
     security_group_ids = var.cluster_security_groups
-    subnet_ids = var.cluster_subnets
+    subnet_ids         = var.cluster_subnets
   }
 
-  depends_on = [ aws_iam_role_policy_attachment.cluster-policy ]
+  depends_on = [aws_iam_role_policy_attachment.cluster-policy]
 
   tags = merge({
     Name = "${var.name}-cluster"
@@ -18,12 +18,12 @@ resource "aws_eks_cluster" "main" {
 resource "aws_eks_node_group" "main" {
   count = length(var.node_groups)
 
-  cluster_name = aws_eks_cluster.main.name
+  cluster_name    = aws_eks_cluster.main.name
   node_group_name = var.node_groups[count.index].name
-  node_role_arn = aws_iam_role.node-group.arn
-  subnet_ids = var.cluster_subnets
+  node_role_arn   = aws_iam_role.node-group.arn
+  subnet_ids      = var.cluster_subnets
 
-  instance_types = [ var.node_groups[count.index].instance_type ]
+  instance_types = [var.node_groups[count.index].instance_type]
 
   scaling_config {
     min_size     = var.node_groups[count.index].min_size
@@ -34,7 +34,7 @@ resource "aws_eks_node_group" "main" {
   # Ensure that IAM Role permissions are created before and deleted
   # after EKS Node Group handling.  Otherwise, EKS will not be able to
   # properly delete EC2 Instances and Elastic Network Interfaces.
-  depends_on = [ aws_iam_role_policy_attachment.node-group-policy ]
+  depends_on = [aws_iam_role_policy_attachment.node-group-policy]
 
   tags = {
     "kubernetes.io/cluster/${var.name}-cluster" = "shared"

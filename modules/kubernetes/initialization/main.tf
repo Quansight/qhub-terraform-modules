@@ -11,7 +11,7 @@ resource "kubernetes_namespace" "main" {
 
 resource "kubernetes_secret" "main" {
   metadata {
-    name = "test-secret"
+    name      = "test-secret"
     namespace = var.namespace
   }
 

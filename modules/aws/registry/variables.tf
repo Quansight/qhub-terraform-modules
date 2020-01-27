@@ -1,10 +1,10 @@
 variable "name" {
   description = "Prefix AWS registry name"
-  type = string
+  type        = string
 }
 
 variable "tags" {
   description = "AWS ECR Registry tags"
-  type = map(string)
-  default = {}
+  type        = map(string)
+  default     = {}
 }

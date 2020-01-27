@@ -18,7 +18,7 @@ resource "aws_iam_role" "cluster" {
         Principal = {
           Service = "eks.amazonaws.com"
         }
-      }]
+    }]
     Version = "2012-10-17"
   })
 }
@@ -27,7 +27,7 @@ resource "aws_iam_role_policy_attachment" "cluster-policy" {
   count = length(local.cluster_policies)
 
   policy_arn = local.cluster_policies[count.index]
-  role = aws_iam_role.cluster.name
+  role       = aws_iam_role.cluster.name
 }
 
 # =======================================================
@@ -45,7 +45,7 @@ resource "aws_iam_role" "node-group" {
         Principal = {
           Service = "ec2.amazonaws.com"
         }
-      }]
+    }]
     Version = "2012-10-17"
   })
 }
@@ -54,5 +54,5 @@ resource "aws_iam_role_policy_attachment" "node-group-policy" {
   count = length(local.node_group_policies)
 
   policy_arn = local.node_group_policies[count.index]
-  role = aws_iam_role.node-group.name
+  role       = aws_iam_role.node-group.name
 }

@@ -1,18 +1,18 @@
 resource "aws_resourcegroups_group" "main" {
-  name = "${var.project}-group"
+  name        = "${var.project}-group"
   description = "project ${var.project} - environment ${var.environment}"
 
   resource_query {
     query = jsonencode({
-      ResourceTypeFilters = [ "AWS::AllSupported" ]
+      ResourceTypeFilters = ["AWS::AllSupported"]
       TagFilters = [
         {
-          Key = "Project"
-          Values = [ var.project ]
+          Key    = "Project"
+          Values = [var.project]
         },
         {
-          Key = "Environment"
-          Values = [ var.environment ]
+          Key    = "Environment"
+          Values = [var.environment]
         }
       ]
     })

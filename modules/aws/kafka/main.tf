@@ -5,14 +5,14 @@ resource "aws_kms_key" "main" {
 }
 
 resource "aws_msk_cluster" "main" {
-  cluster_name = "${var.name}-msk"
-  kafka_version = var.kafka_version
+  cluster_name           = "${var.name}-msk"
+  kafka_version          = var.kafka_version
   number_of_broker_nodes = var.kafka_instance_count
 
   broker_node_group_info {
-    instance_type  = var.kafka_instance_type
+    instance_type   = var.kafka_instance_type
     ebs_volume_size = var.kafka_ebs_volume_size
-    client_subnets = var.kafka_vpc_subnets
+    client_subnets  = var.kafka_vpc_subnets
     security_groups = var.kafka_security_groups
   }
 
@@ -21,7 +21,7 @@ resource "aws_msk_cluster" "main" {
 
     encryption_in_transit {
       client_broker = "TLS"
-      in_cluster = true
+      in_cluster    = true
     }
   }
 
