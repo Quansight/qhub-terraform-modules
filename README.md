@@ -7,9 +7,12 @@ will ever be stored in this module.
 
 # Providers
 
- - aws
- - kuberentes
-
+ - cloud
+   - aws
+   - digitalocean
+ - applications
+   - kuberentes
+   - postgresql
 
 # Motivation
 
