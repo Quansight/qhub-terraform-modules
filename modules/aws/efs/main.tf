@@ -11,7 +11,7 @@ resource "aws_efs_file_system" "main" {
 resource "aws_efs_mount_target" "main" {
   count = length(var.efs_subnets)
 
-  mount_target_id = aws_efs_file_system.main.id
+  file_system_id = aws_efs_file_system.main.id
 
   subnet_id = var.efs_subnets[count.index]
 

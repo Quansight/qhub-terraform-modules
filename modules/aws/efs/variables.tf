@@ -12,7 +12,7 @@ variable "tags" {
 variable "efs_throughput" {
   description = "Throughput mode for EFS filesystem (busting|provisioned)"
   type        = string
-  default     = "bursing"
+  default     = "bursting"
 }
 
 variable "efs_subnets" {
