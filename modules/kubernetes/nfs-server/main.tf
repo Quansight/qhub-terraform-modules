@@ -108,3 +108,22 @@ resource "kubernetes_deployment" "main" {
     }
   }
 }
+
+
+resource "kubernetes_persistent_volume" "main" {
+  metadata {
+    name = "nfs-server-share"
+  }
+  spec {
+    capacity = {
+      storage = var.nfs_capacity
+    }
+    access_modes = ["ReadWriteMany"]
+    persistent_volume_source {
+      nfs {
+        path = "/"
+        server = "nfs-server.kube-system"
+      }
+    }
+  }
+}
