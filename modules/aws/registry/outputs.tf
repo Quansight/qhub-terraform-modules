@@ -1,4 +1,7 @@
-output "registry_url" {
-  description = "Docker registry url for image"
-  value       = aws_ecr_repository.main.repository_url
+output "credentials" {
+  description = "ECR credentials"
+  value       = {
+    arn = aws_ecr_repository.main.arn
+    repository_url = aws_ecr_repository.main.repository_url
+  }
 }
