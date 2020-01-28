@@ -1,6 +1,5 @@
 output "credentials" {
   description = "Credentials needs to connect to kubernetes instance"
-  type = map(string)
   value = {
     endpoint = digitalocean_kubernetes_cluster.main.endpoint
     token = digitalocean_kubernetes_cluster.main.kube_config[0].token

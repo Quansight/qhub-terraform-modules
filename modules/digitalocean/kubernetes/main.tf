@@ -1,9 +1,9 @@
 resource "digitalocean_kubernetes_cluster" "main" {
-  name    = "${var.cluster-name}-tf-cluster"
+  name    = var.name
   region  = var.region
 
   # Grab the latest from `doctl kubernetes options versions`
-  version = "1.16.2-do.2"
+  version = var.kubernetes_version
 
   node_pool {
     name       = local.master_node_group.name
