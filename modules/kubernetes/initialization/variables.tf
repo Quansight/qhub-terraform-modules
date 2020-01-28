@@ -6,6 +6,7 @@ variable "namespace" {
 variable "labels" {
   description = "Additional labs to apply for all resources deployed"
   type        = map(string)
+  default     = {}
 }
 
 variable "secrets" {

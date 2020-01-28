@@ -24,4 +24,3 @@ our deployments (it is not far away). This should significally reduce
 the burden of bringing up new people to help manage infrastructure and
 deployments. For advanced users provided a disciplined and automate
 all the repetitive steps.
-
