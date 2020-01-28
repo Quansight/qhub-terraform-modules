@@ -1,4 +1,4 @@
-output "eks_credentials" {
+output "credentials" {
   description = "AWS eks credentials"
   value = {
     host                   = aws_eks_cluster.main.endpoint
