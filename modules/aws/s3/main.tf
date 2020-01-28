@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "main" {
-  bucket = "${var.name}-bucket"
+  bucket = var.name
   acl    = var.public ? "public-read" : "private"
 
   versioning {
@@ -7,7 +7,7 @@ resource "aws_s3_bucket" "main" {
   }
 
   tags = merge({
-    Name        = "${var.name}-bucket"
+    Name        = var.name
     Description = "S3 bucket for ${var.name}"
   }, var.tags)
 }

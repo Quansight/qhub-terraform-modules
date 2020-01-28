@@ -1,4 +1,4 @@
-output "iam_credentials" {
+output "credentials" {
   description = "Information about specific AWS IAM user"
   value = {
     user_arn          = aws_iam_user.main.arn,

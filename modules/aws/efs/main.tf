@@ -1,11 +1,11 @@
 resource "aws_efs_file_system" "main" {
-  creation_token = "${var.name}-efs"
+  creation_token = var.name
 
   encrypted = true
 
   throughput_mode = var.efs_throughput
 
-  tags = merge({ Name = "${var.name}-efs" }, var.tags)
+  tags = merge({ Name = var.name }, var.tags)
 }
 
 resource "aws_efs_mount_target" "main" {

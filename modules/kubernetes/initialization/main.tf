@@ -13,7 +13,7 @@ resource "kubernetes_secret" "main" {
   metadata {
     name      = var.secrets[count.index].name
     namespace = var.namespace
-    labels = merge({}, var.labels)
+    labels    = merge({}, var.labels)
   }
 
   data = var.secrets[count.index].data

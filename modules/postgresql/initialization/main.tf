@@ -16,6 +16,10 @@ resource "postgresql_role" "main" {
 }
 
 resource "postgresql_database" "main" {
+  depends_on = [
+    postgresql_role.main
+  ]
+
   count = length(var.postgresql_additional_users)
 
   name  = var.postgresql_additional_users[count.index].database

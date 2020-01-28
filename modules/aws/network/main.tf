@@ -5,7 +5,7 @@ resource "aws_vpc" "main" {
   enable_dns_hostnames = true
   enable_classiclink   = false
 
-  tags = merge({ Name = "${var.name}-vpc" }, var.tags, var.vpc_additional_tags)
+  tags = merge({ Name = var.name }, var.tags, var.vpc_tags)
 }
 
 resource "aws_subnet" "main" {
@@ -15,13 +15,13 @@ resource "aws_subnet" "main" {
   cidr_block        = cidrsubnet(var.vpc_cidr_block, 8, count.index)
   vpc_id            = aws_vpc.main.id
 
-  tags = merge({ Name = "${var.name}-subnet-${count.index}" }, var.tags, var.vpc_subnet_additional_tags)
+  tags = merge({ Name = "${var.name}-subnet-${count.index}" }, var.tags, var.subnet_tags)
 }
 
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 
-  tags = merge({ Name = "${var.name}-internet-gateway" }, var.tags)
+  tags = merge({ Name = var.name }, var.tags)
 }
 
 resource "aws_route_table" "main" {
@@ -32,7 +32,7 @@ resource "aws_route_table" "main" {
     gateway_id = aws_internet_gateway.main.id
   }
 
-  tags = merge({ Name = "${var.name}-route-table" }, var.tags)
+  tags = merge({ Name = var.name }, var.tags)
 }
 
 resource "aws_route_table_association" "main" {
@@ -43,7 +43,7 @@ resource "aws_route_table_association" "main" {
 }
 
 resource "aws_security_group" "main" {
-  name        = "${var.name}-security-group"
+  name        = var.name
   description = "Main security group for infrastructure deployment"
 
   vpc_id = aws_vpc.main.id
@@ -55,5 +55,5 @@ resource "aws_security_group" "main" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = merge({ Name = "${var.name}-security-group" }, var.tags)
+  tags = merge({ Name = var.name }, var.tags, var.security_group_tags)
 }

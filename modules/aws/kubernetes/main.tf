@@ -1,5 +1,5 @@
 resource "aws_eks_cluster" "main" {
-  name     = "${var.name}-cluster"
+  name     = var.name
   role_arn = aws_iam_role.cluster.arn
 
   vpc_config {
@@ -9,9 +9,7 @@ resource "aws_eks_cluster" "main" {
 
   depends_on = [aws_iam_role_policy_attachment.cluster-policy]
 
-  tags = merge({
-    Name = "${var.name}-cluster"
-  }, var.tags)
+  tags = merge({ Name = var.name }, var.tags)
 }
 
 
@@ -36,9 +34,9 @@ resource "aws_eks_node_group" "main" {
   # properly delete EC2 Instances and Elastic Network Interfaces.
   depends_on = [aws_iam_role_policy_attachment.node-group-policy]
 
-  tags = {
-    "kubernetes.io/cluster/${var.name}-cluster" = "shared"
-  }
+  tags = merge({
+    "kubernetes.io/cluster/${var.name}" = "shared"
+  }, var.tags)
 }
 
 data "aws_eks_cluster_auth" "main" {

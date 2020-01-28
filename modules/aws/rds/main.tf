@@ -1,5 +1,5 @@
 resource "aws_rds_cluster" "main" {
-  cluster_identifier = "${var.name}-rds-cluster"
+  cluster_identifier = var.name
 
   engine = var.rds_database_engine
 
@@ -17,7 +17,7 @@ resource "aws_rds_cluster" "main" {
   apply_immediately = true
 
   tags = merge({
-    Name        = "${var.name}-rds-cluster"
+    Name        = var.name
     Description = "RDS database for ${var.name}-rds-cluster"
   }, var.tags)
 }
@@ -31,4 +31,9 @@ resource "aws_rds_cluster_instance" "main" {
   publicly_accessible = true
 
   engine = var.rds_database_engine
+
+  tags = merge({
+    Name        = "${var.name}-cluster-instance-${count.index}"
+    Description = "RDS database for ${var.name}-rds-cluster instances"
+  }, var.tags)
 }

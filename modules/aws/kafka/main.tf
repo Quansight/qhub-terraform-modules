@@ -1,11 +1,11 @@
 resource "aws_kms_key" "main" {
-  description = "${var.name}-kms"
+  description = var.name
 
-  tags = merge({ Name = "${var.name}-kms" }, var.tags)
+  tags = merge({ Name = var.name }, var.tags)
 }
 
 resource "aws_msk_cluster" "main" {
-  cluster_name           = "${var.name}-msk"
+  cluster_name           = var.name
   kafka_version          = var.kafka_version
   number_of_broker_nodes = var.kafka_instance_count
 
@@ -25,5 +25,5 @@ resource "aws_msk_cluster" "main" {
     }
   }
 
-  tags = merge({ Name = "${var.name}-msk" }, var.tags)
+  tags = merge({ Name = var.name }, var.tags)
 }

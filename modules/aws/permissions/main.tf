@@ -25,7 +25,7 @@ data "aws_iam_policy_document" "main" {
 }
 
 resource "aws_iam_policy" "main" {
-  name   = "${var.name}-iam-policy"
+  name   = var.name
   path   = "/"
   policy = data.aws_iam_policy_document.main.json
 }

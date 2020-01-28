@@ -4,19 +4,25 @@ variable "name" {
 }
 
 variable "tags" {
-  description = "Additional tags to apply to network resources"
+  description = "Additional tags to apply to all network resource"
   type        = map(string)
   default     = {}
 }
 
-variable "vpc_additional_tags" {
-  description = "Additional tags to apply specifically to vpc"
+variable "vpc_tags" {
+  description = "Additional tags to apply to vpc network resource"
   type        = map(string)
   default     = {}
 }
 
-variable "vpc_subnet_additional_tags" {
-  description = "Additional tags to apply specifically to vpc subnet"
+variable "subnet_tags" {
+  description = "Additional tags to apply to subnet network resources"
+  type        = map(string)
+  default     = {}
+}
+
+variable "security_group_tags" {
+  description = "Additional tags to apply to security group network resource"
   type        = map(string)
   default     = {}
 }
