@@ -23,7 +23,7 @@ resource "digitalocean_kubernetes_node_pool" "main" {
   name       = local.additional_node_groups[count.index].name
   size       = lookup(local.additional_node_groups[count.index], "size", "s-1vcpu-2gb")
 
-  auto_scale = true
+  auto_scale = lookup(local.additional_node_groups[count.index], "auto_scale", true)
   min_nodes = lookup(local.additional_node_groups[count.index], "min_nodes", 1)
   max_nodes = lookup(local.additional_node_groups[count.index], "max_nodes", 1)
 
