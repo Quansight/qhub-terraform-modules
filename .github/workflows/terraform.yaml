@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 'Event Name'
-        run: echo $GITHUB_EVENT_NAME
+        run: echo $GITHUB_EVENT_NAME $tfComment
       - name: 'Checkout'
         uses: actions/checkout@master
       - name: 'Terraform Format'
