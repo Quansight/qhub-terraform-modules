@@ -1,6 +1,6 @@
 resource "kubernetes_persistent_volume_claim" "main" {
   metadata {
-    name = "nfs-server-storage"
+    name      = "nfs-server-storage"
     namespace = "kube-system"
   }
 
@@ -45,7 +45,7 @@ resource "kubernetes_service" "main" {
 
 resource "kubernetes_deployment" "main" {
   metadata {
-    name = "nfs-server"
+    name      = "nfs-server"
     namespace = "kube-system"
     labels = {
       role = "nfs-server"
@@ -70,21 +70,21 @@ resource "kubernetes_deployment" "main" {
 
       spec {
         container {
-          name = "nfs-server"
+          name  = "nfs-server"
           image = "gcr.io/google_containers/volume-nfs:0.8"
 
           port {
-            name = "nfs"
+            name           = "nfs"
             container_port = 2049
           }
 
           port {
-            name = "mountd"
+            name           = "mountd"
             container_port = 20048
           }
 
           port {
-            name = "rpcbind"
+            name           = "rpcbind"
             container_port = 111
           }
 
@@ -94,7 +94,7 @@ resource "kubernetes_deployment" "main" {
 
           volume_mount {
             mount_path = "/exports"
-            name = "nfs-export-fast"
+            name       = "nfs-export-fast"
           }
         }
 
@@ -121,7 +121,7 @@ resource "kubernetes_persistent_volume" "main" {
     access_modes = ["ReadWriteMany"]
     persistent_volume_source {
       nfs {
-        path = "/"
+        path   = "/"
         server = "nfs-server.kube-system"
       }
     }
