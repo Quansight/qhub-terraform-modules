@@ -19,6 +19,6 @@ jobs:
           tf_actions_version: 'latest'
           tf_actions_subcommand: 'fmt'
           tf_actions_working_dir: '.'
-          tf_actions_comment: true
+          tf_actions_comment: "1"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
