@@ -11,6 +11,8 @@ jobs:
     name: 'Terraform'
     runs-on: ubuntu-latest
     steps:
+      - name: 'Event Name'
+        run: echo $GITHUB_EVENT_NAME
       - name: 'Checkout'
         uses: actions/checkout@master
       - name: 'Terraform Format'
