@@ -13,3 +13,5 @@ variable "postgresql_extensions" {
   type        = list(string)
   default     = []
 }
+
+asdf as df asdf;;;;;
