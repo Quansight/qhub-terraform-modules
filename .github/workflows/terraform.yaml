@@ -1,0 +1,19 @@
+name: 'Terraform Validation'
+on: [push, pull_request]
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Event Name'
+        run: echo $GITHUB_EVENT_NAME $tfComment
+      - name: 'Checkout'
+        uses: actions/checkout@master
+      - name: 'Terraform Format'
+        uses: hashicorp/terraform-github-actions@master
+        with:
+          tf_actions_version: "0.12.13"
+          tf_actions_subcommand: 'fmt'
+          tf_actions_working_dir: '.'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
