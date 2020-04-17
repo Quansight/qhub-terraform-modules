@@ -1,4 +1,4 @@
-# Quansight Terraform Modules
+# QHub Terraform Modules
 
 Repository to manage deployments of Quansight and customer terraform
 modules. This repository holds the modules (not deployments) to allow
