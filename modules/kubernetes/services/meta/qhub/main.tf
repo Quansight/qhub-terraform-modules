@@ -36,10 +36,7 @@ module "kubernetes-jupyterhub" {
           "${var.user-node-group.key}" = var.user-node-group.value
         }
 
-        image = {
-          name = var.user-image.name
-          tag  = var.user-image.tag
-        }
+        image = var.jupyterlab-image
 
         storage = {
           static = {
@@ -83,10 +80,13 @@ module "kubernetes-dask-gateway" {
     jsonencode({
       gateway = {
         clusterManager = {
-          image = {
-            name = var.user-image.name
-            tag  = var.user-image.tag
-          }
+
+          # Since we are using autoscaling nodes and pods take
+          # longer to spin up
+          clusterStartTimeout = 300 # 5 minutes
+          workerStartTimeout  = 300 # 5 minutes
+
+          image = var.dask-worker-image
 
           scheduler = {
             extraPodConfig = {

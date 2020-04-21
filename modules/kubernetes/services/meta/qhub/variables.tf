@@ -18,8 +18,16 @@ variable "external-url" {
   type        = string
 }
 
-variable "user-image" {
-  description = "Docker image to use for jupyterlab users and dask workers"
+variable "jupyterlab-image" {
+  description = "Docker image to use for jupyterlab users"
+  type = object({
+    name = string
+    tag  = string
+  })
+}
+
+variable "dask-worker-image" {
+  description = "Docker image to use for dask worker image"
   type = object({
     name = string
     tag  = string
