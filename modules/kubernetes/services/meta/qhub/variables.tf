@@ -18,6 +18,14 @@ variable "external-url" {
   type        = string
 }
 
+variable "jupyterhub-image" {
+  description = "Docker image to use for jupyterhub hub"
+  type = object({
+    name = string
+    tag  = string
+  })
+}
+
 variable "jupyterlab-image" {
   description = "Docker image to use for jupyterlab users"
   type = object({

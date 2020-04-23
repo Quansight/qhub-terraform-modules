@@ -10,6 +10,8 @@ module "kubernetes-jupyterhub" {
           "${var.general-node-group.key}" = var.general-node-group.value
         }
 
+        image = var.jupyterhub-image
+
         services = {
           "dask-gateway" = {
             apiToken = module.kubernetes-dask-gateway.jupyterhub_api_token
