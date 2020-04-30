@@ -70,3 +70,9 @@ variable "jupyterhub-overrides" {
   description = "Jupyterhub helm overrides"
   type        = list(string)
 }
+
+variable "dask-gateway-overrides" {
+  description = "Dask Worker helm overrides"
+  type        = list(string)
+  default     = []
+}

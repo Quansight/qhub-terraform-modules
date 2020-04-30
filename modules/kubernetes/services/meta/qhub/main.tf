@@ -78,7 +78,7 @@ module "kubernetes-dask-gateway" {
 
   external_endpoint = "https://${var.external-url}"
 
-  overrides = [
+  overrides = concat(var.dask-gateway-overrides, [
     jsonencode({
       gateway = {
         clusterManager = {
@@ -103,7 +103,7 @@ module "kubernetes-dask-gateway" {
         }
       }
     })
-  ]
+  ])
 }
 
 resource "kubernetes_config_map" "dask-etc" {
