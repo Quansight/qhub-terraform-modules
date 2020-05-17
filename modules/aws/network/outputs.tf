@@ -12,3 +12,7 @@ output "vpc_id" {
   description = "AWS VPC id"
   value       = aws_vpc.main.id
 }
+
+output "depended_on" {
+  value = "${null_resource.dependency_setter.id}-${timestamp()}"
+}

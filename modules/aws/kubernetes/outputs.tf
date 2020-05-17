@@ -7,3 +7,11 @@ output "credentials" {
     aws_eks_cluster.main.certificate_authority.0.data)
   }
 }
+
+output "node_groups_arn" {
+  value = aws_eks_node_group.main[*].arn
+}
+
+output "depended_on" {
+  value = "${null_resource.dependency_setter.id}-${timestamp()}"
+}

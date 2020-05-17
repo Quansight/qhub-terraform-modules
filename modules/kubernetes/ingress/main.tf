@@ -1,3 +1,9 @@
+resource "null_resource" "dependency_getter" {
+  triggers = {
+    my_dependencies = join(",", var.dependencies)
+  }
+}
+
 resource "helm_release" "ingress" {
   name      = "ingress"
   namespace = var.namespace
@@ -30,6 +36,10 @@ resource "helm_release" "ingress" {
       }
     }),
   ], var.overrides)
+
+  depends_on = [
+    null_resource.dependency_getter
+  ]
 }
 
 data "kubernetes_service" "ingress" {
@@ -39,4 +49,11 @@ data "kubernetes_service" "ingress" {
     name      = "ingress-nginx-ingress-controller"
     namespace = var.namespace
   }
+}
+
+resource "null_resource" "dependency_setter" {
+  depends_on = [
+    helm_release.ingress
+    # List resource(s) that will be constructed last within the module.
+  ]
 }
