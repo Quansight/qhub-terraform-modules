@@ -1,3 +1,9 @@
+resource "null_resource" "dependency_getter" {
+  triggers = {
+    my_dependencies = join(",", var.dependencies)
+  }
+}
+
 module "kubernetes-jupyterhub" {
   source = "../../jupyterhub"
 
@@ -69,6 +75,8 @@ module "kubernetes-jupyterhub" {
       }
     })
   ])
+
+  dependencies = var.dependencies
 }
 
 module "kubernetes-dask-gateway" {
@@ -104,6 +112,8 @@ module "kubernetes-dask-gateway" {
       }
     })
   ])
+
+  dependencies = concat(var.dependencies, [module.kubernetes-jupyterhub.depended_on])
 }
 
 resource "kubernetes_config_map" "dask-etc" {
@@ -116,6 +126,7 @@ resource "kubernetes_config_map" "dask-etc" {
     "gateway.yaml"   = jsonencode(module.kubernetes-dask-gateway.config)
     "dashboard.yaml" = jsonencode({})
   }
+  depends_on = [null_resource.dependency_getter]
 }
 
 resource "kubernetes_ingress" "dask-gateway" {
@@ -159,4 +170,12 @@ resource "kubernetes_ingress" "dask-gateway" {
       hosts       = [var.external-url]
     }
   }
+
+  depends_on = [null_resource.dependency_getter]
+}
+
+resource "null_resource" "dependency_setter" {
+  depends_on = [
+    # List resource(s) that will be constructed last within the module.
+  ]
 }

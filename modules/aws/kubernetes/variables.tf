@@ -47,3 +47,9 @@ variable "node_group_instance_type" {
   type        = string
   default     = "m5.large"
 }
+
+variable "dependencies" {
+  description = "A list of module dependencies to be injected in the module"
+  type        = list(any)
+  default     = []
+}

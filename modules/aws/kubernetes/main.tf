@@ -1,3 +1,9 @@
+resource "null_resource" "dependency_getter" {
+  triggers = {
+    my_dependencies = join(",", var.dependencies)
+  }
+}
+
 resource "aws_eks_cluster" "main" {
   name     = var.name
   role_arn = aws_iam_role.cluster.arn
@@ -7,7 +13,10 @@ resource "aws_eks_cluster" "main" {
     subnet_ids         = var.cluster_subnets
   }
 
-  depends_on = [aws_iam_role_policy_attachment.cluster-policy]
+  depends_on = [
+    aws_iam_role_policy_attachment.cluster-policy,
+    null_resource.dependency_getter
+  ]
 
   tags = merge({ Name = var.name }, var.tags)
 }
@@ -32,7 +41,10 @@ resource "aws_eks_node_group" "main" {
   # Ensure that IAM Role permissions are created before and deleted
   # after EKS Node Group handling.  Otherwise, EKS will not be able to
   # properly delete EC2 Instances and Elastic Network Interfaces.
-  depends_on = [aws_iam_role_policy_attachment.node-group-policy]
+  depends_on = [
+    aws_iam_role_policy_attachment.node-group-policy,
+    null_resource.dependency_getter
+  ]
 
   tags = merge({
     "kubernetes.io/cluster/${var.name}" = "shared"
@@ -41,4 +53,11 @@ resource "aws_eks_node_group" "main" {
 
 data "aws_eks_cluster_auth" "main" {
   name = aws_eks_cluster.main.name
+}
+
+resource "null_resource" "dependency_setter" {
+  depends_on = [
+    aws_eks_node_group.main
+    # List resource(s) that will be constructed last within the module.
+  ]
 }

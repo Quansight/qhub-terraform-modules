@@ -1,3 +1,9 @@
+resource "null_resource" "dependency_getter" {
+  triggers = {
+    my_dependencies = join(",", var.dependencies)
+  }
+}
+
 resource "aws_vpc" "main" {
   cidr_block = var.vpc_cidr_block
 
@@ -5,23 +11,27 @@ resource "aws_vpc" "main" {
   enable_dns_hostnames = true
   enable_classiclink   = false
 
-  tags = merge({ Name = var.name }, var.tags, var.vpc_tags)
+  tags       = merge({ Name = var.name }, var.tags, var.vpc_tags)
+  depends_on = [null_resource.dependency_getter]
 }
 
 resource "aws_subnet" "main" {
   count = length(var.aws_availability_zones)
 
-  availability_zone = var.aws_availability_zones[count.index]
-  cidr_block        = cidrsubnet(var.vpc_cidr_block, 8, count.index)
-  vpc_id            = aws_vpc.main.id
+  availability_zone       = var.aws_availability_zones[count.index]
+  cidr_block              = cidrsubnet(var.vpc_cidr_block, 8, count.index)
+  vpc_id                  = aws_vpc.main.id
+  map_public_ip_on_launch = true
 
-  tags = merge({ Name = "${var.name}-subnet-${count.index}" }, var.tags, var.subnet_tags)
+  tags       = merge({ Name = "${var.name}-subnet-${count.index}" }, var.tags, var.subnet_tags)
+  depends_on = [null_resource.dependency_getter]
 }
 
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 
-  tags = merge({ Name = var.name }, var.tags)
+  tags       = merge({ Name = var.name }, var.tags)
+  depends_on = [null_resource.dependency_getter]
 }
 
 resource "aws_route_table" "main" {
@@ -32,7 +42,8 @@ resource "aws_route_table" "main" {
     gateway_id = aws_internet_gateway.main.id
   }
 
-  tags = merge({ Name = var.name }, var.tags)
+  tags       = merge({ Name = var.name }, var.tags)
+  depends_on = [null_resource.dependency_getter]
 }
 
 resource "aws_route_table_association" "main" {
@@ -40,6 +51,7 @@ resource "aws_route_table_association" "main" {
 
   subnet_id      = aws_subnet.main[count.index].id
   route_table_id = aws_route_table.main.id
+  depends_on     = [null_resource.dependency_getter]
 }
 
 resource "aws_security_group" "main" {
@@ -62,5 +74,18 @@ resource "aws_security_group" "main" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = merge({ Name = var.name }, var.tags, var.security_group_tags)
+  tags       = merge({ Name = var.name }, var.tags, var.security_group_tags)
+  depends_on = [null_resource.dependency_getter]
+}
+
+resource "null_resource" "dependency_setter" {
+  depends_on = [
+    aws_vpc.main,
+    aws_subnet.main,
+    aws_internet_gateway.main,
+    aws_route_table.main,
+    aws_route_table_association.main,
+    aws_security_group.main,
+    # List resource(s) that will be constructed last within the module.
+  ]
 }

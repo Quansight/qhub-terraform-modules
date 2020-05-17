@@ -1,3 +1,9 @@
+resource "null_resource" "dependency_getter" {
+  triggers = {
+    my_dependencies = join(",", var.dependencies)
+  }
+}
+
 data "helm_repository" "dask-gateway" {
   name = "dask-gateway"
   url  = "https://dask.org/dask-gateway-helm-repo/"
@@ -44,4 +50,13 @@ resource "helm_release" "dask-gateway" {
     name  = "gateway.auth.jupyterhub.apiToken"
     value = random_password.jupyterhub_api_token.result
   }
+  depends_on = [
+    null_resource.dependency_getter
+  ]
+}
+
+resource "null_resource" "dependency_setter" {
+  depends_on = [
+    # List resource(s) that will be constructed last within the module.
+  ]
 }
