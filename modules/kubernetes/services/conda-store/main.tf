@@ -132,7 +132,7 @@ resource "kubernetes_deployment" "main" {
 
         volume {
           name = "conda-environments"
-          configMap = {
+          config_map {
             name = kubernetes_config_map.conda-environments.metadata.0.name
           }
         }
