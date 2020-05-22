@@ -53,6 +53,12 @@ module "kubernetes-jupyterhub" {
 
           extraVolumes = [
             {
+              name = "conda-store"
+              persistentVolumeClaim = {
+                claimName = var.conda-store-pvc
+              }
+            },
+            {
               name = "etc-dask"
               configMap = {
                 name = kubernetes_config_map.dask-etc.metadata.0.name
@@ -61,6 +67,10 @@ module "kubernetes-jupyterhub" {
           ]
 
           extraVolumeMounts = [
+            {
+              name      = "conda-store"
+              mountPath = "/home/conda"
+            },
             {
               name      = "etc-dask"
               mountPath = "/etc/dask"

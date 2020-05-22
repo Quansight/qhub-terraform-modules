@@ -22,7 +22,7 @@ resource "kubernetes_service" "main" {
 
   spec {
     selector = {
-      role = "${var.name}-nfs"
+      role = "${var.name}-conda-store"
     }
 
     port {

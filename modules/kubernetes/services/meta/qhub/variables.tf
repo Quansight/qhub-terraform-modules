@@ -13,6 +13,11 @@ variable "home-pvc" {
   type        = string
 }
 
+variable "conda-store-pvc" {
+  description = "Name for persistent volume claim to use for conda-store directory"
+  type        = string
+}
+
 variable "external-url" {
   description = "External url that jupyterhub cluster is accessible"
   type        = string
