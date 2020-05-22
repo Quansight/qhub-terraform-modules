@@ -6,7 +6,7 @@ resource "null_resource" "dependency_getter" {
 
 resource "kubernetes_storage_class" "main" {
   metadata {
-    name = "nfs-class"
+    name = "${var.name}-${var.namespace}-share"
   }
 
   storage_provisioner = "kubernetes.io/fake-nfs"
@@ -16,7 +16,7 @@ resource "kubernetes_storage_class" "main" {
 
 resource "kubernetes_persistent_volume" "main" {
   metadata {
-    name = "nfs-server-share-${var.namespace}"
+    name = "${var.name}-${var.namespace}-share"
   }
   spec {
     capacity = {
@@ -37,13 +37,13 @@ resource "kubernetes_persistent_volume" "main" {
 
 resource "kubernetes_persistent_volume_claim" "main" {
   metadata {
-    name      = "nfs-server-share-${var.namespace}"
+    name      = "${var.name}-${var.namespace}-share"
     namespace = var.namespace
   }
 
   spec {
     access_modes       = ["ReadWriteMany"]
-    storage_class_name = "nfs-class"
+    storage_class_name = kubernetes_storage_class.main.metadata.0.name
     resources {
       requests = {
         storage = var.nfs_capacity
