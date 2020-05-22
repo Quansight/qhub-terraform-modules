@@ -22,7 +22,7 @@ resource "kubernetes_persistent_volume" "main" {
     capacity = {
       storage = var.nfs_capacity
     }
-    storage_class_name = "nfs-class"
+    storage_class_name = kubernetes_storage_class.main.metadata.0.name
     access_modes       = ["ReadWriteMany"]
     persistent_volume_source {
       nfs {
