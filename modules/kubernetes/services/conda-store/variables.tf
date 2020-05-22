@@ -13,3 +13,9 @@ variable "nfs_capacity" {
   type        = string
   default     = "10Gi"
 }
+
+variable "environments" {
+  description = "conda environments for conda-store to build"
+  type        = map(any)
+  default     = {}
+}

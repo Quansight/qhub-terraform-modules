@@ -147,29 +147,5 @@ resource "kubernetes_config_map" "conda-environments" {
     namespace = var.namespace
   }
 
-  data = {
-    "environment1.yaml" = jsonencode({
-      name = "env-name-1"
-      channels = [
-        "conda-forge"
-      ]
-      dependencies = [
-        "python=3.7",
-        "dask",
-        "numba",
-      ]
-    })
-
-    "environment2.yaml" = jsonencode({
-      name = "env-name-2"
-      channels = [
-        "conda-forge"
-      ]
-      dependencies = [
-        "python=3.7",
-        "flask",
-        "jinja2",
-      ]
-    })
-  }
+  data = var.environments
 }
