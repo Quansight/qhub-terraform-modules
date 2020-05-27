@@ -114,8 +114,24 @@ module "kubernetes-dask-gateway" {
             }
           }
           worker = {
+            extraContainerConfig = {
+              volumeMounts = [
+                {
+                  name      = "conda-store"
+                  mountPath = "/home/conda"
+                }
+              ]
+            }
             extraPodConfig = {
               affinity = local.affinity.worker-nodegroup
+              volumes = [
+                {
+                  name = "conda-store"
+                  persistentVolumeClaim = {
+                    claimName = var.conda-store-pvc
+                  }
+                }
+              ]
             }
           }
         }
