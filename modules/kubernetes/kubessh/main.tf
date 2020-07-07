@@ -5,7 +5,7 @@ resource "tls_private_key" "kubessh_private_key" {
 
 resource "kubessh_key_pair" "generated_key" {
   key_name   = var.key_name
-  public_key = tls_private_key.kubessh_private_key.private_key_pem"
+  public_key = "${tls_private_key.kubessh_private_key.private_key_pem}"
 }
 
 resource "null_resource" "dependency_getter" {
