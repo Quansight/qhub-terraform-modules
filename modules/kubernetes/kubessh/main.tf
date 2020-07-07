@@ -1,13 +1,11 @@
-variable "key_name" {}
-
 resource "tls_private_key" "kubessh_private_key" {
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
 resource "kubessh_key_pair" "generated_key" {
-  key_name   = "${var.key_name}"
-  public_key = "${tls_private_key.kubessh_private_key.public_key_openssh}"
+  key_name   = var.key_name
+  public_key = tls_private_key.kubessh_private_key.private_key_pem"
 }
 
 resource "null_resource" "dependency_getter" {
@@ -27,7 +25,7 @@ resource "helm_release" "kubessh" {
 
   repository = data.helm_repository.kubessh.metadata[0].name
   chart      = "kubessh"
-  version    = "0.1"
+  version    = "0.0.1-n001.h2068e92"
 
   values = concat([
     file("${path.module}/values.yaml")

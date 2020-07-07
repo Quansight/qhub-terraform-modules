@@ -4,6 +4,12 @@ variable "name" {
   default     = "kubessh"
 }
 
+variable "key_name" {
+  description = "Name of private key"
+  type        = string
+  default     = "kubessh_key"
+}
+
 variable "namespace" {
   description = "Namespace for kubessh deployment"
   type        = string
