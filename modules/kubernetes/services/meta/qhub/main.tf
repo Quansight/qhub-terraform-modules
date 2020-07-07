@@ -89,6 +89,15 @@ module "kubernetes-jupyterhub" {
   dependencies = var.dependencies
 }
 
+module "kubernetes-kubessh" {
+  source = "../../kubessh"
+
+  namespace = var.kubessh-namespace
+
+  dependencies = var.dependencies
+}
+
+
 module "kubernetes-dask-gateway" {
   source = "../../dask-gateway"
 
