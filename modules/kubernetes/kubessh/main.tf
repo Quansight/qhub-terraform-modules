@@ -23,8 +23,14 @@ resource "helm_release" "kubessh" {
   version    = "0.0.1-n001.h2068e92"
 
   values = concat([
-    yamlencode({
-      "hostKey" = "${tls_private_key.kubessh_private_key.private_key_pem}"
+    jsonencode({
+      hostKey = tls_private_key.kubessh_private_key.private_key_pem
+
+      service = {
+        type     = "ClusterIP"
+        port     = 22
+        nodePort = 22
+      }
     }),
   ], var.overrides)
 
