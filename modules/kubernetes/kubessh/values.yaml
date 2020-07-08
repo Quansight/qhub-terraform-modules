@@ -1,5 +1,0 @@
-kubessh:
-  hostkey: {}
-  auth:
-    github:
-      allowedUsers: {}
