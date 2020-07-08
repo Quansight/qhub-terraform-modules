@@ -8,11 +8,6 @@ variable "namespace" {
   type        = string
 }
 
-variable "kubessh-namespace" {
-  description = "Namespace for Kubessh"
-  type        = string
-}
-
 variable "home-pvc" {
   description = "Name for persistent volume claim to use for home directory uses /home/{username}"
   type        = string
@@ -79,12 +74,6 @@ variable "worker-node-group" {
 variable "jupyterhub-overrides" {
   description = "Jupyterhub helm overrides"
   type        = list(string)
-}
-
-variable "kubessh-overrides" {
-  description = "Dask Worker helm overrides"
-  type        = list(string)
-  default     = []
 }
 
 variable "dask-gateway-overrides" {
