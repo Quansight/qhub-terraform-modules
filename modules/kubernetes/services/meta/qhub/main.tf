@@ -109,8 +109,24 @@ module "kubernetes-dask-gateway" {
           image = var.dask-worker-image
 
           scheduler = {
+            extraContainerConfig = {
+              volumeMounts = [
+                {
+                  name      = "conda-store"
+                  mountPath = "/home/conda"
+                }
+              ]
+            }
             extraPodConfig = {
               affinity = local.affinity.worker-nodegroup
+              volumes = [
+                {
+                  name = "conda-store"
+                  persistentVolumeClaim = {
+                    claimName = var.conda-store-pvc
+                  }
+                }
+              ]
             }
           }
           worker = {
