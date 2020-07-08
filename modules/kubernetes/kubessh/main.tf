@@ -3,11 +3,6 @@ resource "tls_private_key" "kubessh_private_key" {
   rsa_bits  = 4096
 }
 
-resource "kubessh_key_pair" "generated_key" {
-  key_name   = var.key_name
-  public_key = "${tls_private_key.kubessh_private_key.private_key_pem}"
-}
-
 resource "null_resource" "dependency_getter" {
   triggers = {
     my_dependencies = join(",", var.dependencies)
@@ -28,7 +23,9 @@ resource "helm_release" "kubessh" {
   version    = "0.0.1-n001.h2068e92"
 
   values = concat([
-    file("${path.module}/values.yaml")
+    yamlencode({
+      "hostKey" = "${tls_private_key.kubessh_private_key.private_key_pem}"
+    }),
   ], var.overrides)
 
   depends_on = [
