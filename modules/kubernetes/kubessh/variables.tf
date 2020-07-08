@@ -9,11 +9,6 @@ variable "namespace" {
   type        = string
 }
 
-variable "external_endpoint" {
-  description = "External endpoint of kubessh exposed"
-  type        = string
-}
-
 variable "overrides" {
   description = "kubessh helm chart list of overrides"
   type        = list(string)
