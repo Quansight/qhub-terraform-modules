@@ -18,6 +18,9 @@
 
 // The safer-cluster module is based on a private cluster, with a several
 // settings set to recommended values by default.
+data "google_client_config" "main" {
+}
+
 module "gke" {
   source             = "../beta-private-cluster/"
   project_id         = var.project_id

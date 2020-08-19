@@ -126,3 +126,8 @@ output "peering_name" {
   description = "The name of the peering between this cluster and the Google owned VPC."
   value       = module.gke.peering_name
 }
+
+output "token" {
+  description = "Token required for connecting to kubernets cluster"
+  token    = data.google_client_config.main.access_token
+}
