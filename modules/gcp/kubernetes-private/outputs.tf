@@ -129,5 +129,5 @@ output "peering_name" {
 
 output "token" {
   description = "Token required for connecting to kubernets cluster"
-  token    = data.google_client_config.main.access_token
+  value       = data.google_client_config.main.access_token
 }
