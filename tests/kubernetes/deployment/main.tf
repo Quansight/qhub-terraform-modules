@@ -1,4 +1,9 @@
+provider "kubernetes" {
+  config_context = "minikube"
+}
+
 provider "kubernetes-alpha" {
+  config_path = "~/.kube/config"
   config_context = "minikube"
 }
 
@@ -8,16 +13,23 @@ resource "kubernetes_namespace" "main" {
   }
 }
 
-module "dask-gateway" {
-  source = "../dask-gateway"
+module "traefik" {
+  source = "../traefik"
 
-  name = "terraform-qhub-daskgateway"
+  name = "terraform-traefik"
   namespace = var.namespace
 }
 
-module "jupyterhub" {
-  source = "../jupyterhub"
+# module "dask-gateway" {
+#   source = "../dask-gateway"
 
-  name = "terraform-qhub-jupyterhub"
-  namespace = var.namespace
-}
+#   name = "terraform-qhub-daskgateway"
+#   namespace = var.namespace
+# }
+
+# module "jupyterhub" {
+#   source = "../jupyterhub"
+
+#   name = "terraform-qhub-jupyterhub"
+#   namespace = var.namespace
+# }

@@ -1,26 +1,24 @@
 resource "kubernetes_service" "main" {
-  metadata = {
+  metadata {
     name = var.name
     namespace = var.namespace
   }
 
   spec {
     selector = {
-      app = "traefik"
+      "app.kubernetes.io/component" = "traefik"
     }
 
     port {
       name        = "web"
       target_port = 8000
       port        = 8000
-      node_port   = 9001
     }
 
     port {
       name        = "tcp"
       target_port = 8786
       port        = 8786
-      node_port   = 9002
     }
 
     port {
@@ -29,12 +27,11 @@ resource "kubernetes_service" "main" {
       port        = 9000
     }
 
-    type = "LoadBalancer"
+    type = "NodePort"
   }
 }
 
 
-##### convert https://github.com/dask/dask-gateway/blob/master/resources/helm/dask-gateway/templates/traefik/deployment.yaml
 resource "kubernetes_deployment" "main" {
   metadata {
     name = var.name
@@ -46,83 +43,87 @@ resource "kubernetes_deployment" "main" {
 
     selector {
       match_labels = {
-        app = "traefik"
+        "app.kubernetes.io/component" = "traefik"
       }
     }
 
     template {
       metadata {
         labels = {
-          app = "traefik"
+          "app.kubernetes.io/component" = "traefik"
         }
       }
 
       spec {
-        volume {
-          name = "configmap"
-          config_map = {
-            name = kubernetes_config_map.main.metadata.0.name
-          }
-        }
+        service_account_name = kubernetes_service_account.main.metadata.0.name
+
+        termination_grace_period_seconds = 60
 
         container {
-          image = "${var.gateway-image.image}:${var.gateway-image.tag}"
+          image = "${var.traefik-image.image}:${var.traefik-image.tag}"
           name  = var.name
 
-          command = [
-            "dask-gateway-server",
-            "--config",
-            "/etc/dask-gateway/dask_gateway_config.py"
-          ]
-
-          volume_mount {
-            name = "configmap"
-            mount_path = "/etc/dask-gateway/"
+          security_context {
+            run_as_user = 1000
+            run_as_group = 1000
           }
 
-          env {
-            name  = "JUPYTERHUB_API_TOKEN"
-            value = random_password.jupyterhub_api_token
+          args = [
+            "--global.checknewversion=False",
+            "--global.sendanonymoususage=False",
+            "--ping=true",
+            "--providers.kubernetescrd",
+            # "--providers.kubernetescrd.labelselector=gateway.dask.org/instance=${ include "dask-gateway.fullname"}",
+            "--providers.kubernetescrd.throttleduration=2",
+            "--log.level=${var.loglevel}",
+            "--entryPoints.traefik.address=:9000",
+            "--entryPoints.web.address=:8000",
+            # {{- if ne (toString .Values.traefik.service.ports.tcp.port) "web" }}
+            "--entryPoints.tcp.address=:8786",
+            # dashboard
+            "--api.dashboard=true",
+            "--api.insecure=true"
+          ]
+
+          port {
+            name = "traefik"
+            container_port = 9000
           }
 
           port {
-            name = "api"
+            name = "web"
             container_port = 8000
           }
 
-          resources {
-            limits {
-              cpu    = "0.5"
-              memory = "512Mi"
-            }
-            requests {
-              cpu    = "250m"
-              memory = "50Mi"
-            }
+          port {
+            name = "tcp"
+            container_port = 8786
           }
 
           liveness_probe {
             http_get {
-              path = "/api/health"
-              port = "api"
+              path = "/ping"
+              port = 9000
             }
 
-            initial_delay_seconds = 5
+            initial_delay_seconds = 10
             timeout_seconds       = 2
             period_seconds        = 10
-            failure_threshold     = 6
+            success_threshold     = 1
+            failure_threshold     = 3
           }
 
           readiness_probe {
             http_get {
-              path = "/api/health"
-              port = "api"
+              path = "ping"
+              port = 9000
             }
 
-            initial_delay_seconds = 5
+            initial_delay_seconds = 10
             timeout_seconds       = 2
             period_seconds        = 10
-            failure_threshold     = 3
+            success_threshold     = 1
+            failure_threshold     = 1
           }
         }
       }
@@ -130,19 +131,35 @@ resource "kubernetes_deployment" "main" {
   }
 }
 
-##### convert https://github.com/dask/dask-gateway/blob/master/resources/helm/dask-gateway/templates/traefik/dashboard.yaml
-# apiVersion: traefik.containo.us/v1alpha1
-# kind: IngressRoute
-# metadata:
-#   name: {{ include "dask-gateway.fullname" . | printf "traefik-dashboard-%s" | trunc 63 | trimSuffix "-" }}
-#   labels:
-#     {{- include "dask-gateway.labels" . | nindent 4 }}
-# spec:
-#   entryPoints:
-#     - traefik
-#   routes:
-#   - match: PathPrefix(`/dashboard`) || PathPrefix(`/api`)
-#     kind: Rule
-#     services:
-#     - name: api@internal
-#       kind: TraefikService
+# # for now requires that crd be applied successfully first
+# resource "kubernetes_manifest" "ingress" {
+#   provider = kubernetes-alpha
+
+#   manifest = {
+#     apiVersion = "traefik.containo.us/v1alpha1"
+#     kind = "IngressRoute"
+#     metadata = {
+#       name = "${var.name}-dashboard"
+#       namespace = var.namespace
+#     }
+#     spec = {
+#       entryPoints = ["traefik"]
+#       routes = [
+#         {
+#           match = "PathPrefix(`/dashboard`) || PathPrefix(`/api`)"
+#           kind = "Rule"
+#           services = [
+#             {
+#               name = "api@internal"
+#               kind = "TraefikService"
+#             }
+#           ]
+#         }
+#       ]
+#     }
+#   }
+
+#   depends_on = [
+#     kubernetes_manifest.ingress_route
+#   ]
+# }

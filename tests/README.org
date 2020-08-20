@@ -3,17 +3,17 @@
 Start
 
 #+begin_src shell :results output
-  minikube start --vm-driver kvm2
+  minikube start --kubernetes-version=v1.17.0 --vm-driver=kvm2
 #+end_src
 
 #+RESULTS:
 : * minikube v1.2.0 on linux (amd64)
-:
-:
-: * Restarting existing kvm VM for "minikube" ...
-: * Waiting for SSH access ...
-: * Configuring environment for Kubernetes v1.15.0 on Docker 18.09.6
-: * Relaunching Kubernetes v1.15.0 using kubeadm ...
+: * Creating kvm2 VM (CPUs=2, Memory=2048MB, Disk=20000MB) ...
+: * Configuring environment for Kubernetes v1.17.0 on Docker 18.09.6
+: * Downloading kubeadm v1.17.0
+: * Downloading kubelet v1.17.0
+: * Pulling images ...
+: * Launching Kubernetes ...
 : * Verifying: apiserver proxy etcd scheduler controller dns
 : * Done! kubectl is now configured to use "minikube"
 
@@ -25,7 +25,7 @@ Start
 : host: Running
 : kubelet: Running
 : apiserver: Running
-: kubectl: Correctly Configured: pointing to minikube-vm at 192.168.42.73
+: kubectl: Correctly Configured: pointing to minikube-vm at 192.168.39.106
 
 Get kubernetes context
 
@@ -41,8 +41,8 @@ Get kubernetes context
 #+end_src
 
 #+RESULTS:
-| NAME     | STATUS | ROLES  | AGE | VERSION |
-| minikube | Ready  | master | 38d | v1.15.0 |
+| NAME     | STATUS | ROLES  | AGE   | VERSION |
+| minikube | Ready  | master | 2m59s | v1.17.0 |
 
 #+begin_src shell :results output
   kubectl get namespaces -A
@@ -50,30 +50,934 @@ Get kubernetes context
 
 #+RESULTS:
 : NAME              STATUS   AGE
-: default           Active   38d
-: kube-node-lease   Active   38d
-: kube-public       Active   38d
-: kube-system       Active   38d
+: default           Active   3m
+: kube-node-lease   Active   3m2s
+: kube-public       Active   3m2s
+: kube-system       Active   3m2s
 
 ** Terraform Deployment
 
 Initialize Terraform
 
-#+begin_src shell :results none :dir kubernetes/deployment
+#+begin_src shell :results output :dir kubernetes/deployment
+  rm -rf .terraform
+  mkdir -p .terraform/plugins/linux_amd64
+
+  pushd .terraform/plugins/linux_amd64
+  wget https://github.com/hashicorp/terraform-provider-kubernetes-alpha/releases/download/v0.1.0/terraform-provider-kubernetes-alpha_0.1.0_linux_amd64.zip
+  unzip terraform-provider-kubernetes-alpha_0.1.0_linux_amd64.zip
+  popd
+
   terraform init
 #+end_src
 
+#+RESULTS:
+#+begin_example
+~/p/quansight/qhub-terraform-modules/tests/kubernetes/deployment/.terraform/plugins/linux_amd64 ~/p/quansight/qhub-terraform-modules/tests/kubernetes/deployment
+Archive:  terraform-provider-kubernetes-alpha_0.1.0_linux_amd64.zip
+  inflating: terraform-provider-kubernetes-alpha
+~/p/quansight/qhub-terraform-modules/tests/kubernetes/deployment
+[0m[1mInitializing modules...[0m
+- traefik in ../traefik
+
+[0m[1mInitializing the backend...[0m
+
+[0m[1mInitializing provider plugins...[0m
+- Checking for available provider plugins...
+- Downloading plugin for provider "kubernetes" (hashicorp/kubernetes) 1.12.0...
+
+The following providers do not have any version constraints in configuration,
+so the latest version was installed.
+
+To prevent automatic upgrades to new major versions that may contain breaking
+changes, it is recommended to add version = "..." constraints to the
+corresponding provider blocks in configuration, with the constraint strings
+suggested below.
+
+,* provider.kubernetes: version = "~> 1.12"
+
+[0m[1m[32mTerraform has been successfully initialized![0m[32m[0m
+[0m[32m
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.[0m
+#+end_example
+
+#+begin_src shell :dir kubernetes/deployment/
+  ls .terraform/plugins/linux_amd64
+#+end_src
+
+#+RESULTS:
+| lock.json                                |
+| terraform-provider-kubernetes-alpha      |
+| terraform-provider-kubernetes_v1.12.0_x4 |
+
 Terraform plan
 
-#+begin_src shell :results none :dir kubernetes/deployment
+#+begin_src shell :results output :dir kubernetes/deployment
   terraform plan
 #+end_src
 
+#+RESULTS:
+#+begin_example
+[0m[1mRefreshing Terraform state in-memory prior to plan...[0m
+The refreshed state will be used to calculate this plan, but will not be
+persisted to local or remote state storage.
+[0m
+
+------------------------------------------------------------------------
+
+An execution plan has been generated and is shown below.
+Resource actions are indicated with the following symbols:
+  [32m+[0m create
+[0m
+Terraform will perform the following actions:
+
+[1m  # kubernetes_namespace.main[0m will be created[0m[0m
+[0m  [32m+[0m[0m resource "kubernetes_namespace" "main" {
+      [32m+[0m [0m[1m[0mid[0m[0m = (known after apply)
+
+      [32m+[0m [0mmetadata {
+          [32m+[0m [0m[1m[0mgeneration[0m[0m       = (known after apply)
+          [32m+[0m [0m[1m[0mname[0m[0m             = "dev"
+          [32m+[0m [0m[1m[0mresource_version[0m[0m = (known after apply)
+          [32m+[0m [0m[1m[0mself_link[0m[0m        = (known after apply)
+          [32m+[0m [0m[1m[0muid[0m[0m              = (known after apply)
+        }
+    }
+
+[1m  # module.traefik.kubernetes_cluster_role.main[0m will be created[0m[0m
+[0m  [32m+[0m[0m resource "kubernetes_cluster_role" "main" {
+      [32m+[0m [0m[1m[0mid[0m[0m = (known after apply)
+
+      [32m+[0m [0mmetadata {
+          [32m+[0m [0m[1m[0mgeneration[0m[0m       = (known after apply)
+          [32m+[0m [0m[1m[0mname[0m[0m             = "terraform-traefik-traefik"
+          [32m+[0m [0m[1m[0mresource_version[0m[0m = (known after apply)
+          [32m+[0m [0m[1m[0mself_link[0m[0m        = (known after apply)
+          [32m+[0m [0m[1m[0muid[0m[0m              = (known after apply)
+        }
+
+      [32m+[0m [0mrule {
+          [32m+[0m [0m[1m[0mapi_groups[0m[0m = [
+              [32m+[0m [0m"",
+            ]
+          [32m+[0m [0m[1m[0mresources[0m[0m  = [
+              [32m+[0m [0m"pods",
+              [32m+[0m [0m"services",
+              [32m+[0m [0m"endpoints",
+              [32m+[0m [0m"secrets",
+            ]
+          [32m+[0m [0m[1m[0mverbs[0m[0m      = [
+              [32m+[0m [0m"get",
+              [32m+[0m [0m"list",
+              [32m+[0m [0m"watch",
+            ]
+        }
+      [32m+[0m [0mrule {
+          [32m+[0m [0m[1m[0mapi_groups[0m[0m = [
+              [32m+[0m [0m"extensions",
+            ]
+          [32m+[0m [0m[1m[0mresources[0m[0m  = [
+              [32m+[0m [0m"ingresses",
+            ]
+          [32m+[0m [0m[1m[0mverbs[0m[0m      = [
+              [32m+[0m [0m"get",
+              [32m+[0m [0m"list",
+              [32m+[0m [0m"watch",
+            ]
+        }
+      [32m+[0m [0mrule {
+          [32m+[0m [0m[1m[0mapi_groups[0m[0m = [
+              [32m+[0m [0m"extensions",
+            ]
+          [32m+[0m [0m[1m[0mresources[0m[0m  = [
+              [32m+[0m [0m"ingresses/status",
+            ]
+          [32m+[0m [0m[1m[0mverbs[0m[0m      = [
+              [32m+[0m [0m"update",
+            ]
+        }
+      [32m+[0m [0mrule {
+          [32m+[0m [0m[1m[0mapi_groups[0m[0m = [
+              [32m+[0m [0m"traefik.containo.us",
+            ]
+          [32m+[0m [0m[1m[0mresources[0m[0m  = [
+              [32m+[0m [0m"ingressroutes",
+              [32m+[0m [0m"ingressroutetcps",
+              [32m+[0m [0m"middlewares",
+              [32m+[0m [0m"tlsoptions",
+              [32m+[0m [0m"traefikservices",
+            ]
+          [32m+[0m [0m[1m[0mverbs[0m[0m      = [
+              [32m+[0m [0m"get",
+              [32m+[0m [0m"list",
+              [32m+[0m [0m"watch",
+            ]
+        }
+    }
+
+[1m  # module.traefik.kubernetes_cluster_role_binding.main[0m will be created[0m[0m
+[0m  [32m+[0m[0m resource "kubernetes_cluster_role_binding" "main" {
+      [32m+[0m [0m[1m[0mid[0m[0m = (known after apply)
+
+      [32m+[0m [0mmetadata {
+          [32m+[0m [0m[1m[0mgeneration[0m[0m       = (known after apply)
+          [32m+[0m [0m[1m[0mname[0m[0m             = "terraform-traefik-traefik"
+          [32m+[0m [0m[1m[0mresource_version[0m[0m = (known after apply)
+          [32m+[0m [0m[1m[0mself_link[0m[0m        = (known after apply)
+          [32m+[0m [0m[1m[0muid[0m[0m              = (known after apply)
+        }
+
+      [32m+[0m [0mrole_ref {
+          [32m+[0m [0m[1m[0mapi_group[0m[0m = "rbac.authorization.k8s.io"
+          [32m+[0m [0m[1m[0mkind[0m[0m      = "ClusterRole"
+          [32m+[0m [0m[1m[0mname[0m[0m      = "terraform-traefik-traefik"
+        }
+
+      [32m+[0m [0msubject {
+          [32m+[0m [0m[1m[0mapi_group[0m[0m = (known after apply)
+          [32m+[0m [0m[1m[0mkind[0m[0m      = "ServiceAccount"
+          [32m+[0m [0m[1m[0mname[0m[0m      = "terraform-traefik-traefik"
+          [32m+[0m [0m[1m[0mnamespace[0m[0m = "dev"
+        }
+    }
+
+[1m  # module.traefik.kubernetes_deployment.main[0m will be created[0m[0m
+[0m  [32m+[0m[0m resource "kubernetes_deployment" "main" {
+      [32m+[0m [0m[1m[0mid[0m[0m               = (known after apply)
+      [32m+[0m [0m[1m[0mwait_for_rollout[0m[0m = true
+
+      [32m+[0m [0mmetadata {
+          [32m+[0m [0m[1m[0mgeneration[0m[0m       = (known after apply)
+          [32m+[0m [0m[1m[0mname[0m[0m             = "terraform-traefik"
+          [32m+[0m [0m[1m[0mnamespace[0m[0m        = "dev"
+          [32m+[0m [0m[1m[0mresource_version[0m[0m = (known after apply)
+          [32m+[0m [0m[1m[0mself_link[0m[0m        = (known after apply)
+          [32m+[0m [0m[1m[0muid[0m[0m              = (known after apply)
+        }
+
+      [32m+[0m [0mspec {
+          [32m+[0m [0m[1m[0mmin_ready_seconds[0m[0m         = 0
+          [32m+[0m [0m[1m[0mpaused[0m[0m                    = false
+          [32m+[0m [0m[1m[0mprogress_deadline_seconds[0m[0m = 600
+          [32m+[0m [0m[1m[0mreplicas[0m[0m                  = 1
+          [32m+[0m [0m[1m[0mrevision_history_limit[0m[0m    = 10
+
+          [32m+[0m [0mselector {
+              [32m+[0m [0m[1m[0mmatch_labels[0m[0m = {
+                  [32m+[0m [0m"app.kubernetes.io/component" = "traefik"
+                }
+            }
+
+          [32m+[0m [0mstrategy {
+              [32m+[0m [0m[1m[0mtype[0m[0m = (known after apply)
+
+              [32m+[0m [0mrolling_update {
+                  [32m+[0m [0m[1m[0mmax_surge[0m[0m       = (known after apply)
+                  [32m+[0m [0m[1m[0mmax_unavailable[0m[0m = (known after apply)
+                }
+            }
+
+          [32m+[0m [0mtemplate {
+              [32m+[0m [0mmetadata {
+                  [32m+[0m [0m[1m[0mgeneration[0m[0m       = (known after apply)
+                  [32m+[0m [0m[1m[0mlabels[0m[0m           = {
+                      [32m+[0m [0m"app.kubernetes.io/component" = "traefik"
+                    }
+                  [32m+[0m [0m[1m[0mname[0m[0m             = (known after apply)
+                  [32m+[0m [0m[1m[0mresource_version[0m[0m = (known after apply)
+                  [32m+[0m [0m[1m[0mself_link[0m[0m        = (known after apply)
+                  [32m+[0m [0m[1m[0muid[0m[0m              = (known after apply)
+                }
+
+              [32m+[0m [0mspec {
+                  [32m+[0m [0m[1m[0mdns_policy[0m[0m                       = "ClusterFirst"
+                  [32m+[0m [0m[1m[0mhost_ipc[0m[0m                         = false
+                  [32m+[0m [0m[1m[0mhost_network[0m[0m                     = false
+                  [32m+[0m [0m[1m[0mhost_pid[0m[0m                         = false
+                  [32m+[0m [0m[1m[0mhostname[0m[0m                         = (known after apply)
+                  [32m+[0m [0m[1m[0mnode_name[0m[0m                        = (known after apply)
+                  [32m+[0m [0m[1m[0mrestart_policy[0m[0m                   = "Always"
+                  [32m+[0m [0m[1m[0mservice_account_name[0m[0m             = "terraform-traefik-traefik"
+                  [32m+[0m [0m[1m[0mshare_process_namespace[0m[0m          = false
+                  [32m+[0m [0m[1m[0mtermination_grace_period_seconds[0m[0m = 60
+
+                  [32m+[0m [0mcontainer {
+                      [32m+[0m [0m[1m[0margs[0m[0m                     = [
+                          [32m+[0m [0m"--global.checknewversion=False",
+                          [32m+[0m [0m"--global.sendanonymoususage=False",
+                          [32m+[0m [0m"--ping=true",
+                          [32m+[0m [0m"--providers.kubernetescrd",
+                          [32m+[0m [0m"--providers.kubernetescrd.throttleduration=2",
+                          [32m+[0m [0m"--log.level=WARN",
+                          [32m+[0m [0m"--entryPoints.traefik.address=:9000",
+                          [32m+[0m [0m"--entryPoints.web.address=:8000",
+                          [32m+[0m [0m"--entryPoints.tcp.address=:8786",
+                          [32m+[0m [0m"--api.dashboard=true",
+                          [32m+[0m [0m"--api.insecure=true",
+                        ]
+                      [32m+[0m [0m[1m[0mimage[0m[0m                    = "traefik:2.1.3"
+                      [32m+[0m [0m[1m[0mimage_pull_policy[0m[0m        = (known after apply)
+                      [32m+[0m [0m[1m[0mname[0m[0m                     = "terraform-traefik"
+                      [32m+[0m [0m[1m[0mstdin[0m[0m                    = false
+                      [32m+[0m [0m[1m[0mstdin_once[0m[0m               = false
+                      [32m+[0m [0m[1m[0mtermination_message_path[0m[0m = "/dev/termination-log"
+                      [32m+[0m [0m[1m[0mtty[0m[0m                      = false
+
+                      [32m+[0m [0mliveness_probe {
+                          [32m+[0m [0m[1m[0mfailure_threshold[0m[0m     = 3
+                          [32m+[0m [0m[1m[0minitial_delay_seconds[0m[0m = 10
+                          [32m+[0m [0m[1m[0mperiod_seconds[0m[0m        = 10
+                          [32m+[0m [0m[1m[0msuccess_threshold[0m[0m     = 1
+                          [32m+[0m [0m[1m[0mtimeout_seconds[0m[0m       = 2
+
+                          [32m+[0m [0mhttp_get {
+                              [32m+[0m [0m[1m[0mpath[0m[0m   = "/ping"
+                              [32m+[0m [0m[1m[0mport[0m[0m   = "9000"
+                              [32m+[0m [0m[1m[0mscheme[0m[0m = "HTTP"
+                            }
+                        }
+
+                      [32m+[0m [0mport {
+                          [32m+[0m [0m[1m[0mcontainer_port[0m[0m = 9000
+                          [32m+[0m [0m[1m[0mname[0m[0m           = "traefik"
+                          [32m+[0m [0m[1m[0mprotocol[0m[0m       = "TCP"
+                        }
+                      [32m+[0m [0mport {
+                          [32m+[0m [0m[1m[0mcontainer_port[0m[0m = 8000
+                          [32m+[0m [0m[1m[0mname[0m[0m           = "web"
+                          [32m+[0m [0m[1m[0mprotocol[0m[0m       = "TCP"
+                        }
+                      [32m+[0m [0mport {
+                          [32m+[0m [0m[1m[0mcontainer_port[0m[0m = 8786
+                          [32m+[0m [0m[1m[0mname[0m[0m           = "tcp"
+                          [32m+[0m [0m[1m[0mprotocol[0m[0m       = "TCP"
+                        }
+
+                      [32m+[0m [0mreadiness_probe {
+                          [32m+[0m [0m[1m[0mfailure_threshold[0m[0m     = 1
+                          [32m+[0m [0m[1m[0minitial_delay_seconds[0m[0m = 10
+                          [32m+[0m [0m[1m[0mperiod_seconds[0m[0m        = 10
+                          [32m+[0m [0m[1m[0msuccess_threshold[0m[0m     = 1
+                          [32m+[0m [0m[1m[0mtimeout_seconds[0m[0m       = 2
+
+                          [32m+[0m [0mhttp_get {
+                              [32m+[0m [0m[1m[0mpath[0m[0m   = "ping"
+                              [32m+[0m [0m[1m[0mport[0m[0m   = "9000"
+                              [32m+[0m [0m[1m[0mscheme[0m[0m = "HTTP"
+                            }
+                        }
+
+                      [32m+[0m [0mresources {
+                          [32m+[0m [0mlimits {
+                              [32m+[0m [0m[1m[0mcpu[0m[0m    = (known after apply)
+                              [32m+[0m [0m[1m[0mmemory[0m[0m = (known after apply)
+                            }
+
+                          [32m+[0m [0mrequests {
+                              [32m+[0m [0m[1m[0mcpu[0m[0m    = (known after apply)
+                              [32m+[0m [0m[1m[0mmemory[0m[0m = (known after apply)
+                            }
+                        }
+
+                      [32m+[0m [0msecurity_context {
+                          [32m+[0m [0m[1m[0mallow_privilege_escalation[0m[0m = true
+                          [32m+[0m [0m[1m[0mprivileged[0m[0m                 = false
+                          [32m+[0m [0m[1m[0mread_only_root_filesystem[0m[0m  = false
+                          [32m+[0m [0m[1m[0mrun_as_group[0m[0m               = 1000
+                          [32m+[0m [0m[1m[0mrun_as_user[0m[0m                = 1000
+                        }
+
+                      [32m+[0m [0mvolume_mount {
+                          [32m+[0m [0m[1m[0mmount_path[0m[0m        = (known after apply)
+                          [32m+[0m [0m[1m[0mmount_propagation[0m[0m = (known after apply)
+                          [32m+[0m [0m[1m[0mname[0m[0m              = (known after apply)
+                          [32m+[0m [0m[1m[0mread_only[0m[0m         = (known after apply)
+                          [32m+[0m [0m[1m[0msub_path[0m[0m          = (known after apply)
+                        }
+                    }
+
+                  [32m+[0m [0mimage_pull_secrets {
+                      [32m+[0m [0m[1m[0mname[0m[0m = (known after apply)
+                    }
+
+                  [32m+[0m [0mvolume {
+                      [32m+[0m [0m[1m[0mname[0m[0m = (known after apply)
+
+                      [32m+[0m [0maws_elastic_block_store {
+                          [32m+[0m [0m[1m[0mfs_type[0m[0m   = (known after apply)
+                          [32m+[0m [0m[1m[0mpartition[0m[0m = (known after apply)
+                          [32m+[0m [0m[1m[0mread_only[0m[0m = (known after apply)
+                          [32m+[0m [0m[1m[0mvolume_id[0m[0m = (known after apply)
+                        }
+
+                      [32m+[0m [0mazure_disk {
+                          [32m+[0m [0m[1m[0mcaching_mode[0m[0m  = (known after apply)
+                          [32m+[0m [0m[1m[0mdata_disk_uri[0m[0m = (known after apply)
+                          [32m+[0m [0m[1m[0mdisk_name[0m[0m     = (known after apply)
+                          [32m+[0m [0m[1m[0mfs_type[0m[0m       = (known after apply)
+                          [32m+[0m [0m[1m[0mread_only[0m[0m     = (known after apply)
+                        }
+
+                      [32m+[0m [0mazure_file {
+                          [32m+[0m [0m[1m[0mread_only[0m[0m   = (known after apply)
+                          [32m+[0m [0m[1m[0msecret_name[0m[0m = (known after apply)
+                          [32m+[0m [0m[1m[0mshare_name[0m[0m  = (known after apply)
+                        }
+
+                      [32m+[0m [0mceph_fs {
+                          [32m+[0m [0m[1m[0mmonitors[0m[0m    = (known after apply)
+                          [32m+[0m [0m[1m[0mpath[0m[0m        = (known after apply)
+                          [32m+[0m [0m[1m[0mread_only[0m[0m   = (known after apply)
+                          [32m+[0m [0m[1m[0msecret_file[0m[0m = (known after apply)
+                          [32m+[0m [0m[1m[0muser[0m[0m        = (known after apply)
+
+                          [32m+[0m [0msecret_ref {
+                              [32m+[0m [0m[1m[0mname[0m[0m      = (known after apply)
+                              [32m+[0m [0m[1m[0mnamespace[0m[0m = (known after apply)
+                            }
+                        }
+
+                      [32m+[0m [0mcinder {
+                          [32m+[0m [0m[1m[0mfs_type[0m[0m   = (known after apply)
+                          [32m+[0m [0m[1m[0mread_only[0m[0m = (known after apply)
+                          [32m+[0m [0m[1m[0mvolume_id[0m[0m = (known after apply)
+                        }
+
+                      [32m+[0m [0mconfig_map {
+                          [32m+[0m [0m[1m[0mdefault_mode[0m[0m = (known after apply)
+                          [32m+[0m [0m[1m[0mname[0m[0m         = (known after apply)
+                          [32m+[0m [0m[1m[0moptional[0m[0m     = (known after apply)
+
+                          [32m+[0m [0mitems {
+                              [32m+[0m [0m[1m[0mkey[0m[0m  = (known after apply)
+                              [32m+[0m [0m[1m[0mmode[0m[0m = (known after apply)
+                              [32m+[0m [0m[1m[0mpath[0m[0m = (known after apply)
+                            }
+                        }
+
+                      [32m+[0m [0mcsi {
+                          [32m+[0m [0m[1m[0mdriver[0m[0m            = (known after apply)
+                          [32m+[0m [0m[1m[0mfs_type[0m[0m           = (known after apply)
+                          [32m+[0m [0m[1m[0mread_only[0m[0m         = (known after apply)
+                          [32m+[0m [0m[1m[0mvolume_attributes[0m[0m = (known after apply)
+                          [32m+[0m [0m[1m[0mvolume_handle[0m[0m     = (known after apply)
+
+                          [32m+[0m [0mcontroller_expand_secret_ref {
+                              [32m+[0m [0m[1m[0mname[0m[0m      = (known after apply)
+                              [32m+[0m [0m[1m[0mnamespace[0m[0m = (known after apply)
+                            }
+
+                          [32m+[0m [0mcontroller_publish_secret_ref {
+                              [32m+[0m [0m[1m[0mname[0m[0m      = (known after apply)
+                              [32m+[0m [0m[1m[0mnamespace[0m[0m = (known after apply)
+                            }
+
+                          [32m+[0m [0mnode_publish_secret_ref {
+                              [32m+[0m [0m[1m[0mname[0m[0m      = (known after apply)
+                              [32m+[0m [0m[1m[0mnamespace[0m[0m = (known after apply)
+                            }
+
+                          [32m+[0m [0mnode_stage_secret_ref {
+                              [32m+[0m [0m[1m[0mname[0m[0m      = (known after apply)
+                              [32m+[0m [0m[1m[0mnamespace[0m[0m = (known after apply)
+                            }
+                        }
+
+                      [32m+[0m [0mdownward_api {
+                          [32m+[0m [0m[1m[0mdefault_mode[0m[0m = (known after apply)
+
+                          [32m+[0m [0mitems {
+                              [32m+[0m [0m[1m[0mmode[0m[0m = (known after apply)
+                              [32m+[0m [0m[1m[0mpath[0m[0m = (known after apply)
+
+                              [32m+[0m [0mfield_ref {
+                                  [32m+[0m [0m[1m[0mapi_version[0m[0m = (known after apply)
+                                  [32m+[0m [0m[1m[0mfield_path[0m[0m  = (known after apply)
+                                }
+
+                              [32m+[0m [0mresource_field_ref {
+                                  [32m+[0m [0m[1m[0mcontainer_name[0m[0m = (known after apply)
+                                  [32m+[0m [0m[1m[0mquantity[0m[0m       = (known after apply)
+                                  [32m+[0m [0m[1m[0mresource[0m[0m       = (known after apply)
+                                }
+                            }
+                        }
+
+                      [32m+[0m [0mempty_dir {
+                          [32m+[0m [0m[1m[0mmedium[0m[0m = (known after apply)
+                        }
+
+                      [32m+[0m [0mfc {
+                          [32m+[0m [0m[1m[0mfs_type[0m[0m      = (known after apply)
+                          [32m+[0m [0m[1m[0mlun[0m[0m          = (known after apply)
+                          [32m+[0m [0m[1m[0mread_only[0m[0m    = (known after apply)
+                          [32m+[0m [0m[1m[0mtarget_ww_ns[0m[0m = (known after apply)
+                        }
+
+                      [32m+[0m [0mflex_volume {
+                          [32m+[0m [0m[1m[0mdriver[0m[0m    = (known after apply)
+                          [32m+[0m [0m[1m[0mfs_type[0m[0m   = (known after apply)
+                          [32m+[0m [0m[1m[0moptions[0m[0m   = (known after apply)
+                          [32m+[0m [0m[1m[0mread_only[0m[0m = (known after apply)
+
+                          [32m+[0m [0msecret_ref {
+                              [32m+[0m [0m[1m[0mname[0m[0m      = (known after apply)
+                              [32m+[0m [0m[1m[0mnamespace[0m[0m = (known after apply)
+                            }
+                        }
+
+                      [32m+[0m [0mflocker {
+                          [32m+[0m [0m[1m[0mdataset_name[0m[0m = (known after apply)
+                          [32m+[0m [0m[1m[0mdataset_uuid[0m[0m = (known after apply)
+                        }
+
+                      [32m+[0m [0mgce_persistent_disk {
+                          [32m+[0m [0m[1m[0mfs_type[0m[0m   = (known after apply)
+                          [32m+[0m [0m[1m[0mpartition[0m[0m = (known after apply)
+                          [32m+[0m [0m[1m[0mpd_name[0m[0m   = (known after apply)
+                          [32m+[0m [0m[1m[0mread_only[0m[0m = (known after apply)
+                        }
+
+                      [32m+[0m [0mgit_repo {
+                          [32m+[0m [0m[1m[0mdirectory[0m[0m  = (known after apply)
+                          [32m+[0m [0m[1m[0mrepository[0m[0m = (known after apply)
+                          [32m+[0m [0m[1m[0mrevision[0m[0m   = (known after apply)
+                        }
+
+                      [32m+[0m [0mglusterfs {
+                          [32m+[0m [0m[1m[0mendpoints_name[0m[0m = (known after apply)
+                          [32m+[0m [0m[1m[0mpath[0m[0m           = (known after apply)
+                          [32m+[0m [0m[1m[0mread_only[0m[0m      = (known after apply)
+                        }
+
+                      [32m+[0m [0mhost_path {
+                          [32m+[0m [0m[1m[0mpath[0m[0m = (known after apply)
+                          [32m+[0m [0m[1m[0mtype[0m[0m = (known after apply)
+                        }
+
+                      [32m+[0m [0miscsi {
+                          [32m+[0m [0m[1m[0mfs_type[0m[0m         = (known after apply)
+                          [32m+[0m [0m[1m[0miqn[0m[0m             = (known after apply)
+                          [32m+[0m [0m[1m[0miscsi_interface[0m[0m = (known after apply)
+                          [32m+[0m [0m[1m[0mlun[0m[0m             = (known after apply)
+                          [32m+[0m [0m[1m[0mread_only[0m[0m       = (known after apply)
+                          [32m+[0m [0m[1m[0mtarget_portal[0m[0m   = (known after apply)
+                        }
+
+                      [32m+[0m [0mlocal {
+                          [32m+[0m [0m[1m[0mpath[0m[0m = (known after apply)
+                        }
+
+                      [32m+[0m [0mnfs {
+                          [32m+[0m [0m[1m[0mpath[0m[0m      = (known after apply)
+                          [32m+[0m [0m[1m[0mread_only[0m[0m = (known after apply)
+                          [32m+[0m [0m[1m[0mserver[0m[0m    = (known after apply)
+                        }
+
+                      [32m+[0m [0mpersistent_volume_claim {
+                          [32m+[0m [0m[1m[0mclaim_name[0m[0m = (known after apply)
+                          [32m+[0m [0m[1m[0mread_only[0m[0m  = (known after apply)
+                        }
+
+                      [32m+[0m [0mphoton_persistent_disk {
+                          [32m+[0m [0m[1m[0mfs_type[0m[0m = (known after apply)
+                          [32m+[0m [0m[1m[0mpd_id[0m[0m   = (known after apply)
+                        }
+
+                      [32m+[0m [0mquobyte {
+                          [32m+[0m [0m[1m[0mgroup[0m[0m     = (known after apply)
+                          [32m+[0m [0m[1m[0mread_only[0m[0m = (known after apply)
+                          [32m+[0m [0m[1m[0mregistry[0m[0m  = (known after apply)
+                          [32m+[0m [0m[1m[0muser[0m[0m      = (known after apply)
+                          [32m+[0m [0m[1m[0mvolume[0m[0m    = (known after apply)
+                        }
+
+                      [32m+[0m [0mrbd {
+                          [32m+[0m [0m[1m[0mceph_monitors[0m[0m = (known after apply)
+                          [32m+[0m [0m[1m[0mfs_type[0m[0m       = (known after apply)
+                          [32m+[0m [0m[1m[0mkeyring[0m[0m       = (known after apply)
+                          [32m+[0m [0m[1m[0mrados_user[0m[0m    = (known after apply)
+                          [32m+[0m [0m[1m[0mrbd_image[0m[0m     = (known after apply)
+                          [32m+[0m [0m[1m[0mrbd_pool[0m[0m      = (known after apply)
+                          [32m+[0m [0m[1m[0mread_only[0m[0m     = (known after apply)
+
+                          [32m+[0m [0msecret_ref {
+                              [32m+[0m [0m[1m[0mname[0m[0m      = (known after apply)
+                              [32m+[0m [0m[1m[0mnamespace[0m[0m = (known after apply)
+                            }
+                        }
+
+                      [32m+[0m [0msecret {
+                          [32m+[0m [0m[1m[0mdefault_mode[0m[0m = (known after apply)
+                          [32m+[0m [0m[1m[0moptional[0m[0m     = (known after apply)
+                          [32m+[0m [0m[1m[0msecret_name[0m[0m  = (known after apply)
+
+                          [32m+[0m [0mitems {
+                              [32m+[0m [0m[1m[0mkey[0m[0m  = (known after apply)
+                              [32m+[0m [0m[1m[0mmode[0m[0m = (known after apply)
+                              [32m+[0m [0m[1m[0mpath[0m[0m = (known after apply)
+                            }
+                        }
+
+                      [32m+[0m [0mvsphere_volume {
+                          [32m+[0m [0m[1m[0mfs_type[0m[0m     = (known after apply)
+                          [32m+[0m [0m[1m[0mvolume_path[0m[0m = (known after apply)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+[1m  # module.traefik.kubernetes_manifest.ingress_route[0m will be created[0m[0m
+[0m  [32m+[0m[0m resource "kubernetes_manifest" "ingress_route" {
+      [32m+[0m [0m[1m[0mmanifest[0m[0m = {
+          [32m+[0m [0mapiVersion = "apiextensions.k8s.io/v1beta1"
+          [32m+[0m [0mkind       = "CustomResourceDefinition"
+          [32m+[0m [0mmetadata   = {
+              [32m+[0m [0mname = "ingressroutes.traefik.containo.us"
+            }
+          [32m+[0m [0mspec       = {
+              [32m+[0m [0mgroup   = "traefik.containo.us"
+              [32m+[0m [0mnames   = {
+                  [32m+[0m [0mkind     = "IngressRoute"
+                  [32m+[0m [0mplural   = "ingressroutes"
+                  [32m+[0m [0msingular = "ingressroute"
+                }
+              [32m+[0m [0mscope   = "Namespaced"
+              [32m+[0m [0mversion = "v1alpha1"
+            }
+        }
+      [32m+[0m [0m[1m[0mobject[0m[0m   = {
+          [32m+[0m [0mapiVersion = "apiextensions.k8s.io/v1beta1"
+          [32m+[0m [0mkind       = "CustomResourceDefinition"
+          [32m+[0m [0mmetadata   = {
+              [32m+[0m [0mname = "ingressroutes.traefik.containo.us"
+            }
+          [32m+[0m [0mspec       = {
+              [32m+[0m [0mconversion            = {
+                  [32m+[0m [0mstrategy = "None"
+                }
+              [32m+[0m [0mgroup                 = "traefik.containo.us"
+              [32m+[0m [0mnames                 = {
+                  [32m+[0m [0mkind     = "IngressRoute"
+                  [32m+[0m [0mlistKind = "IngressRouteList"
+                  [32m+[0m [0mplural   = "ingressroutes"
+                  [32m+[0m [0msingular = "ingressroute"
+                }
+              [32m+[0m [0mpreserveUnknownFields = true
+              [32m+[0m [0mscope                 = "Namespaced"
+              [32m+[0m [0mversion               = "v1alpha1"
+              [32m+[0m [0mversions              = [
+                  [32m+[0m [0m{
+                      [32m+[0m [0mname    = "v1alpha1"
+                      [32m+[0m [0mserved  = true
+                      [32m+[0m [0mstorage = true
+                    },
+                ]
+            }
+        }
+    }
+
+[1m  # module.traefik.kubernetes_manifest.ingress_route_tcp[0m will be created[0m[0m
+[0m  [32m+[0m[0m resource "kubernetes_manifest" "ingress_route_tcp" {
+      [32m+[0m [0m[1m[0mmanifest[0m[0m = {
+          [32m+[0m [0mapiVersion = "apiextensions.k8s.io/v1beta1"
+          [32m+[0m [0mkind       = "CustomResourceDefinition"
+          [32m+[0m [0mmetadata   = {
+              [32m+[0m [0mname = "ingressroutetcps.traefik.containo.us"
+            }
+          [32m+[0m [0mspec       = {
+              [32m+[0m [0mgroup   = "traefik.containo.us"
+              [32m+[0m [0mnames   = {
+                  [32m+[0m [0mkind     = "IngressRouteTCP"
+                  [32m+[0m [0mplural   = "ingressroutetcps"
+                  [32m+[0m [0msingular = "ingressroutetcp"
+                }
+              [32m+[0m [0mscope   = "Namespaced"
+              [32m+[0m [0mversion = "v1alpha1"
+            }
+        }
+      [32m+[0m [0m[1m[0mobject[0m[0m   = {
+          [32m+[0m [0mapiVersion = "apiextensions.k8s.io/v1beta1"
+          [32m+[0m [0mkind       = "CustomResourceDefinition"
+          [32m+[0m [0mmetadata   = {
+              [32m+[0m [0mname = "ingressroutetcps.traefik.containo.us"
+            }
+          [32m+[0m [0mspec       = {
+              [32m+[0m [0mconversion            = {
+                  [32m+[0m [0mstrategy = "None"
+                }
+              [32m+[0m [0mgroup                 = "traefik.containo.us"
+              [32m+[0m [0mnames                 = {
+                  [32m+[0m [0mkind     = "IngressRouteTCP"
+                  [32m+[0m [0mlistKind = "IngressRouteTCPList"
+                  [32m+[0m [0mplural   = "ingressroutetcps"
+                  [32m+[0m [0msingular = "ingressroutetcp"
+                }
+              [32m+[0m [0mpreserveUnknownFields = true
+              [32m+[0m [0mscope                 = "Namespaced"
+              [32m+[0m [0mversion               = "v1alpha1"
+              [32m+[0m [0mversions              = [
+                  [32m+[0m [0m{
+                      [32m+[0m [0mname    = "v1alpha1"
+                      [32m+[0m [0mserved  = true
+                      [32m+[0m [0mstorage = true
+                    },
+                ]
+            }
+        }
+    }
+
+[1m  # module.traefik.kubernetes_manifest.middleware[0m will be created[0m[0m
+[0m  [32m+[0m[0m resource "kubernetes_manifest" "middleware" {
+      [32m+[0m [0m[1m[0mmanifest[0m[0m = {
+          [32m+[0m [0mapiVersion = "apiextensions.k8s.io/v1beta1"
+          [32m+[0m [0mkind       = "CustomResourceDefinition"
+          [32m+[0m [0mmetadata   = {
+              [32m+[0m [0mname = "middlewares.traefik.containo.us"
+            }
+          [32m+[0m [0mspec       = {
+              [32m+[0m [0mgroup   = "traefik.containo.us"
+              [32m+[0m [0mnames   = {
+                  [32m+[0m [0mkind     = "Middleware"
+                  [32m+[0m [0mplural   = "middlewares"
+                  [32m+[0m [0msingular = "middleware"
+                }
+              [32m+[0m [0mscope   = "Namespaced"
+              [32m+[0m [0mversion = "v1alpha1"
+            }
+        }
+      [32m+[0m [0m[1m[0mobject[0m[0m   = {
+          [32m+[0m [0mapiVersion = "apiextensions.k8s.io/v1beta1"
+          [32m+[0m [0mkind       = "CustomResourceDefinition"
+          [32m+[0m [0mmetadata   = {
+              [32m+[0m [0mname = "middlewares.traefik.containo.us"
+            }
+          [32m+[0m [0mspec       = {
+              [32m+[0m [0mconversion            = {
+                  [32m+[0m [0mstrategy = "None"
+                }
+              [32m+[0m [0mgroup                 = "traefik.containo.us"
+              [32m+[0m [0mnames                 = {
+                  [32m+[0m [0mkind     = "Middleware"
+                  [32m+[0m [0mlistKind = "MiddlewareList"
+                  [32m+[0m [0mplural   = "middlewares"
+                  [32m+[0m [0msingular = "middleware"
+                }
+              [32m+[0m [0mpreserveUnknownFields = true
+              [32m+[0m [0mscope                 = "Namespaced"
+              [32m+[0m [0mversion               = "v1alpha1"
+              [32m+[0m [0mversions              = [
+                  [32m+[0m [0m{
+                      [32m+[0m [0mname    = "v1alpha1"
+                      [32m+[0m [0mserved  = true
+                      [32m+[0m [0mstorage = true
+                    },
+                ]
+            }
+        }
+    }
+
+[1m  # module.traefik.kubernetes_manifest.tls_option[0m will be created[0m[0m
+[0m  [32m+[0m[0m resource "kubernetes_manifest" "tls_option" {
+      [32m+[0m [0m[1m[0mmanifest[0m[0m = {
+          [32m+[0m [0mapiVersion = "apiextensions.k8s.io/v1beta1"
+          [32m+[0m [0mkind       = "CustomResourceDefinition"
+          [32m+[0m [0mmetadata   = {
+              [32m+[0m [0mname = "tlsoptions.traefik.containo.us"
+            }
+          [32m+[0m [0mspec       = {
+              [32m+[0m [0mgroup   = "traefik.containo.us"
+              [32m+[0m [0mnames   = {
+                  [32m+[0m [0mkind     = "TLSOption"
+                  [32m+[0m [0mplural   = "tlsoptions"
+                  [32m+[0m [0msingular = "tlsoption"
+                }
+              [32m+[0m [0mscope   = "Namespaced"
+              [32m+[0m [0mversion = "v1alpha1"
+            }
+        }
+      [32m+[0m [0m[1m[0mobject[0m[0m   = {
+          [32m+[0m [0mapiVersion = "apiextensions.k8s.io/v1beta1"
+          [32m+[0m [0mkind       = "CustomResourceDefinition"
+          [32m+[0m [0mmetadata   = {
+              [32m+[0m [0mname = "tlsoptions.traefik.containo.us"
+            }
+          [32m+[0m [0mspec       = {
+              [32m+[0m [0mconversion            = {
+                  [32m+[0m [0mstrategy = "None"
+                }
+              [32m+[0m [0mgroup                 = "traefik.containo.us"
+              [32m+[0m [0mnames                 = {
+                  [32m+[0m [0mkind     = "TLSOption"
+                  [32m+[0m [0mlistKind = "TLSOptionList"
+                  [32m+[0m [0mplural   = "tlsoptions"
+                  [32m+[0m [0msingular = "tlsoption"
+                }
+              [32m+[0m [0mpreserveUnknownFields = true
+              [32m+[0m [0mscope                 = "Namespaced"
+              [32m+[0m [0mversion               = "v1alpha1"
+              [32m+[0m [0mversions              = [
+                  [32m+[0m [0m{
+                      [32m+[0m [0mname    = "v1alpha1"
+                      [32m+[0m [0mserved  = true
+                      [32m+[0m [0mstorage = true
+                    },
+                ]
+            }
+        }
+    }
+
+[1m  # module.traefik.kubernetes_manifest.traefik_service[0m will be created[0m[0m
+[0m  [32m+[0m[0m resource "kubernetes_manifest" "traefik_service" {
+      [32m+[0m [0m[1m[0mmanifest[0m[0m = {
+          [32m+[0m [0mapiVersion = "apiextensions.k8s.io/v1beta1"
+          [32m+[0m [0mkind       = "CustomResourceDefinition"
+          [32m+[0m [0mmetadata   = {
+              [32m+[0m [0mname = "traefikservices.traefik.containo.us"
+            }
+          [32m+[0m [0mspec       = {
+              [32m+[0m [0mgroup   = "traefik.containo.us"
+              [32m+[0m [0mnames   = {
+                  [32m+[0m [0mkind     = "TraefikService"
+                  [32m+[0m [0mplural   = "traefikservices"
+                  [32m+[0m [0msingular = "traefikservice"
+                }
+              [32m+[0m [0mscope   = "Namespaced"
+              [32m+[0m [0mversion = "v1alpha1"
+            }
+        }
+      [32m+[0m [0m[1m[0mobject[0m[0m   = {
+          [32m+[0m [0mapiVersion = "apiextensions.k8s.io/v1beta1"
+          [32m+[0m [0mkind       = "CustomResourceDefinition"
+          [32m+[0m [0mmetadata   = {
+              [32m+[0m [0mname = "traefikservices.traefik.containo.us"
+            }
+          [32m+[0m [0mspec       = {
+              [32m+[0m [0mconversion            = {
+                  [32m+[0m [0mstrategy = "None"
+                }
+              [32m+[0m [0mgroup                 = "traefik.containo.us"
+              [32m+[0m [0mnames                 = {
+                  [32m+[0m [0mkind     = "TraefikService"
+                  [32m+[0m [0mlistKind = "TraefikServiceList"
+                  [32m+[0m [0mplural   = "traefikservices"
+                  [32m+[0m [0msingular = "traefikservice"
+                }
+              [32m+[0m [0mpreserveUnknownFields = true
+              [32m+[0m [0mscope                 = "Namespaced"
+              [32m+[0m [0mversion               = "v1alpha1"
+              [32m+[0m [0mversions              = [
+                  [32m+[0m [0m{
+                      [32m+[0m [0mname    = "v1alpha1"
+                      [32m+[0m [0mserved  = true
+                      [32m+[0m [0mstorage = true
+                    },
+                ]
+            }
+        }
+    }
+
+[1m  # module.traefik.kubernetes_service.main[0m will be created[0m[0m
+[0m  [32m+[0m[0m resource "kubernetes_service" "main" {
+      [32m+[0m [0m[1m[0mid[0m[0m                    = (known after apply)
+      [32m+[0m [0m[1m[0mload_balancer_ingress[0m[0m = (known after apply)
+
+      [32m+[0m [0mmetadata {
+          [32m+[0m [0m[1m[0mgeneration[0m[0m       = (known after apply)
+          [32m+[0m [0m[1m[0mname[0m[0m             = "terraform-traefik"
+          [32m+[0m [0m[1m[0mnamespace[0m[0m        = "dev"
+          [32m+[0m [0m[1m[0mresource_version[0m[0m = (known after apply)
+          [32m+[0m [0m[1m[0mself_link[0m[0m        = (known after apply)
+          [32m+[0m [0m[1m[0muid[0m[0m              = (known after apply)
+        }
+
+      [32m+[0m [0mspec {
+          [32m+[0m [0m[1m[0mcluster_ip[0m[0m                  = (known after apply)
+          [32m+[0m [0m[1m[0mexternal_traffic_policy[0m[0m     = (known after apply)
+          [32m+[0m [0m[1m[0mpublish_not_ready_addresses[0m[0m = false
+          [32m+[0m [0m[1m[0mselector[0m[0m                    = {
+              [32m+[0m [0m"app.kubernetes.io/component" = "traefik"
+            }
+          [32m+[0m [0m[1m[0msession_affinity[0m[0m            = "None"
+          [32m+[0m [0m[1m[0mtype[0m[0m                        = "LoadBalancer"
+
+          [32m+[0m [0mport {
+              [32m+[0m [0m[1m[0mname[0m[0m        = "web"
+              [32m+[0m [0m[1m[0mnode_port[0m[0m   = (known after apply)
+              [32m+[0m [0m[1m[0mport[0m[0m        = 8000
+              [32m+[0m [0m[1m[0mprotocol[0m[0m    = "TCP"
+              [32m+[0m [0m[1m[0mtarget_port[0m[0m = "8000"
+            }
+          [32m+[0m [0mport {
+              [32m+[0m [0m[1m[0mname[0m[0m        = "tcp"
+              [32m+[0m [0m[1m[0mnode_port[0m[0m   = (known after apply)
+              [32m+[0m [0m[1m[0mport[0m[0m        = 8786
+              [32m+[0m [0m[1m[0mprotocol[0m[0m    = "TCP"
+              [32m+[0m [0m[1m[0mtarget_port[0m[0m = "8786"
+            }
+          [32m+[0m [0mport {
+              [32m+[0m [0m[1m[0mname[0m[0m        = "traefik"
+              [32m+[0m [0m[1m[0mnode_port[0m[0m   = (known after apply)
+              [32m+[0m [0m[1m[0mport[0m[0m        = 9000
+              [32m+[0m [0m[1m[0mprotocol[0m[0m    = "TCP"
+              [32m+[0m [0m[1m[0mtarget_port[0m[0m = "9000"
+            }
+        }
+    }
+
+[1m  # module.traefik.kubernetes_service_account.main[0m will be created[0m[0m
+[0m  [32m+[0m[0m resource "kubernetes_service_account" "main" {
+      [32m+[0m [0m[1m[0mdefault_secret_name[0m[0m = (known after apply)
+      [32m+[0m [0m[1m[0mid[0m[0m                  = (known after apply)
+
+      [32m+[0m [0mmetadata {
+          [32m+[0m [0m[1m[0mgeneration[0m[0m       = (known after apply)
+          [32m+[0m [0m[1m[0mname[0m[0m             = "terraform-traefik-traefik"
+          [32m+[0m [0m[1m[0mnamespace[0m[0m        = "dev"
+          [32m+[0m [0m[1m[0mresource_version[0m[0m = (known after apply)
+          [32m+[0m [0m[1m[0mself_link[0m[0m        = (known after apply)
+          [32m+[0m [0m[1m[0muid[0m[0m              = (known after apply)
+        }
+    }
+
+[0m[1mPlan:[0m 11 to add, 0 to change, 0 to destroy.[0m
+[33m
+[1m[33mWarning: [0m[0m[1mQuoted references are deprecated[0m
+
+[0m  on ../traefik/crds.tf line 2, in resource "kubernetes_manifest" "ingress_route":
+   2:   provider = [4m"kubernetes-alpha"[0m
+[0m
+In this context, references are expected literally rather than in quotes.
+Terraform 0.11 and earlier required quotes, but quoted references are now
+deprecated and will be removed in a future version of Terraform. Remove the
+quotes surrounding this reference to silence this warning.
+
+(and 4 more similar warnings elsewhere)
+[0m[0m
+
+------------------------------------------------------------------------
+
+Note: You didn't specify an "-out" parameter to save this plan, so Terraform
+can't guarantee that exactly these actions will be performed if
+"terraform apply" is subsequently run.
+
+#+end_example
+
 Terraform apply
 
-#+begin_src shell :results none :dir kubernetes/deployment
+#+begin_src shell :results output :dir kubernetes/deployment
   terraform apply -auto-approve
 #+end_src
+
+#+RESULTS:
 
 Check that the namespace now exists
 
@@ -83,19 +987,92 @@ Check that the namespace now exists
 
 #+RESULTS:
 : NAME              STATUS   AGE
-: default           Active   38d
-: dev               Active   79s
-: kube-node-lease   Active   38d
-: kube-public       Active   38d
-: kube-system       Active   38d
+: default           Active   23m
+: dev               Active   39s
+: kube-node-lease   Active   23m
+: kube-public       Active   23m
+: kube-system       Active   23m
 
 Check that config files exist
 
 #+begin_src shell :results output :dir kubernetes
-  kubectl get configmap -n dev
+  kubectl get deployments -n dev
 #+end_src
 
 #+RESULTS:
-: NAME                                DATA   AGE
-: terraform-qhub-daskgateway-config   1      104s
-: terraform-qhub-jupyterhub-config    1      104s
+
+#+begin_src shell :results output :dir kubernetes/deployment
+  kubectl delete namespace dev
+#+end_src
+
+#+RESULTS:
+: namespace "dev" deleted
+
+#+begin_src shell :results output :dir kubernetes/deployment
+  kubectl version
+#+end_src
+
+#+RESULTS:
+: Client Version: version.Info{Major:"1", Minor:"17", GitVersion:"v1.17.5", GitCommit:"e0fccafd69541e3750d460ba0f9743b90336f24f", GitTreeState:"archive", BuildDate:"1970-01-01T00:00:01Z", GoVersion:"go1.13.8", Compiler:"gc", Platform:"linux/amd64"}
+: Server Version: version.Info{Major:"1", Minor:"17", GitVersion:"v1.17.0", GitCommit:"70132b0f130acc0bed193d9ba59dd186f0e634cf", GitTreeState:"clean", BuildDate:"2019-12-07T21:12:17Z", GoVersion:"go1.13.4", Compiler:"gc", Platform:"linux/amd64"}
+
+#+begin_src shell :results output :dir kubernetes/deployment
+  terraform destroy -auto-approve
+#+end_src
+
+#+RESULTS:
+#+begin_example
+[0m[1mmodule.traefik.kubernetes_manifest.ingress_route_tcp: Refreshing state...[0m
+[0m[1mmodule.traefik.kubernetes_manifest.middleware: Refreshing state...[0m
+[0m[1mmodule.traefik.kubernetes_manifest.ingress_route: Refreshing state...[0m
+[0m[1mmodule.traefik.kubernetes_manifest.traefik_service: Refreshing state...[0m
+[0m[1mmodule.traefik.kubernetes_manifest.tls_option: Refreshing state...[0m
+[0m[1mkubernetes_namespace.main: Refreshing state... [id=dev][0m
+[0m[1mmodule.traefik.kubernetes_cluster_role.main: Refreshing state... [id=terraform-traefik-traefik][0m
+[0m[1mmodule.traefik.kubernetes_service_account.main: Refreshing state... [id=dev/terraform-traefik-traefik][0m
+[0m[1mmodule.traefik.kubernetes_cluster_role_binding.main: Refreshing state... [id=terraform-traefik-traefik][0m
+[0m[1mmodule.traefik.kubernetes_deployment.main: Refreshing state... [id=dev/terraform-traefik][0m
+[0m[1mmodule.traefik.kubernetes_manifest.traefik_service: Destroying...[0m[0m
+[0m[1mmodule.traefik.kubernetes_manifest.middleware: Destroying...[0m[0m
+[0m[1mmodule.traefik.kubernetes_manifest.ingress_route: Destroying...[0m[0m
+[0m[1mmodule.traefik.kubernetes_manifest.ingress_route_tcp: Destroying...[0m[0m
+[0m[1mmodule.traefik.kubernetes_manifest.tls_option: Destroying...[0m[0m
+[0m[1mmodule.traefik.kubernetes_manifest.ingress_route: Destruction complete after 0s[0m[0m
+[0m[1mmodule.traefik.kubernetes_manifest.tls_option: Destruction complete after 0s[0m[0m
+[0m[1mmodule.traefik.kubernetes_manifest.middleware: Destruction complete after 0s[0m[0m
+[0m[1mmodule.traefik.kubernetes_manifest.traefik_service: Destruction complete after 0s[0m[0m
+[0m[1mmodule.traefik.kubernetes_manifest.ingress_route_tcp: Destruction complete after 0s[0m[0m
+[0m[1mmodule.traefik.kubernetes_cluster_role_binding.main: Destroying... [id=terraform-traefik-traefik][0m[0m
+[0m[1mkubernetes_namespace.main: Destroying... [id=dev][0m[0m
+[0m[1mmodule.traefik.kubernetes_cluster_role_binding.main: Destruction complete after 0s[0m[0m
+[0m[1mmodule.traefik.kubernetes_cluster_role.main: Destroying... [id=terraform-traefik-traefik][0m[0m
+[0m[1mmodule.traefik.kubernetes_cluster_role.main: Destruction complete after 0s[0m[0m
+[0m[1mmodule.traefik.kubernetes_deployment.main: Destroying... [id=dev/terraform-traefik][0m[0m
+[0m[1mmodule.traefik.kubernetes_deployment.main: Destruction complete after 0s[0m[0m
+[0m[1mmodule.traefik.kubernetes_service_account.main: Destroying... [id=dev/terraform-traefik-traefik][0m[0m
+[0m[1mmodule.traefik.kubernetes_service_account.main: Destruction complete after 0s[0m[0m
+[0m[1mkubernetes_namespace.main: Destruction complete after 7s[0m[0m
+[33m
+[1m[33mWarning: [0m[0m[1mQuoted references are deprecated[0m
+
+[0m  on ../traefik/crds.tf line 2, in resource "kubernetes_manifest" "ingress_route":
+   2:   provider = [4m"kubernetes-alpha"[0m
+[0m
+In this context, references are expected literally rather than in quotes.
+Terraform 0.11 and earlier required quotes, but quoted references are now
+deprecated and will be removed in a future version of Terraform. Remove the
+quotes surrounding this reference to silence this warning.
+
+(and 4 more similar warnings elsewhere)
+[0m[0m
+[0m[1m[32m
+Destroy complete! Resources: 10 destroyed.[0m
+#+end_example
+
+* Motivation
+
+Looking at
+ - https://github.com/dask/dask-gateway/blob/master/resources/helm/
+ - https://github.com/jupyterhub/zero-to-jupyterhub-k8s/tree/master/jupyterhub
+
+They both make critical assumptions and try to be more beginner friendly

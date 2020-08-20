@@ -1,4 +1,6 @@
 resource "kubernetes_manifest" "ingress_route" {
+  provider = kubernetes-alpha
+
   manifest = {
     apiVersion = "apiextensions.k8s.io/v1beta1"
     kind = "CustomResourceDefinition"
@@ -20,11 +22,13 @@ resource "kubernetes_manifest" "ingress_route" {
 
 
 resource "kubernetes_manifest" "ingress_route_tcp" {
+  provider = kubernetes-alpha
+
   manifest = {
     apiVersion = "apiextensions.k8s.io/v1beta1"
     kind = "CustomResourceDefinition"
     metadata = {
-      name = "ingressroutes.traefik.containo.us"
+      name = "ingressroutetcps.traefik.containo.us"
     }
     spec = {
       group = "traefik.containo.us"
@@ -41,11 +45,13 @@ resource "kubernetes_manifest" "ingress_route_tcp" {
 
 
 resource "kubernetes_manifest" "middleware" {
+  provider = kubernetes-alpha
+
   manifest = {
     apiVersion = "apiextensions.k8s.io/v1beta1"
     kind = "CustomResourceDefinition"
     metadata = {
-      name = "ingressroutes.traefik.containo.us"
+      name = "middlewares.traefik.containo.us"
     }
     spec = {
       group = "traefik.containo.us"
@@ -62,11 +68,13 @@ resource "kubernetes_manifest" "middleware" {
 
 
 resource "kubernetes_manifest" "tls_option" {
+  provider = kubernetes-alpha
+
   manifest = {
     apiVersion = "apiextensions.k8s.io/v1beta1"
     kind = "CustomResourceDefinition"
     metadata = {
-      name = "ingressroutes.traefik.containo.us"
+      name = "tlsoptions.traefik.containo.us"
     }
     spec = {
       group = "traefik.containo.us"
@@ -83,11 +91,13 @@ resource "kubernetes_manifest" "tls_option" {
 
 
 resource "kubernetes_manifest" "traefik_service" {
+  provider = kubernetes-alpha
+
   manifest = {
     apiVersion = "apiextensions.k8s.io/v1beta1"
     kind = "CustomResourceDefinition"
     metadata = {
-      name = "ingressroutes.traefik.containo.us"
+      name = "traefikservices.traefik.containo.us"
     }
     spec = {
       group = "traefik.containo.us"

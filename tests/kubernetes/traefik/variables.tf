@@ -20,3 +20,8 @@ variable "traefik-image" {
     tag   = "2.1.3"
   }
 }
+
+variable "loglevel" {
+  description = "traefik log level"
+  default     = "WARN"
+}
