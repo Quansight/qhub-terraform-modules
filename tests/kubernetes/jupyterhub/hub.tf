@@ -1,3 +1,9 @@
+resource "random_password" "proxy_secret_token" {
+  length  = 32
+  special = false
+}
+
+
 resource "kubernetes_config_map" "main" {
   metadata {
     name = "${var.name}-jupyterhub"
@@ -8,6 +14,18 @@ resource "kubernetes_config_map" "main" {
     "jupyterhub_config.py" = templatefile("${path.module}/jupyterhub_config.py", {
 
     })
+  }
+}
+
+
+resource "kubernetes_secret" "main" {
+  metadata {
+    name = "${var.name}-jupyterhub"
+    namespace = var.namespace
+  }
+
+  data = {
+    "proxy.token" = random_password.proxy_secret_token.result
   }
 }
 
@@ -139,7 +157,41 @@ resource "kubernetes_deployment" "main" {
             }
           }
 
-          # continue at POD_NAMESPACE
+          env {
+            name = "POD_NAMESPACE"
+            value_from = {
+              field_ref = {
+                field_path = "metadata.namespace"
+              }
+            }
+          }
+
+          env {
+            name = "CONFIGPROXY_AUTH_TOKEN"
+            value_from = {
+              secret_key_ref = {
+                name = "hub-secret"
+                key = "proxy.token"
+              }
+            }
+          }
+
+          env {
+            name = "JUPYTERHUB_CRYPT_KEY"
+            value_from = {
+              secret_key_ref = {
+                name = "hub-secret"
+                key = "auth.state.crypto-key"
+              }
+            }
+          }
+
+          port {
+            name = "http"
+            container_port = 8081
+          }
+
+          # TODO: add liveliness/readiness probe
         }
       }
     }

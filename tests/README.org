@@ -1,17 +1,27 @@
 * Using minikube for testing
 
+Delete previous minikube
+
+#+begin_src shell :results output
+  minikube delete
+#+end_src
+
+#+RESULTS:
+: * Deleting "minikube" from kvm2 ...
+: * The "minikube" cluster has been deleted.
+
 Start
 
 #+begin_src shell :results output
-  minikube start --kubernetes-version=v1.17.0 --vm-driver=kvm2
+  minikube start --kubernetes-version=v1.17.11 --vm-driver=kvm2
 #+end_src
 
 #+RESULTS:
 : * minikube v1.2.0 on linux (amd64)
 : * Creating kvm2 VM (CPUs=2, Memory=2048MB, Disk=20000MB) ...
-: * Configuring environment for Kubernetes v1.17.0 on Docker 18.09.6
-: * Downloading kubeadm v1.17.0
-: * Downloading kubelet v1.17.0
+: * Configuring environment for Kubernetes v1.17.11 on Docker 18.09.6
+: * Downloading kubeadm v1.17.11
+: * Downloading kubelet v1.17.11
 : * Pulling images ...
 : * Launching Kubernetes ...
 : * Verifying: apiserver proxy etcd scheduler controller dns
@@ -25,7 +35,7 @@ Start
 : host: Running
 : kubelet: Running
 : apiserver: Running
-: kubectl: Correctly Configured: pointing to minikube-vm at 192.168.39.106
+: kubectl: Correctly Configured: pointing to minikube-vm at 192.168.39.101
 
 Get kubernetes context
 
@@ -41,8 +51,8 @@ Get kubernetes context
 #+end_src
 
 #+RESULTS:
-| NAME     | STATUS | ROLES  | AGE   | VERSION |
-| minikube | Ready  | master | 2m59s | v1.17.0 |
+| NAME     | STATUS | ROLES  | AGE | VERSION  |
+| minikube | Ready  | master | 92s | v1.17.11 |
 
 #+begin_src shell :results output
   kubectl get namespaces -A
@@ -50,10 +60,10 @@ Get kubernetes context
 
 #+RESULTS:
 : NAME              STATUS   AGE
-: default           Active   3m
-: kube-node-lease   Active   3m2s
-: kube-public       Active   3m2s
-: kube-system       Active   3m2s
+: default           Active   96s
+: kube-node-lease   Active   97s
+: kube-public       Active   97s
+: kube-system       Active   97s
 
 ** Terraform Deployment
 
@@ -78,6 +88,7 @@ Archive:  terraform-provider-kubernetes-alpha_0.1.0_linux_amd64.zip
   inflating: terraform-provider-kubernetes-alpha
 ~/p/quansight/qhub-terraform-modules/tests/kubernetes/deployment
 [0m[1mInitializing modules...[0m
+- conda-store in ../conda-store
 - traefik in ../traefik
 
 [0m[1mInitializing the backend...[0m
@@ -150,13 +161,293 @@ Terraform will perform the following actions:
         }
     }
 
+[1m  # module.conda-store.kubernetes_config_map.conda_environments[0m will be created[0m[0m
+[0m  [32m+[0m[0m resource "kubernetes_config_map" "conda_environments" {
+      [32m+[0m [0m[1m[0mid[0m[0m = (known after apply)
+
+      [32m+[0m [0mmetadata {
+          [32m+[0m [0m[1m[0mgeneration[0m[0m       = (known after apply)
+          [32m+[0m [0m[1m[0mname[0m[0m             = "qhub-conda-environments"
+          [32m+[0m [0m[1m[0mnamespace[0m[0m        = "dev"
+          [32m+[0m [0m[1m[0mresource_version[0m[0m = (known after apply)
+          [32m+[0m [0m[1m[0mself_link[0m[0m        = (known after apply)
+          [32m+[0m [0m[1m[0muid[0m[0m              = (known after apply)
+        }
+    }
+
+[1m  # module.conda-store.kubernetes_deployment.main[0m will be created[0m[0m
+[0m  [32m+[0m[0m resource "kubernetes_deployment" "main" {
+      [32m+[0m [0m[1m[0mid[0m[0m               = (known after apply)
+      [32m+[0m [0m[1m[0mwait_for_rollout[0m[0m = true
+
+      [32m+[0m [0mmetadata {
+          [32m+[0m [0m[1m[0mgeneration[0m[0m       = (known after apply)
+          [32m+[0m [0m[1m[0mlabels[0m[0m           = {
+              [32m+[0m [0m"role" = "qhub-conda-store"
+            }
+          [32m+[0m [0m[1m[0mname[0m[0m             = "qhub-conda-store"
+          [32m+[0m [0m[1m[0mnamespace[0m[0m        = "dev"
+          [32m+[0m [0m[1m[0mresource_version[0m[0m = (known after apply)
+          [32m+[0m [0m[1m[0mself_link[0m[0m        = (known after apply)
+          [32m+[0m [0m[1m[0muid[0m[0m              = (known after apply)
+        }
+
+      [32m+[0m [0mspec {
+          [32m+[0m [0m[1m[0mmin_ready_seconds[0m[0m         = 0
+          [32m+[0m [0m[1m[0mpaused[0m[0m                    = false
+          [32m+[0m [0m[1m[0mprogress_deadline_seconds[0m[0m = 600
+          [32m+[0m [0m[1m[0mreplicas[0m[0m                  = 1
+          [32m+[0m [0m[1m[0mrevision_history_limit[0m[0m    = 10
+
+          [32m+[0m [0mselector {
+              [32m+[0m [0m[1m[0mmatch_labels[0m[0m = {
+                  [32m+[0m [0m"role" = "qhub-conda-store"
+                }
+            }
+
+          [32m+[0m [0mstrategy {
+              [32m+[0m [0m[1m[0mtype[0m[0m = (known after apply)
+
+              [32m+[0m [0mrolling_update {
+                  [32m+[0m [0m[1m[0mmax_surge[0m[0m       = (known after apply)
+                  [32m+[0m [0m[1m[0mmax_unavailable[0m[0m = (known after apply)
+                }
+            }
+
+          [32m+[0m [0mtemplate {
+              [32m+[0m [0mmetadata {
+                  [32m+[0m [0m[1m[0mgeneration[0m[0m       = (known after apply)
+                  [32m+[0m [0m[1m[0mlabels[0m[0m           = {
+                      [32m+[0m [0m"role" = "qhub-conda-store"
+                    }
+                  [32m+[0m [0m[1m[0mname[0m[0m             = (known after apply)
+                  [32m+[0m [0m[1m[0mresource_version[0m[0m = (known after apply)
+                  [32m+[0m [0m[1m[0mself_link[0m[0m        = (known after apply)
+                  [32m+[0m [0m[1m[0muid[0m[0m              = (known after apply)
+                }
+
+              [32m+[0m [0mspec {
+                  [32m+[0m [0m[1m[0mdns_policy[0m[0m                       = "ClusterFirst"
+                  [32m+[0m [0m[1m[0mhost_ipc[0m[0m                         = false
+                  [32m+[0m [0m[1m[0mhost_network[0m[0m                     = false
+                  [32m+[0m [0m[1m[0mhost_pid[0m[0m                         = false
+                  [32m+[0m [0m[1m[0mhostname[0m[0m                         = (known after apply)
+                  [32m+[0m [0m[1m[0mnode_name[0m[0m                        = (known after apply)
+                  [32m+[0m [0m[1m[0mrestart_policy[0m[0m                   = "Always"
+                  [32m+[0m [0m[1m[0mservice_account_name[0m[0m             = (known after apply)
+                  [32m+[0m [0m[1m[0mshare_process_namespace[0m[0m          = false
+                  [32m+[0m [0m[1m[0mtermination_grace_period_seconds[0m[0m = 30
+
+                  [32m+[0m [0mcontainer {
+                      [32m+[0m [0m[1m[0mcommand[0m[0m                  = [
+                          [32m+[0m [0m"python",
+                          [32m+[0m [0m"/opt/conda-store/conda-store.py",
+                          [32m+[0m [0m"-e",
+                          [32m+[0m [0m"/opt/environments",
+                          [32m+[0m [0m"-o",
+                          [32m+[0m [0m"/home/conda/environments",
+                          [32m+[0m [0m"-s",
+                          [32m+[0m [0m"/home/conda/store",
+                          [32m+[0m [0m"--uid",
+                          [32m+[0m [0m"0",
+                          [32m+[0m [0m"--gid",
+                          [32m+[0m [0m"0",
+                          [32m+[0m [0m"--permissions",
+                          [32m+[0m [0m"775",
+                        ]
+                      [32m+[0m [0m[1m[0mimage[0m[0m                    = "quansight/conda-store:e2051a36e60bd3abd9aa44105f240b359ee6bab7"
+                      [32m+[0m [0m[1m[0mimage_pull_policy[0m[0m        = (known after apply)
+                      [32m+[0m [0m[1m[0mname[0m[0m                     = "conda-store"
+                      [32m+[0m [0m[1m[0mstdin[0m[0m                    = false
+                      [32m+[0m [0m[1m[0mstdin_once[0m[0m               = false
+                      [32m+[0m [0m[1m[0mtermination_message_path[0m[0m = "/dev/termination-log"
+                      [32m+[0m [0m[1m[0mtty[0m[0m                      = false
+
+                      [32m+[0m [0mresources {
+                          [32m+[0m [0mlimits {
+                              [32m+[0m [0m[1m[0mcpu[0m[0m    = (known after apply)
+                              [32m+[0m [0m[1m[0mmemory[0m[0m = (known after apply)
+                            }
+
+                          [32m+[0m [0mrequests {
+                              [32m+[0m [0m[1m[0mcpu[0m[0m    = (known after apply)
+                              [32m+[0m [0m[1m[0mmemory[0m[0m = (known after apply)
+                            }
+                        }
+
+                      [32m+[0m [0mvolume_mount {
+                          [32m+[0m [0m[1m[0mmount_path[0m[0m        = "/opt/environments"
+                          [32m+[0m [0m[1m[0mmount_propagation[0m[0m = "None"
+                          [32m+[0m [0m[1m[0mname[0m[0m              = "conda-environments"
+                          [32m+[0m [0m[1m[0mread_only[0m[0m         = false
+                        }
+                      [32m+[0m [0mvolume_mount {
+                          [32m+[0m [0m[1m[0mmount_path[0m[0m        = "/home/conda"
+                          [32m+[0m [0m[1m[0mmount_propagation[0m[0m = "None"
+                          [32m+[0m [0m[1m[0mname[0m[0m              = "nfs-export-fast"
+                          [32m+[0m [0m[1m[0mread_only[0m[0m         = false
+                        }
+                    }
+                  [32m+[0m [0mcontainer {
+                      [32m+[0m [0m[1m[0mimage[0m[0m                    = "gcr.io/google_containers/volume-nfs:0.8"
+                      [32m+[0m [0m[1m[0mimage_pull_policy[0m[0m        = (known after apply)
+                      [32m+[0m [0m[1m[0mname[0m[0m                     = "nfs-server"
+                      [32m+[0m [0m[1m[0mstdin[0m[0m                    = false
+                      [32m+[0m [0m[1m[0mstdin_once[0m[0m               = false
+                      [32m+[0m [0m[1m[0mtermination_message_path[0m[0m = "/dev/termination-log"
+                      [32m+[0m [0m[1m[0mtty[0m[0m                      = false
+
+                      [32m+[0m [0mport {
+                          [32m+[0m [0m[1m[0mcontainer_port[0m[0m = 2049
+                          [32m+[0m [0m[1m[0mname[0m[0m           = "nfs"
+                          [32m+[0m [0m[1m[0mprotocol[0m[0m       = "TCP"
+                        }
+                      [32m+[0m [0mport {
+                          [32m+[0m [0m[1m[0mcontainer_port[0m[0m = 20048
+                          [32m+[0m [0m[1m[0mname[0m[0m           = "mountd"
+                          [32m+[0m [0m[1m[0mprotocol[0m[0m       = "TCP"
+                        }
+                      [32m+[0m [0mport {
+                          [32m+[0m [0m[1m[0mcontainer_port[0m[0m = 111
+                          [32m+[0m [0m[1m[0mname[0m[0m           = "rpcbind"
+                          [32m+[0m [0m[1m[0mprotocol[0m[0m       = "TCP"
+                        }
+
+                      [32m+[0m [0mresources {
+                          [32m+[0m [0mlimits {
+                              [32m+[0m [0m[1m[0mcpu[0m[0m    = (known after apply)
+                              [32m+[0m [0m[1m[0mmemory[0m[0m = (known after apply)
+                            }
+
+                          [32m+[0m [0mrequests {
+                              [32m+[0m [0m[1m[0mcpu[0m[0m    = (known after apply)
+                              [32m+[0m [0m[1m[0mmemory[0m[0m = (known after apply)
+                            }
+                        }
+
+                      [32m+[0m [0msecurity_context {
+                          [32m+[0m [0m[1m[0mallow_privilege_escalation[0m[0m = true
+                          [32m+[0m [0m[1m[0mprivileged[0m[0m                 = true
+                          [32m+[0m [0m[1m[0mread_only_root_filesystem[0m[0m  = false
+                        }
+
+                      [32m+[0m [0mvolume_mount {
+                          [32m+[0m [0m[1m[0mmount_path[0m[0m        = "/exports"
+                          [32m+[0m [0m[1m[0mmount_propagation[0m[0m = "None"
+                          [32m+[0m [0m[1m[0mname[0m[0m              = "nfs-export-fast"
+                          [32m+[0m [0m[1m[0mread_only[0m[0m         = false
+                        }
+                    }
+
+                  [32m+[0m [0mimage_pull_secrets {
+                      [32m+[0m [0m[1m[0mname[0m[0m = (known after apply)
+                    }
+
+                  [32m+[0m [0mvolume {
+                      [32m+[0m [0m[1m[0mname[0m[0m = "nfs-export-fast"
+
+                      [32m+[0m [0mpersistent_volume_claim {
+                          [32m+[0m [0m[1m[0mclaim_name[0m[0m = "qhub-conda-store-storage"
+                          [32m+[0m [0m[1m[0mread_only[0m[0m  = false
+                        }
+                    }
+                  [32m+[0m [0mvolume {
+                      [32m+[0m [0m[1m[0mname[0m[0m = "conda-environments"
+
+                      [32m+[0m [0mconfig_map {
+                          [32m+[0m [0m[1m[0mdefault_mode[0m[0m = "0644"
+                          [32m+[0m [0m[1m[0mname[0m[0m         = "qhub-conda-environments"
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+[1m  # module.conda-store.kubernetes_persistent_volume_claim.main[0m will be created[0m[0m
+[0m  [32m+[0m[0m resource "kubernetes_persistent_volume_claim" "main" {
+      [32m+[0m [0m[1m[0mid[0m[0m               = (known after apply)
+      [32m+[0m [0m[1m[0mwait_until_bound[0m[0m = true
+
+      [32m+[0m [0mmetadata {
+          [32m+[0m [0m[1m[0mgeneration[0m[0m       = (known after apply)
+          [32m+[0m [0m[1m[0mname[0m[0m             = "qhub-conda-store-storage"
+          [32m+[0m [0m[1m[0mnamespace[0m[0m        = "dev"
+          [32m+[0m [0m[1m[0mresource_version[0m[0m = (known after apply)
+          [32m+[0m [0m[1m[0mself_link[0m[0m        = (known after apply)
+          [32m+[0m [0m[1m[0muid[0m[0m              = (known after apply)
+        }
+
+      [32m+[0m [0mspec {
+          [32m+[0m [0m[1m[0maccess_modes[0m[0m       = [
+              [32m+[0m [0m"ReadWriteOnce",
+            ]
+          [32m+[0m [0m[1m[0mstorage_class_name[0m[0m = (known after apply)
+          [32m+[0m [0m[1m[0mvolume_name[0m[0m        = (known after apply)
+
+          [32m+[0m [0mresources {
+              [32m+[0m [0m[1m[0mrequests[0m[0m = {
+                  [32m+[0m [0m"storage" = "5Gi"
+                }
+            }
+        }
+    }
+
+[1m  # module.conda-store.kubernetes_service.main[0m will be created[0m[0m
+[0m  [32m+[0m[0m resource "kubernetes_service" "main" {
+      [32m+[0m [0m[1m[0mid[0m[0m                    = (known after apply)
+      [32m+[0m [0m[1m[0mload_balancer_ingress[0m[0m = (known after apply)
+
+      [32m+[0m [0mmetadata {
+          [32m+[0m [0m[1m[0mgeneration[0m[0m       = (known after apply)
+          [32m+[0m [0m[1m[0mname[0m[0m             = "qhub-conda-store"
+          [32m+[0m [0m[1m[0mnamespace[0m[0m        = "dev"
+          [32m+[0m [0m[1m[0mresource_version[0m[0m = (known after apply)
+          [32m+[0m [0m[1m[0mself_link[0m[0m        = (known after apply)
+          [32m+[0m [0m[1m[0muid[0m[0m              = (known after apply)
+        }
+
+      [32m+[0m [0mspec {
+          [32m+[0m [0m[1m[0mcluster_ip[0m[0m                  = (known after apply)
+          [32m+[0m [0m[1m[0mexternal_traffic_policy[0m[0m     = (known after apply)
+          [32m+[0m [0m[1m[0mpublish_not_ready_addresses[0m[0m = false
+          [32m+[0m [0m[1m[0mselector[0m[0m                    = {
+              [32m+[0m [0m"role" = "qhub-conda-store"
+            }
+          [32m+[0m [0m[1m[0msession_affinity[0m[0m            = "None"
+          [32m+[0m [0m[1m[0mtype[0m[0m                        = "ClusterIP"
+
+          [32m+[0m [0mport {
+              [32m+[0m [0m[1m[0mname[0m[0m        = "nfs"
+              [32m+[0m [0m[1m[0mnode_port[0m[0m   = (known after apply)
+              [32m+[0m [0m[1m[0mport[0m[0m        = 2049
+              [32m+[0m [0m[1m[0mprotocol[0m[0m    = "TCP"
+              [32m+[0m [0m[1m[0mtarget_port[0m[0m = (known after apply)
+            }
+          [32m+[0m [0mport {
+              [32m+[0m [0m[1m[0mname[0m[0m        = "mountd"
+              [32m+[0m [0m[1m[0mnode_port[0m[0m   = (known after apply)
+              [32m+[0m [0m[1m[0mport[0m[0m        = 20048
+              [32m+[0m [0m[1m[0mprotocol[0m[0m    = "TCP"
+              [32m+[0m [0m[1m[0mtarget_port[0m[0m = (known after apply)
+            }
+          [32m+[0m [0mport {
+              [32m+[0m [0m[1m[0mname[0m[0m        = "rpcbind"
+              [32m+[0m [0m[1m[0mnode_port[0m[0m   = (known after apply)
+              [32m+[0m [0m[1m[0mport[0m[0m        = 111
+              [32m+[0m [0m[1m[0mprotocol[0m[0m    = "TCP"
+              [32m+[0m [0m[1m[0mtarget_port[0m[0m = (known after apply)
+            }
+        }
+    }
+
 [1m  # module.traefik.kubernetes_cluster_role.main[0m will be created[0m[0m
 [0m  [32m+[0m[0m resource "kubernetes_cluster_role" "main" {
       [32m+[0m [0m[1m[0mid[0m[0m = (known after apply)
 
       [32m+[0m [0mmetadata {
           [32m+[0m [0m[1m[0mgeneration[0m[0m       = (known after apply)
-          [32m+[0m [0m[1m[0mname[0m[0m             = "terraform-traefik-traefik"
+          [32m+[0m [0m[1m[0mname[0m[0m             = "qhub-traefik"
           [32m+[0m [0m[1m[0mresource_version[0m[0m = (known after apply)
           [32m+[0m [0m[1m[0mself_link[0m[0m        = (known after apply)
           [32m+[0m [0m[1m[0muid[0m[0m              = (known after apply)
@@ -227,7 +518,7 @@ Terraform will perform the following actions:
 
       [32m+[0m [0mmetadata {
           [32m+[0m [0m[1m[0mgeneration[0m[0m       = (known after apply)
-          [32m+[0m [0m[1m[0mname[0m[0m             = "terraform-traefik-traefik"
+          [32m+[0m [0m[1m[0mname[0m[0m             = "qhub-traefik"
           [32m+[0m [0m[1m[0mresource_version[0m[0m = (known after apply)
           [32m+[0m [0m[1m[0mself_link[0m[0m        = (known after apply)
           [32m+[0m [0m[1m[0muid[0m[0m              = (known after apply)
@@ -236,13 +527,13 @@ Terraform will perform the following actions:
       [32m+[0m [0mrole_ref {
           [32m+[0m [0m[1m[0mapi_group[0m[0m = "rbac.authorization.k8s.io"
           [32m+[0m [0m[1m[0mkind[0m[0m      = "ClusterRole"
-          [32m+[0m [0m[1m[0mname[0m[0m      = "terraform-traefik-traefik"
+          [32m+[0m [0m[1m[0mname[0m[0m      = "qhub-traefik"
         }
 
       [32m+[0m [0msubject {
           [32m+[0m [0m[1m[0mapi_group[0m[0m = (known after apply)
           [32m+[0m [0m[1m[0mkind[0m[0m      = "ServiceAccount"
-          [32m+[0m [0m[1m[0mname[0m[0m      = "terraform-traefik-traefik"
+          [32m+[0m [0m[1m[0mname[0m[0m      = "qhub-traefik"
           [32m+[0m [0m[1m[0mnamespace[0m[0m = "dev"
         }
     }
@@ -254,7 +545,7 @@ Terraform will perform the following actions:
 
       [32m+[0m [0mmetadata {
           [32m+[0m [0m[1m[0mgeneration[0m[0m       = (known after apply)
-          [32m+[0m [0m[1m[0mname[0m[0m             = "terraform-traefik"
+          [32m+[0m [0m[1m[0mname[0m[0m             = "qhub-traefik"
           [32m+[0m [0m[1m[0mnamespace[0m[0m        = "dev"
           [32m+[0m [0m[1m[0mresource_version[0m[0m = (known after apply)
           [32m+[0m [0m[1m[0mself_link[0m[0m        = (known after apply)
@@ -303,7 +594,7 @@ Terraform will perform the following actions:
                   [32m+[0m [0m[1m[0mhostname[0m[0m                         = (known after apply)
                   [32m+[0m [0m[1m[0mnode_name[0m[0m                        = (known after apply)
                   [32m+[0m [0m[1m[0mrestart_policy[0m[0m                   = "Always"
-                  [32m+[0m [0m[1m[0mservice_account_name[0m[0m             = "terraform-traefik-traefik"
+                  [32m+[0m [0m[1m[0mservice_account_name[0m[0m             = "qhub-traefik"
                   [32m+[0m [0m[1m[0mshare_process_namespace[0m[0m          = false
                   [32m+[0m [0m[1m[0mtermination_grace_period_seconds[0m[0m = 60
 
@@ -323,7 +614,7 @@ Terraform will perform the following actions:
                         ]
                       [32m+[0m [0m[1m[0mimage[0m[0m                    = "traefik:2.1.3"
                       [32m+[0m [0m[1m[0mimage_pull_policy[0m[0m        = (known after apply)
-                      [32m+[0m [0m[1m[0mname[0m[0m                     = "terraform-traefik"
+                      [32m+[0m [0m[1m[0mname[0m[0m                     = "qhub"
                       [32m+[0m [0m[1m[0mstdin[0m[0m                    = false
                       [32m+[0m [0m[1m[0mstdin_once[0m[0m               = false
                       [32m+[0m [0m[1m[0mtermination_message_path[0m[0m = "/dev/termination-log"
@@ -892,7 +1183,7 @@ Terraform will perform the following actions:
 
       [32m+[0m [0mmetadata {
           [32m+[0m [0m[1m[0mgeneration[0m[0m       = (known after apply)
-          [32m+[0m [0m[1m[0mname[0m[0m             = "terraform-traefik"
+          [32m+[0m [0m[1m[0mname[0m[0m             = "qhub-traefik"
           [32m+[0m [0m[1m[0mnamespace[0m[0m        = "dev"
           [32m+[0m [0m[1m[0mresource_version[0m[0m = (known after apply)
           [32m+[0m [0m[1m[0mself_link[0m[0m        = (known after apply)
@@ -907,7 +1198,7 @@ Terraform will perform the following actions:
               [32m+[0m [0m"app.kubernetes.io/component" = "traefik"
             }
           [32m+[0m [0m[1m[0msession_affinity[0m[0m            = "None"
-          [32m+[0m [0m[1m[0mtype[0m[0m                        = "LoadBalancer"
+          [32m+[0m [0m[1m[0mtype[0m[0m                        = "NodePort"
 
           [32m+[0m [0mport {
               [32m+[0m [0m[1m[0mname[0m[0m        = "web"
@@ -940,7 +1231,7 @@ Terraform will perform the following actions:
 
       [32m+[0m [0mmetadata {
           [32m+[0m [0m[1m[0mgeneration[0m[0m       = (known after apply)
-          [32m+[0m [0m[1m[0mname[0m[0m             = "terraform-traefik-traefik"
+          [32m+[0m [0m[1m[0mname[0m[0m             = "qhub-traefik"
           [32m+[0m [0m[1m[0mnamespace[0m[0m        = "dev"
           [32m+[0m [0m[1m[0mresource_version[0m[0m = (known after apply)
           [32m+[0m [0m[1m[0mself_link[0m[0m        = (known after apply)
@@ -948,20 +1239,7 @@ Terraform will perform the following actions:
         }
     }
 
-[0m[1mPlan:[0m 11 to add, 0 to change, 0 to destroy.[0m
-[33m
-[1m[33mWarning: [0m[0m[1mQuoted references are deprecated[0m
-
-[0m  on ../traefik/crds.tf line 2, in resource "kubernetes_manifest" "ingress_route":
-   2:   provider = [4m"kubernetes-alpha"[0m
-[0m
-In this context, references are expected literally rather than in quotes.
-Terraform 0.11 and earlier required quotes, but quoted references are now
-deprecated and will be removed in a future version of Terraform. Remove the
-quotes surrounding this reference to silence this warning.
-
-(and 4 more similar warnings elsewhere)
-[0m[0m
+[0m[1mPlan:[0m 15 to add, 0 to change, 0 to destroy.[0m
 
 ------------------------------------------------------------------------
 
@@ -978,6 +1256,58 @@ Terraform apply
 #+end_src
 
 #+RESULTS:
+#+begin_example
+[0m[1mmodule.traefik.kubernetes_manifest.traefik_service: Creating...[0m[0m
+[0m[1mmodule.traefik.kubernetes_manifest.ingress_route_tcp: Creating...[0m[0m
+[0m[1mmodule.traefik.kubernetes_manifest.ingress_route: Creating...[0m[0m
+[0m[1mmodule.traefik.kubernetes_manifest.tls_option: Creating...[0m[0m
+[0m[1mmodule.traefik.kubernetes_manifest.middleware: Creating...[0m[0m
+[0m[1mmodule.traefik.kubernetes_manifest.traefik_service: Creation complete after 0s[0m[0m
+[0m[1mmodule.traefik.kubernetes_manifest.ingress_route: Creation complete after 0s[0m[0m
+[0m[1mmodule.traefik.kubernetes_manifest.ingress_route_tcp: Creation complete after 0s[0m[0m
+[0m[1mmodule.traefik.kubernetes_manifest.tls_option: Creation complete after 0s[0m[0m
+[0m[1mmodule.traefik.kubernetes_manifest.middleware: Creation complete after 0s[0m[0m
+[0m[1mmodule.conda-store.kubernetes_config_map.conda_environments: Creating...[0m[0m
+[0m[1mkubernetes_namespace.main: Creating...[0m[0m
+[0m[1mmodule.traefik.kubernetes_service_account.main: Creating...[0m[0m
+[0m[1mmodule.traefik.kubernetes_cluster_role.main: Creating...[0m[0m
+[0m[1mmodule.conda-store.kubernetes_persistent_volume_claim.main: Creating...[0m[0m
+[0m[1mmodule.traefik.kubernetes_service.main: Creating...[0m[0m
+[0m[1mmodule.conda-store.kubernetes_service.main: Creating...[0m[0m
+[0m[1mkubernetes_namespace.main: Creation complete after 0s [id=dev][0m[0m
+[0m[1mmodule.traefik.kubernetes_cluster_role.main: Creation complete after 0s [id=qhub-traefik][0m[0m
+[0m[1mmodule.conda-store.kubernetes_config_map.conda_environments: Creation complete after 1s [id=dev/qhub-conda-environments][0m[0m
+[0m[1mmodule.conda-store.kubernetes_service.main: Creation complete after 1s [id=dev/qhub-conda-store][0m[0m
+[0m[1mmodule.traefik.kubernetes_service.main: Creation complete after 1s [id=dev/qhub-traefik][0m[0m
+[0m[1mmodule.conda-store.kubernetes_persistent_volume_claim.main: Creation complete after 1s [id=dev/qhub-conda-store-storage][0m[0m
+[0m[1mmodule.traefik.kubernetes_service_account.main: Creation complete after 1s [id=dev/qhub-traefik][0m[0m
+[0m[1mmodule.traefik.kubernetes_cluster_role_binding.main: Creating...[0m[0m
+[0m[1mmodule.traefik.kubernetes_cluster_role_binding.main: Creation complete after 0s [id=qhub-traefik][0m[0m
+[0m[1mmodule.conda-store.kubernetes_deployment.main: Creating...[0m[0m
+[0m[1mmodule.traefik.kubernetes_deployment.main: Creating...[0m[0m
+[0m[1mmodule.conda-store.kubernetes_deployment.main: Still creating... [10s elapsed][0m[0m
+[0m[1mmodule.traefik.kubernetes_deployment.main: Still creating... [10s elapsed][0m[0m
+[0m[1mmodule.conda-store.kubernetes_deployment.main: Still creating... [20s elapsed][0m[0m
+[0m[1mmodule.traefik.kubernetes_deployment.main: Still creating... [20s elapsed][0m[0m
+[0m[1mmodule.traefik.kubernetes_deployment.main: Creation complete after 26s [id=dev/qhub-traefik][0m[0m
+[0m[1mmodule.conda-store.kubernetes_deployment.main: Still creating... [30s elapsed][0m[0m
+[0m[1mmodule.conda-store.kubernetes_deployment.main: Still creating... [40s elapsed][0m[0m
+[0m[1mmodule.conda-store.kubernetes_deployment.main: Still creating... [50s elapsed][0m[0m
+[0m[1mmodule.conda-store.kubernetes_deployment.main: Creation complete after 56s [id=dev/qhub-conda-store][0m[0m
+[0m[1m[32m
+Apply complete! Resources: 15 added, 0 changed, 0 destroyed.[0m
+#+end_example
+
+Check that services are available
+
+#+begin_src shell :results output :dir kubernetes/deployment
+  kubectl get services -n dev
+#+end_src
+
+#+RESULTS:
+: NAME               TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                                        AGE
+: qhub-conda-store   ClusterIP   10.105.255.178   <none>        2049/TCP,20048/TCP,111/TCP                     4m35s
+: qhub-traefik       NodePort    10.107.164.226   <none>        8000:32239/TCP,8786:32231/TCP,9000:31820/TCP   4m35s
 
 Check that the namespace now exists
 
@@ -987,11 +1317,11 @@ Check that the namespace now exists
 
 #+RESULTS:
 : NAME              STATUS   AGE
-: default           Active   23m
-: dev               Active   39s
-: kube-node-lease   Active   23m
-: kube-public       Active   23m
-: kube-system       Active   23m
+: default           Active   6m31s
+: dev               Active   4m9s
+: kube-node-lease   Active   6m32s
+: kube-public       Active   6m32s
+: kube-system       Active   6m32s
 
 Check that config files exist
 
@@ -1068,6 +1398,18 @@ quotes surrounding this reference to silence this warning.
 [0m[1m[32m
 Destroy complete! Resources: 10 destroyed.[0m
 #+end_example
+
+There is a value.yaml file that is also stored in the configuration
+
+#+begin_src yaml
+auth:
+  github:
+    clientSecret: 321e5a2ff3e5362ea7e0cbb0fccbdaacbbb6b3bb
+hub:
+  services:
+    dask-gateway:
+      apiToken: jNdg9NTJ4z3ZrZrBP2nlGSNSZcWNVlEE
+#+end_src
 
 * Motivation
 
