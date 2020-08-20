@@ -15,7 +15,7 @@ variable "hub_storage" {
 
 variable "hub-image" {
   description = "hub image"
-    type = object({
+  type = object({
     image = string
     tag = string
   })
@@ -23,4 +23,12 @@ variable "hub-image" {
     image = "jupyterhub/k8s-hub"
     tag   = "0.9.1"
   }
+}
+
+variable "services" {
+  description = "services to add to jupyterhub cluster"
+  type = list(object({
+    name = string
+    api_key = string
+  }))
 }

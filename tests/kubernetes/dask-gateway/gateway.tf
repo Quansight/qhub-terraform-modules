@@ -6,7 +6,7 @@ resource "random_password" "jupyterhub_api_token" {
 
 resource "kubernetes_config_map" "gateway" {
   metadata {
-    name = "${var.name}-gateway-config"
+    name = "${var.name}-daskgateway-gateway"
     namespace = var.namespace
   }
 
@@ -20,7 +20,7 @@ resource "kubernetes_config_map" "gateway" {
 
 resource "kubernetes_service_account" "gateway" {
   metadata {
-    name = var.name
+    name = "${var.name}-daskgateway-gateway"
     namespace = var.namespace
   }
 }
@@ -28,8 +28,7 @@ resource "kubernetes_service_account" "gateway" {
 
 resource "kubernetes_cluster_role" "gateway" {
   metadata {
-    name = var.name
-    namespace = var.namespace
+    name = "${var.name}-daskgateway-gateway"
   }
 
   rule {
@@ -48,8 +47,7 @@ resource "kubernetes_cluster_role" "gateway" {
 
 resource "kubernetes_cluster_role_binding" "gateway" {
   metadata {
-    name = var.name
-    namespace = var.namespace
+    name = "${var.name}-daskgateway-gateway"
   }
 
   role_ref {
@@ -67,7 +65,8 @@ resource "kubernetes_cluster_role_binding" "gateway" {
 
 resource "kubernetes_deployment" "gateway" {
   metadata {
-    name = var.name
+    name = "${var.name}-daskgateway-gateway"
+    namespace = var.namespace
   }
 
   spec {
@@ -89,8 +88,8 @@ resource "kubernetes_deployment" "gateway" {
       spec {
         volume {
           name = "configmap"
-          config_map = {
-            name = kubernetes_config_map.main.metadata.0.name
+          config_map {
+            name = kubernetes_config_map.gateway.metadata.0.name
           }
         }
 
@@ -111,7 +110,7 @@ resource "kubernetes_deployment" "gateway" {
 
           env {
             name  = "JUPYTERHUB_API_TOKEN"
-            value = random_password.jupyterhub_api_token
+            value = random_password.jupyterhub_api_token.result
           }
 
           port {

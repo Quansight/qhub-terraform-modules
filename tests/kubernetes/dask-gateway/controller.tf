@@ -1,6 +1,6 @@
 resource "kubernetes_config_map" "controller" {
   metadata {
-    name = "${var.name}-controller-config"
+    name = "${var.name}-daskgateway-controller"
     namespace = var.namespace
   }
 
@@ -13,7 +13,7 @@ resource "kubernetes_config_map" "controller" {
 
 resource "kubernetes_service_account" "controller" {
   metadata {
-    name = "${var.name}-controller"
+    name = "${var.name}-daskgateway-controller"
     namespace = var.namespace
   }
 }
@@ -21,8 +21,7 @@ resource "kubernetes_service_account" "controller" {
 
 resource "kubernetes_cluster_role" "controller" {
   metadata {
-    name = "${var.name}-controller"
-    namespace = var.namespace
+    name = "${var.name}-daskgateway-controller"
   }
 
   rule {
@@ -59,8 +58,7 @@ resource "kubernetes_cluster_role" "controller" {
 
 resource "kubernetes_cluster_role_binding" "controller" {
   metadata {
-    name = "${var.name}-controller"
-    namespace = var.namespace
+    name = "${var.name}-daskgateway-controller"
   }
 
   role_ref {
@@ -78,7 +76,7 @@ resource "kubernetes_cluster_role_binding" "controller" {
 
 resource "kubernetes_deployment" "controller" {
   metadata {
-    name = "${var.name}-controller"
+    name = "${var.name}-daskgateway-controller"
     namespace = var.namespace
   }
 
@@ -116,7 +114,7 @@ resource "kubernetes_deployment" "controller" {
 
         container {
           image = "${var.controller-image.image}:${var.controller-image.tag}"
-          name  = "${var.name}-controller"
+          name  = "${var.name}-daskgateway-controller"
 
           command = [
             "dask-gateway-server",

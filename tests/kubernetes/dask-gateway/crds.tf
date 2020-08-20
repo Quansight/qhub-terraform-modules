@@ -1,4 +1,6 @@
 resource "kubernetes_manifest" "main" {
+  provider = kubernetes-alpha
+
   manifest = {
     apiVersion = "apiextensions.k8s.io/v1beta1"
     kind = "CustomResourceDefinition"
@@ -7,9 +9,10 @@ resource "kubernetes_manifest" "main" {
     }
     spec = {
       group = "gateway.dask.org"
+      version = "v1alpha1"
       names = {
         kind = "DaskCluster"
-        list_kind = "DaskClusterList"
+        listKind = "DaskClusterList"
         plural = "daskclusters"
         singular = "daskcluster"
       }
