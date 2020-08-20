@@ -18,6 +18,10 @@ module "traefik" {
 
   name = var.prefix
   namespace = var.namespace
+
+  depends_on = [
+    kubernetes_namespace.main
+  ]
 }
 
 module "conda-store" {
@@ -25,6 +29,10 @@ module "conda-store" {
 
   name = var.prefix
   namespace = var.namespace
+
+  depends_on = [
+    kubernetes_namespace.main
+  ]
 }
 
 # module "dask-gateway" {
