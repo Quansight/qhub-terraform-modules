@@ -1,6 +1,6 @@
-variable "name" {
-  description = "name prefix to assign to qhub"
-  default = "terraform-qhub"
+variable "prefix" {
+  description = "prefix to assign to resources"
+  default = "qhub"
 }
 
 variable "namespace" {

@@ -133,7 +133,7 @@ resource "kubernetes_deployment" "main" {
         volume {
           name = "conda-environments"
           config_map {
-            name = kubernetes_config_map.conda-environments.metadata.0.name
+            name = kubernetes_config_map.conda_environments.metadata.0.name
           }
         }
       }
@@ -141,9 +141,9 @@ resource "kubernetes_deployment" "main" {
   }
 }
 
-resource "kubernetes_config_map" "conda-environments" {
+resource "kubernetes_config_map" "conda_environments" {
   metadata {
-    name      = "conda-environments"
+    name      = "${var.name}-conda-environments"
     namespace = var.namespace
   }
 

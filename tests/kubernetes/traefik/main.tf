@@ -1,6 +1,6 @@
 resource "kubernetes_service" "main" {
   metadata {
-    name = var.name
+    name = "${var.name}-traefik"
     namespace = var.namespace
   }
 
@@ -34,7 +34,7 @@ resource "kubernetes_service" "main" {
 
 resource "kubernetes_deployment" "main" {
   metadata {
-    name = var.name
+    name = "${var.name}-traefik"
     namespace = var.namespace
   }
 

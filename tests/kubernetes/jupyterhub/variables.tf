@@ -7,3 +7,20 @@ variable "namespace" {
   description = "namespace to deploy jupyterhub"
   default = "default"
 }
+
+variable "hub_storage" {
+  description = "storage to allocate for jupyterhub"
+  default     = "1Gi"
+}
+
+variable "hub-image" {
+  description = "hub image"
+    type = object({
+    image = string
+    tag = string
+  })
+  default = {
+    image = "jupyterhub/k8s-hub"
+    tag   = "0.9.1"
+  }
+}

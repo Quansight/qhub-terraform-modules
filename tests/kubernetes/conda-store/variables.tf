@@ -12,7 +12,7 @@ variable "namespace" {
 variable "nfs_capacity" {
   description = "Capacity of conda-store deployment"
   type        = string
-  default     = "10Gi"
+  default     = "5Gi"
 }
 
 variable "environments" {

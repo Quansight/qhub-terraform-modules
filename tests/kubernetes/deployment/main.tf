@@ -16,7 +16,14 @@ resource "kubernetes_namespace" "main" {
 module "traefik" {
   source = "../traefik"
 
-  name = "terraform-traefik"
+  name = var.prefix
+  namespace = var.namespace
+}
+
+module "conda-store" {
+  source = "../conda-store"
+
+  name = var.prefix
   namespace = var.namespace
 }
 
