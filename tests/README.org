@@ -32,10 +32,6 @@ Start
 #+end_src
 
 #+RESULTS:
-: host: Running
-: kubelet: Running
-: apiserver: Running
-: kubectl: Correctly Configured: pointing to minikube-vm at 192.168.39.55
 
 Get kubernetes context
 
@@ -52,7 +48,7 @@ Get kubernetes context
 
 #+RESULTS:
 | NAME     | STATUS | ROLES  | AGE | VERSION  |
-| minikube | Ready  | master | 92s | v1.17.11 |
+| minikube | Ready  | master | 17h | v1.17.11 |
 
 #+begin_src shell :results output
   kubectl get namespaces -A
@@ -149,10 +145,12 @@ Check that config files exist
 #+RESULTS:
 
 #+begin_src shell :results output :dir kubernetes/deployment
+  kubectl delete clusterrole qhub-traefik
   kubectl delete clusterrolebinding qhub-traefik
 #+end_src
 
 #+RESULTS:
+: clusterrole.rbac.authorization.k8s.io "qhub-traefik" deleted
 : clusterrolebinding.rbac.authorization.k8s.io "qhub-traefik" deleted
 
 #+begin_src shell :results output :dir kubernetes/deployment

@@ -11,9 +11,18 @@ resource "kubernetes_config_map" "gateway" {
   }
 
   data = {
-    "dask_gateway_config.py" = templatefile("${path.module}/templates/gateway_config.py", {
-
-    })
+    "dask_gateway_config.py" = templatefile(
+      "${path.module}/templates/gateway_config.py", {
+        gatewayName = "${var.name}-daskgateway-gateway"
+        gatewayNamespace = var.namespace
+        jupyterhub = {
+          host = "example.com"
+          port = 80
+        }
+        gateway = var.gateway
+        cluster = var.cluster
+        cluster-image = var.cluster-image
+      })
   }
 }
 
@@ -92,6 +101,8 @@ resource "kubernetes_deployment" "gateway" {
             name = kubernetes_config_map.gateway.metadata.0.name
           }
         }
+
+        service_account_name = kubernetes_service_account.gateway.metadata.0.name
 
         container {
           image = "${var.gateway-image.image}:${var.gateway-image.tag}"

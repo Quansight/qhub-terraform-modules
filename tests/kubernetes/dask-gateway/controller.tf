@@ -5,9 +5,13 @@ resource "kubernetes_config_map" "controller" {
   }
 
   data = {
-    "dask_gateway_config.py" = templatefile("${path.module}/templates/controller_config.py", {
-
-    })
+    "dask_gateway_config.py" = templatefile(
+      "${path.module}/templates/controller_config.py", {
+        gatewayName = kubernetes_deployment.gateway.metadata.0.name
+        gatewayNamespace = kubernetes_deployment.gateway.metadata.0.namespace
+        gateway = var.gateway
+        controller = var.controller
+      })
   }
 }
 
