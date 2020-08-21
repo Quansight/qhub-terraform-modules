@@ -8,11 +8,6 @@ variable "namespace" {
   default = "default"
 }
 
-variable "hub_storage" {
-  description = "storage to allocate for jupyterhub"
-  default     = "1Gi"
-}
-
 variable "hub-image" {
   description = "hub image"
   type = object({
@@ -26,9 +21,29 @@ variable "hub-image" {
 }
 
 variable "services" {
-  description = "services to add to jupyterhub cluster"
-  type = list(object({
-    name = string
-    api_key = string
-  }))
+  description = "services to create api tokens"
+  type = list(string)
+  default = []
+}
+
+variable "proxy-image" {
+  description = "proxy image"
+  type = object({
+    image = string
+    tag = string
+  })
+  default = {
+    image = "jupyterhub/k8s-hub"
+    tag   = "0.9.1"
+  }
+}
+
+variable "singleuser" {
+  description = "jupyterhub singleuser defaults"
+  type = object({
+    namespace = string
+  })
+  default = {
+    namespace = "default"
+  }
 }

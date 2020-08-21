@@ -6,13 +6,21 @@ resource "random_password" "proxy_secret_token" {
 
 resource "kubernetes_config_map" "main" {
   metadata {
-    name = "${var.name}-jupyterhub"
+    name = "${var.name}-jupyterhub-hub"
     namespace = var.namespace
   }
 
   data = {
-    "jupyterhub_config.py" = templatefile("${path.module}/jupyterhub_config.py", {
-
+    "jupyterhub_config.py" = templatefile("${path.module}/templates/jupyterhub_config.py", {
+      proxy = {
+        host = "${kubernetes_service.proxy.metadata.0.name}.${kubernetes_service.proxy.metadata.0.namespace}"
+        port = 80
+      }
+      singleuser = var.singleuser
+      hub = {
+        host = "${kubernetes_service.hub.metadata.0.name}.${kubernetes_service.hub.metadata.0.namespace}"
+        port = 8081
+      }
     })
   }
 }
@@ -20,7 +28,7 @@ resource "kubernetes_config_map" "main" {
 
 resource "kubernetes_secret" "main" {
   metadata {
-    name = "${var.name}-jupyterhub"
+    name = "${var.name}-jupyterhub-hub"
     namespace = var.namespace
   }
 
@@ -32,7 +40,7 @@ resource "kubernetes_secret" "main" {
 
 resource "kubernetes_persistent_volume_claim" "main" {
   metadata {
-    name      = "${var.name}-jupyterhub"
+    name      = "${var.name}-jupyterhub-hub"
     namespace = var.namespace
   }
 
@@ -40,7 +48,7 @@ resource "kubernetes_persistent_volume_claim" "main" {
     access_modes = ["ReadWriteOnce"]
     resources {
       requests = {
-        storage = var.hub_storage
+        storage = "1Gi"
       }
     }
   }
@@ -49,13 +57,13 @@ resource "kubernetes_persistent_volume_claim" "main" {
 
 resource "kubernetes_service" "hub" {
   metadata {
-    name = "${var.name}-jupyterhub"
+    name = "${var.name}-jupyterhub-hub"
     namespace = var.namespace
   }
 
   spec {
     selector = {
-      "app.kubernetes.io/component" = "jupyterhub"
+      "app.kubernetes.io/component" = "jupyterhub-hub"
     }
 
     port {
@@ -68,7 +76,7 @@ resource "kubernetes_service" "hub" {
 
 resource "kubernetes_deployment" "main" {
   metadata {
-    name      = "${var.name}-jupyterhub"
+    name      = "${var.name}-jupyterhub-hub"
     namespace = var.namespace
   }
 
@@ -77,14 +85,14 @@ resource "kubernetes_deployment" "main" {
 
     selector {
       match_labels = {
-        "app.kubernetes.io/component" = "jupyterhub"
+        "app.kubernetes.io/component" = "jupyterhub-hub"
       }
     }
 
     template {
       metadata {
         labels = {
-          "app.kubernetes.io/component" = "jupyterhub"
+          "app.kubernetes.io/component" = "jupyterhub-hub"
           "hub.jupyter.org/network-access-proxy-api" = "true"
           "hub.jupyter.org/network-access-proxy-http" = "true"
           "hub.jupyter.org/network-access-singleuser" = "true"
@@ -94,7 +102,7 @@ resource "kubernetes_deployment" "main" {
       spec {
         volume {
           name = "config"
-          config_map = {
+          config_map {
             name = kubernetes_config_map.main.metadata.0.name
           }
         }
@@ -108,7 +116,7 @@ resource "kubernetes_deployment" "main" {
 
         volume {
           name = "hub-db-dir"
-          persistent_volumne_claim = {
+          persistent_volume_claim {
             claim_name = kubernetes_persistent_volume_claim.main.metadata.0.name
           }
         }
@@ -149,8 +157,8 @@ resource "kubernetes_deployment" "main" {
 
           env {
             name = "JPY_COOKIE_SECRET"
-            value_from = {
-              secret_key_ref = {
+            value_from {
+              secret_key_ref {
                 name = "hub-secret"
                 key = "hub.cookie-secret"
               }
@@ -158,30 +166,11 @@ resource "kubernetes_deployment" "main" {
           }
 
           env {
-            name = "POD_NAMESPACE"
-            value_from = {
-              field_ref = {
-                field_path = "metadata.namespace"
-              }
-            }
-          }
-
-          env {
             name = "CONFIGPROXY_AUTH_TOKEN"
-            value_from = {
-              secret_key_ref = {
+            value_from {
+              secret_key_ref {
                 name = "hub-secret"
                 key = "proxy.token"
-              }
-            }
-          }
-
-          env {
-            name = "JUPYTERHUB_CRYPT_KEY"
-            value_from = {
-              secret_key_ref = {
-                name = "hub-secret"
-                key = "auth.state.crypto-key"
               }
             }
           }

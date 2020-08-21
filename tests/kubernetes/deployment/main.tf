@@ -35,8 +35,19 @@ module "conda-store" {
   ]
 }
 
-module "dask-gateway" {
-  source = "../dask-gateway"
+# module "dask-gateway" {
+#   source = "../dask-gateway"
+
+#   name = var.prefix
+#   namespace = var.namespace
+
+#   depends_on = [
+#     kubernetes_namespace.main
+#   ]
+# }
+
+module "jupyterhub" {
+  source = "../jupyterhub"
 
   name = var.prefix
   namespace = var.namespace
@@ -45,10 +56,3 @@ module "dask-gateway" {
     kubernetes_namespace.main
   ]
 }
-
-# module "jupyterhub" {
-#   source = "../jupyterhub"
-
-#   name = "terraform-qhub-jupyterhub"
-#   namespace = var.namespace
-# }
