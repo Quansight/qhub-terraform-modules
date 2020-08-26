@@ -46,6 +46,8 @@ module "jupyterhub" {
     "dask_gateway"
   ]
 
+  extraConfig = file("${path.module}/files/jupyterhub_config.py")
+
   depends_on = [
     kubernetes_namespace.main
   ]

@@ -34,7 +34,7 @@ resource "kubernetes_config_map" "hub" {
       }
       singleuser = var.singleuser
       hub = {
-        host = kubernetes_service.hub.metadata.0.name
+        host = "${kubernetes_service.hub.metadata.0.name}.${kubernetes_service.hub.metadata.0.namespace}"
         port = 8081
       }
       extraConfig = var.extraConfig

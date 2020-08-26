@@ -41,6 +41,7 @@ c.JupyterHub.hub_ip = '0.0.0.0'
 c.KubeSpawner.namespace = "${singleuser.namespace}"
 
 # Gives spawned containers access to the API of the hub
+# c.JupyterHub.hub_connect_url = "http://${proxy_public.host}:${proxy_public.port}/hub/api"
 c.JupyterHub.hub_connect_ip = "${hub.host}"
 c.JupyterHub.hub_connect_port = ${hub.port}
 
