@@ -1,9 +1,9 @@
 variable "prefix" {
   description = "prefix to assign to resources"
-  default = "qhub"
+  default     = "qhub"
 }
 
 variable "namespace" {
   description = "namespace to deploy qhub"
-  default = "dev"
+  default     = "dev"
 }

@@ -1,6 +1,6 @@
 resource "kubernetes_service_account" "main" {
   metadata {
-    name = "${var.name}-traefik"
+    name      = "${var.name}-traefik"
     namespace = var.namespace
   }
 }

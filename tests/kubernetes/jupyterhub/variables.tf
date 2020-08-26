@@ -1,18 +1,18 @@
 variable "name" {
   description = "name prefix to assign to jupyterhub"
-  default = "terraform-jupyterhub"
+  default     = "terraform-jupyterhub"
 }
 
 variable "namespace" {
   description = "namespace to deploy jupyterhub"
-  default = "default"
+  default     = "default"
 }
 
 variable "hub-image" {
   description = "hub image"
   type = object({
     image = string
-    tag = string
+    tag   = string
   })
   default = {
     image = "jupyterhub/k8s-hub"
@@ -22,15 +22,15 @@ variable "hub-image" {
 
 variable "services" {
   description = "services to create api tokens"
-  type = list(string)
-  default = []
+  type        = list(string)
+  default     = []
 }
 
 variable "proxy-image" {
   description = "proxy image"
   type = object({
     image = string
-    tag = string
+    tag   = string
   })
   default = {
     image = "jupyterhub/configurable-http-proxy"
@@ -46,4 +46,10 @@ variable "singleuser" {
   default = {
     namespace = "default"
   }
+}
+
+variable "extraConfig" {
+  description = "Additional jupyterhub configuration"
+  type        = string
+  default     = ""
 }

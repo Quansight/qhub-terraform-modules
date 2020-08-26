@@ -1,6 +1,6 @@
 resource "kubernetes_service" "proxy_api" {
   metadata {
-    name = "${var.name}-jupyterhub-proxy-api"
+    name      = "${var.name}-jupyterhub-proxy-api"
     namespace = var.namespace
   }
 
@@ -19,7 +19,7 @@ resource "kubernetes_service" "proxy_api" {
 
 resource "kubernetes_service" "proxy_public" {
   metadata {
-    name = "${var.name}-jupyterhub-proxy-public"
+    name      = "${var.name}-jupyterhub-proxy-public"
     namespace = var.namespace
   }
 
@@ -40,7 +40,7 @@ resource "kubernetes_service" "proxy_public" {
 
 resource "kubernetes_deployment" "proxy" {
   metadata {
-    name = "${var.name}-jupyterhub-proxy"
+    name      = "${var.name}-jupyterhub-proxy"
     namespace = var.namespace
   }
 
@@ -56,15 +56,15 @@ resource "kubernetes_deployment" "proxy" {
     template {
       metadata {
         labels = {
-          "app.kubernetes.io/component" = "jupyterhub-proxy"
-          "hub.jupyter.org/network-access-hub" = "true"
+          "app.kubernetes.io/component"               = "jupyterhub-proxy"
+          "hub.jupyter.org/network-access-hub"        = "true"
           "hub.jupyter.org/network-access-singleuser" = "true"
         }
 
         annotations = {
           # This lets us autorestart when the secret changes!
           "checksum/config-map" = sha256(jsonencode(kubernetes_config_map.hub.data))
-          "checksum/secret" = sha256(jsonencode(kubernetes_secret.hub.data))
+          "checksum/secret"     = sha256(jsonencode(kubernetes_secret.hub.data))
         }
       }
 
@@ -87,22 +87,22 @@ resource "kubernetes_deployment" "proxy" {
           ]
 
           env {
-            name  = "CONFIGPROXY_AUTH_TOKEN"
+            name = "CONFIGPROXY_AUTH_TOKEN"
             value_from {
               secret_key_ref {
                 name = kubernetes_secret.hub.metadata.0.name
-                key = "proxy.token"
+                key  = "proxy.token"
               }
             }
           }
 
           port {
-            name = "http"
+            name           = "http"
             container_port = 8000
           }
 
           port {
-            name = "api"
+            name           = "api"
             container_port = 8001
           }
 
@@ -113,7 +113,7 @@ resource "kubernetes_deployment" "proxy" {
             }
 
             initial_delay_seconds = 60
-            period_seconds = 10
+            period_seconds        = 10
           }
 
           readiness_probe {
@@ -123,7 +123,7 @@ resource "kubernetes_deployment" "proxy" {
             }
 
             initial_delay_seconds = 0
-            period_seconds = 2
+            period_seconds        = 2
           }
         }
       }

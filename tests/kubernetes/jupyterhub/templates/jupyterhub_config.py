@@ -50,6 +50,8 @@ c.JupyterHub.hub_connect_port = ${hub.port}
 # TODO come up with more elegant way to add services
 c.JupyterHub.services = [{"name": k, "api_token": v} for k, v in json.loads(os.environ['JUPYTERHUB_API_SERVICE_TOKENS']).items()]
 
+${extraConfig}
+
 # HUB_USER_MAPPING = {{ cookiecutter.security.users }}
 # QHUB_GROUP_MAPPING = {{ cookiecutter.security.groups }}
 # QHUB_PROFILES = {{ cookiecutter.profiles.jupyterlab }}

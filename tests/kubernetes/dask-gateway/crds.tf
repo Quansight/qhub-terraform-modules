@@ -3,17 +3,17 @@ resource "kubernetes_manifest" "main" {
 
   manifest = {
     apiVersion = "apiextensions.k8s.io/v1beta1"
-    kind = "CustomResourceDefinition"
+    kind       = "CustomResourceDefinition"
     metadata = {
       name = "daskclusters.gateway.dask.org"
     }
     spec = {
-      group = "gateway.dask.org"
+      group   = "gateway.dask.org"
       version = "v1alpha1"
       names = {
-        kind = "DaskCluster"
+        kind     = "DaskCluster"
         listKind = "DaskClusterList"
-        plural = "daskclusters"
+        plural   = "daskclusters"
         singular = "daskcluster"
       }
       scope = "Namespaced"

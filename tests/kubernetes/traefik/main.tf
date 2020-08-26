@@ -1,6 +1,6 @@
 resource "kubernetes_service" "main" {
   metadata {
-    name = "${var.name}-traefik"
+    name      = "${var.name}-traefik"
     namespace = var.namespace
   }
 
@@ -34,7 +34,7 @@ resource "kubernetes_service" "main" {
 
 resource "kubernetes_deployment" "main" {
   metadata {
-    name = "${var.name}-traefik"
+    name      = "${var.name}-traefik"
     namespace = var.namespace
   }
 
@@ -64,7 +64,7 @@ resource "kubernetes_deployment" "main" {
           name  = var.name
 
           security_context {
-            run_as_user = 1000
+            run_as_user  = 1000
             run_as_group = 1000
           }
 
@@ -86,17 +86,17 @@ resource "kubernetes_deployment" "main" {
           ]
 
           port {
-            name = "traefik"
+            name           = "traefik"
             container_port = 9000
           }
 
           port {
-            name = "web"
+            name           = "web"
             container_port = 8000
           }
 
           port {
-            name = "tcp"
+            name           = "tcp"
             container_port = 8786
           }
 

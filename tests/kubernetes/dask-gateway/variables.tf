@@ -1,29 +1,29 @@
 variable "name" {
   description = "name prefix to assign to daskgateway"
-  type = string
-  default = "terraform-daskgateway"
+  type        = string
+  default     = "terraform-daskgateway"
 }
 
 variable "namespace" {
   description = "namespace to deploy daskgateway"
-  type = string
+  type        = string
 }
 
 variable "jupyterhub_api_token" {
   description = "jupyterhub api token for dask-gateway"
-  type = string
+  type        = string
 }
 
 variable "jupyterhub_api_url" {
   description = "jupyterhub api url for dask-gateway"
-  type = string
+  type        = string
 }
 
 variable "gateway-image" {
   description = "dask gateway image to use for gateway"
   type = object({
     image = string
-    tag = string
+    tag   = string
   })
   default = {
     image = "daskgateway/dask-gateway-server"
@@ -35,7 +35,7 @@ variable "controller-image" {
   description = "dask gateway image to use for controller"
   type = object({
     image = string
-    tag = string
+    tag   = string
   })
   default = {
     image = "daskgateway/dask-gateway-server"
@@ -47,7 +47,7 @@ variable "cluster-image" {
   description = "default dask gateway image to use for cluster"
   type = object({
     image = string
-    tag = string
+    tag   = string
   })
   default = {
     image = "daskgateway/dask-gateway"
@@ -66,7 +66,7 @@ variable "gateway" {
   })
   default = {
     loglevel = "INFO"
-    prefix = "/"
+    prefix   = "/"
   }
 }
 
@@ -90,13 +90,13 @@ variable "controller" {
     k8sApiRateLimitBurst = number
   })
   default = {
-    loglevel = "INFO"
-    completedClusterMaxAge = 86400
+    loglevel                      = "INFO"
+    completedClusterMaxAge        = 86400
     completedClusterCleanupPeriod = 600
-    backoffBaseDelay = 0.1
-    backoffMaxDelay = 300
-    k8sApiRateLimit = 50
-    k8sApiRateLimitBurst = 100
+    backoffBaseDelay              = 0.1
+    backoffMaxDelay               = 300
+    k8sApiRateLimit               = 50
+    k8sApiRateLimitBurst          = 100
   }
 }
 
@@ -104,40 +104,40 @@ variable "cluster" {
   description = "dask gateway cluster defaults"
   type = object({
     # scheduler configuration
-    scheduler_cores = number
-    scheduler_cores_limit = number
-    scheduler_memory = string
-    scheduler_memory_limit = string
+    scheduler_cores                  = number
+    scheduler_cores_limit            = number
+    scheduler_memory                 = string
+    scheduler_memory_limit           = string
     scheduler_extra_container_config = map(any)
-    scheduler_extra_pod_config = map(any)
+    scheduler_extra_pod_config       = map(any)
     # worker configuration
-    worker_cores = number
-    worker_cores_limit = number
-    worker_memory = string
-    worker_memory_limit = string
+    worker_cores                  = number
+    worker_cores_limit            = number
+    worker_memory                 = string
+    worker_memory_limit           = string
     worker_extra_container_config = map(any)
-    worker_extra_pod_config = map(any)
+    worker_extra_pod_config       = map(any)
     # additional fields
     image_pull_policy = string
-    environment = map(string)
+    environment       = map(string)
   })
   default = {
     # scheduler configuration
-    scheduler_cores = 1
-    scheduler_cores_limit = 1
-    scheduler_memory = "2 G"
-    scheduler_memory_limit = "2 G"
+    scheduler_cores                  = 1
+    scheduler_cores_limit            = 1
+    scheduler_memory                 = "2 G"
+    scheduler_memory_limit           = "2 G"
     scheduler_extra_container_config = {}
-    scheduler_extra_pod_config = {}
+    scheduler_extra_pod_config       = {}
     # worker configuration
-    worker_cores = 1
-    worker_cores_limit = 1
-    worker_memory = "2 G"
-    worker_memory_limit = "2 G"
+    worker_cores                  = 1
+    worker_cores_limit            = 1
+    worker_memory                 = "2 G"
+    worker_memory_limit           = "2 G"
     worker_extra_container_config = {}
-    worker_extra_pod_config = {}
+    worker_extra_pod_config       = {}
     # additional fields
     image_pull_policy = "IfNotPresent"
-    environment = {}
+    environment       = {}
   }
 }

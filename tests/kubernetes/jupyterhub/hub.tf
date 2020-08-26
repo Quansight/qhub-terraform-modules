@@ -6,19 +6,19 @@ resource "random_password" "proxy_secret_token" {
 
 # requires hex password
 resource "random_password" "hub_secret_cookie" {
-  length  = 32
+  length = 32
 }
 
 
 resource "random_password" "api_token" {
-  count = length(var.services)
+  count  = length(var.services)
   length = 32
 }
 
 
 resource "kubernetes_config_map" "hub" {
   metadata {
-    name = "${var.name}-jupyterhub-hub"
+    name      = "${var.name}-jupyterhub-hub"
     namespace = var.namespace
   }
 
@@ -37,6 +37,7 @@ resource "kubernetes_config_map" "hub" {
         host = kubernetes_service.hub.metadata.0.name
         port = 8081
       }
+      extraConfig = var.extraConfig
     })
   }
 }
@@ -44,7 +45,7 @@ resource "kubernetes_config_map" "hub" {
 
 resource "kubernetes_secret" "hub" {
   metadata {
-    name = "${var.name}-jupyterhub-hub"
+    name      = "${var.name}-jupyterhub-hub"
     namespace = var.namespace
   }
 
@@ -54,7 +55,7 @@ resource "kubernetes_secret" "hub" {
     "hub.cookie-secret" = sha256(random_password.hub_secret_cookie.result)
     "api-tokens" = jsonencode(zipmap(
       var.services,
-      [for instance in random_password.api_token: instance.result]
+      [for instance in random_password.api_token : instance.result]
     ))
   }
 }
@@ -79,7 +80,7 @@ resource "kubernetes_persistent_volume_claim" "hub" {
 
 resource "kubernetes_service" "hub" {
   metadata {
-    name = "${var.name}-jupyterhub-hub"
+    name      = "${var.name}-jupyterhub-hub"
     namespace = var.namespace
   }
 
@@ -113,8 +114,8 @@ resource "kubernetes_deployment" "hub" {
     template {
       metadata {
         labels = {
-          "app.kubernetes.io/component" = "jupyterhub-hub"
-          "hub.jupyter.org/network-access-proxy-api" = "true"
+          "app.kubernetes.io/component"               = "jupyterhub-hub"
+          "hub.jupyter.org/network-access-proxy-api"  = "true"
           "hub.jupyter.org/network-access-proxy-http" = "true"
           "hub.jupyter.org/network-access-singleuser" = "true"
         }
@@ -122,7 +123,7 @@ resource "kubernetes_deployment" "hub" {
         annotations = {
           # This lets us autorestart when the secret changes!
           "checksum/config-map" = sha256(jsonencode(kubernetes_config_map.hub.data))
-          "checksum/secret" = sha256(jsonencode(kubernetes_secret.hub.data))
+          "checksum/secret"     = sha256(jsonencode(kubernetes_secret.hub.data))
         }
       }
 
@@ -148,7 +149,7 @@ resource "kubernetes_deployment" "hub" {
           }
         }
 
-        service_account_name = kubernetes_service_account.hub.metadata.0.name
+        service_account_name            = kubernetes_service_account.hub.metadata.0.name
         automount_service_account_token = true
 
         container {
@@ -165,7 +166,7 @@ resource "kubernetes_deployment" "hub" {
           volume_mount {
             name       = "config"
             mount_path = "/etc/jupyterhub/jupyterhub_config.py"
-            sub_path = "jupyterhub_config.py"
+            sub_path   = "jupyterhub_config.py"
           }
 
           volume_mount {
@@ -179,7 +180,7 @@ resource "kubernetes_deployment" "hub" {
           }
 
           env {
-            name = "PYTHONUNBUFFERED"
+            name  = "PYTHONUNBUFFERED"
             value = "1"
           }
 
@@ -188,7 +189,7 @@ resource "kubernetes_deployment" "hub" {
             value_from {
               secret_key_ref {
                 name = kubernetes_secret.hub.metadata.0.name
-                key = "hub.cookie-secret"
+                key  = "hub.cookie-secret"
               }
             }
           }
@@ -198,7 +199,7 @@ resource "kubernetes_deployment" "hub" {
             value_from {
               secret_key_ref {
                 name = kubernetes_secret.hub.metadata.0.name
-                key = "proxy.token"
+                key  = "proxy.token"
               }
             }
           }
@@ -208,13 +209,13 @@ resource "kubernetes_deployment" "hub" {
             value_from {
               secret_key_ref {
                 name = kubernetes_secret.hub.metadata.0.name
-                key = "api-tokens"
+                key  = "api-tokens"
               }
             }
           }
 
           port {
-            name = "http"
+            name           = "http"
             container_port = 8081
           }
 

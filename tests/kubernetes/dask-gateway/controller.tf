@@ -1,23 +1,23 @@
 resource "kubernetes_config_map" "controller" {
   metadata {
-    name = "${var.name}-daskgateway-controller"
+    name      = "${var.name}-daskgateway-controller"
     namespace = var.namespace
   }
 
   data = {
     "dask_gateway_config.py" = templatefile(
       "${path.module}/templates/controller_config.py", {
-        gatewayName = kubernetes_deployment.gateway.metadata.0.name
+        gatewayName      = kubernetes_deployment.gateway.metadata.0.name
         gatewayNamespace = kubernetes_deployment.gateway.metadata.0.namespace
-        gateway = var.gateway
-        controller = var.controller
-      })
+        gateway          = var.gateway
+        controller       = var.controller
+    })
   }
 }
 
 resource "kubernetes_service_account" "controller" {
   metadata {
-    name = "${var.name}-daskgateway-controller"
+    name      = "${var.name}-daskgateway-controller"
     namespace = var.namespace
   }
 }
@@ -80,7 +80,7 @@ resource "kubernetes_cluster_role_binding" "controller" {
 
 resource "kubernetes_deployment" "controller" {
   metadata {
-    name = "${var.name}-daskgateway-controller"
+    name      = "${var.name}-daskgateway-controller"
     namespace = var.namespace
   }
 
@@ -93,7 +93,7 @@ resource "kubernetes_deployment" "controller" {
 
     selector {
       match_labels = {
-        app = "dask-gateway-controller"
+        app                           = "dask-gateway-controller"
         "app.kubernetes.io/component" = "controller"
       }
     }
@@ -101,7 +101,7 @@ resource "kubernetes_deployment" "controller" {
     template {
       metadata {
         labels = {
-          app = "dask-gateway-controller"
+          app                           = "dask-gateway-controller"
           "app.kubernetes.io/component" = "controller"
         }
 
@@ -112,7 +112,7 @@ resource "kubernetes_deployment" "controller" {
       }
 
       spec {
-        service_account_name = kubernetes_service_account.controller.metadata.0.name
+        service_account_name            = kubernetes_service_account.controller.metadata.0.name
         automount_service_account_token = true
 
         volume {
@@ -134,12 +134,12 @@ resource "kubernetes_deployment" "controller" {
           ]
 
           volume_mount {
-            name = "configmap"
+            name       = "configmap"
             mount_path = "/etc/dask-gateway/"
           }
 
           port {
-            name = "api"
+            name           = "api"
             container_port = 8000
           }
         }

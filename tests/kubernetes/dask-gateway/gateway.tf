@@ -5,7 +5,7 @@ resource "random_password" "jupyterhub_api_token" {
 
 resource "kubernetes_secret" "gateway" {
   metadata {
-    name = "${var.name}-daskgateway-gateway"
+    name      = "${var.name}-daskgateway-gateway"
     namespace = var.namespace
   }
 
@@ -17,27 +17,27 @@ resource "kubernetes_secret" "gateway" {
 
 resource "kubernetes_config_map" "gateway" {
   metadata {
-    name = "${var.name}-daskgateway-gateway"
+    name      = "${var.name}-daskgateway-gateway"
     namespace = var.namespace
   }
 
   data = {
     "dask_gateway_config.py" = templatefile(
       "${path.module}/templates/gateway_config.py", {
-        gatewayName = "${var.name}-daskgateway-gateway"
-        gatewayNamespace = var.namespace
+        gatewayName        = "${var.name}-daskgateway-gateway"
+        gatewayNamespace   = var.namespace
         jupyterhub_api_url = var.jupyterhub_api_url
-        gateway = var.gateway
-        cluster = var.cluster
-        cluster-image = var.cluster-image
-      })
+        gateway            = var.gateway
+        cluster            = var.cluster
+        cluster-image      = var.cluster-image
+    })
   }
 }
 
 
 resource "kubernetes_service_account" "gateway" {
   metadata {
-    name = "${var.name}-daskgateway-gateway"
+    name      = "${var.name}-daskgateway-gateway"
     namespace = var.namespace
   }
 }
@@ -57,7 +57,7 @@ resource "kubernetes_cluster_role" "gateway" {
   rule {
     api_groups = ["gateway.dask.org"]
     resources  = ["daskclusters"]
-    verbs = ["*"]
+    verbs      = ["*"]
   }
 }
 
@@ -82,7 +82,7 @@ resource "kubernetes_cluster_role_binding" "gateway" {
 
 resource "kubernetes_deployment" "gateway" {
   metadata {
-    name = "${var.name}-daskgateway-gateway"
+    name      = "${var.name}-daskgateway-gateway"
     namespace = var.namespace
   }
 
@@ -104,7 +104,7 @@ resource "kubernetes_deployment" "gateway" {
         annotations = {
           # This lets us autorestart when the secret changes!
           "checksum/config-map" = sha256(jsonencode(kubernetes_config_map.gateway.data))
-          "checksum/secret" = sha256(jsonencode(kubernetes_secret.gateway.data))
+          "checksum/secret"     = sha256(jsonencode(kubernetes_secret.gateway.data))
         }
       }
 
@@ -116,7 +116,7 @@ resource "kubernetes_deployment" "gateway" {
           }
         }
 
-        service_account_name = kubernetes_service_account.gateway.metadata.0.name
+        service_account_name            = kubernetes_service_account.gateway.metadata.0.name
         automount_service_account_token = true
 
         container {
@@ -130,22 +130,22 @@ resource "kubernetes_deployment" "gateway" {
           ]
 
           volume_mount {
-            name = "configmap"
+            name       = "configmap"
             mount_path = "/etc/dask-gateway/"
           }
 
           env {
-            name  = "JUPYTERHUB_API_TOKEN"
+            name = "JUPYTERHUB_API_TOKEN"
             value_from {
               secret_key_ref {
                 name = kubernetes_secret.gateway.metadata.0.name
-                key = "jupyterhub_api_token"
+                key  = "jupyterhub_api_token"
               }
             }
           }
 
           port {
-            name = "api"
+            name           = "api"
             container_port = 8000
           }
 
