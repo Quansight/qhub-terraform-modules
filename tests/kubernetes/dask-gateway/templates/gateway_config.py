@@ -7,14 +7,12 @@ c.DaskGateway.log_level = "${gateway.loglevel}"
 c.DaskGateway.address = ":8000"
 c.KubeBackend.api_url = 'http://{gatewayName}.{gatewayNamespace}:8000/api'
 
-
 c.DaskGateway.backend_class = "dask_gateway_server.backends.kubernetes.KubeBackend"
 c.KubeBackend.gateway_instance = "${gatewayName}"
 
 # ========= Authentication ==========
 c.DaskGateway.authenticator_class = "dask_gateway_server.auth.JupyterHubAuthenticator"
-c.DaskGateway.JupyterHubAuthenticator.jupyterhub_api_url = "http://${jupyterhub.host}:{jupyterhub.port}/hub/api"
-
+c.DaskGateway.JupyterHubAuthenticator.jupyterhub_api_url = "${jupyterhub_api_url}"
 
 # ========= Dask Cluster Default Configuration =========
 c.KubeClusterConfig.image = "${cluster-image.image}:${cluster-image.tag}"

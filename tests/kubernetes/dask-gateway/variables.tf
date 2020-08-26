@@ -9,6 +9,16 @@ variable "namespace" {
   type = string
 }
 
+variable "jupyterhub_api_token" {
+  description = "jupyterhub api token for dask-gateway"
+  type = string
+}
+
+variable "jupyterhub_api_url" {
+  description = "jupyterhub api url for dask-gateway"
+  type = string
+}
+
 variable "gateway-image" {
   description = "dask gateway image to use for gateway"
   type = object({

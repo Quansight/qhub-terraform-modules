@@ -23,6 +23,10 @@ Start
 #+end_src
 
 #+RESULTS:
+: host: Running
+: kubelet: Running
+: apiserver: Running
+: kubectl: Correctly Configured: pointing to minikube-vm at 192.168.39.123
 
 Get kubernetes context
 
@@ -38,8 +42,8 @@ Get kubernetes context
 #+end_src
 
 #+RESULTS:
-| NAME     | STATUS | ROLES  | AGE   | VERSION  |
-| minikube | Ready  | master | 2m10s | v1.17.11 |
+| NAME     | STATUS | ROLES  | AGE | VERSION  |
+| minikube | Ready  | master | 15h | v1.17.11 |
 
 #+begin_src shell :results output
   kubectl get namespaces -A

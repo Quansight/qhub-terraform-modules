@@ -3,6 +3,17 @@ resource "random_password" "jupyterhub_api_token" {
   special = false
 }
 
+resource "kubernetes_secret" "gateway" {
+  metadata {
+    name = "${var.name}-daskgateway-gateway"
+    namespace = var.namespace
+  }
+
+  data = {
+    "jupyterhub_api_token" = var.jupyterhub_api_token
+  }
+}
+
 
 resource "kubernetes_config_map" "gateway" {
   metadata {
@@ -15,10 +26,7 @@ resource "kubernetes_config_map" "gateway" {
       "${path.module}/templates/gateway_config.py", {
         gatewayName = "${var.name}-daskgateway-gateway"
         gatewayNamespace = var.namespace
-        jupyterhub = {
-          host = "example.com"
-          port = 80
-        }
+        jupyterhub_api_url = var.jupyterhub_api_url
         gateway = var.gateway
         cluster = var.cluster
         cluster-image = var.cluster-image
@@ -62,11 +70,11 @@ resource "kubernetes_cluster_role_binding" "gateway" {
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind      = "ClusterRole"
-    name      = kubernetes_deployment.gateway.metadata.0.name
+    name      = kubernetes_cluster_role.gateway.metadata.0.name
   }
   subject {
     kind      = "ServiceAccount"
-    name      = kubernetes_deployment.gateway.metadata.0.name
+    name      = kubernetes_service_account.gateway.metadata.0.name
     namespace = var.namespace
   }
 }
@@ -92,6 +100,12 @@ resource "kubernetes_deployment" "gateway" {
         labels = {
           app = "dask-gateway"
         }
+
+        annotations = {
+          # This lets us autorestart when the secret changes!
+          "checksum/config-map" = sha256(jsonencode(kubernetes_config_map.gateway.data))
+          "checksum/secret" = sha256(jsonencode(kubernetes_secret.gateway.data))
+        }
       }
 
       spec {
@@ -103,6 +117,7 @@ resource "kubernetes_deployment" "gateway" {
         }
 
         service_account_name = kubernetes_service_account.gateway.metadata.0.name
+        automount_service_account_token = true
 
         container {
           image = "${var.gateway-image.image}:${var.gateway-image.tag}"
@@ -121,7 +136,12 @@ resource "kubernetes_deployment" "gateway" {
 
           env {
             name  = "JUPYTERHUB_API_TOKEN"
-            value = random_password.jupyterhub_api_token.result
+            value_from {
+              secret_key_ref {
+                name = kubernetes_secret.gateway.metadata.0.name
+                key = "jupyterhub_api_token"
+              }
+            }
           }
 
           port {

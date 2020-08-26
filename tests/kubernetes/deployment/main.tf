@@ -36,24 +36,32 @@ module "conda-store" {
   ]
 }
 
-# module "dask-gateway" {
-#   source = "../dask-gateway"
-
-#   name = var.prefix
-#   namespace = var.namespace
-
-#   depends_on = [
-#     kubernetes_namespace.main
-#   ]
-# }
-
 module "jupyterhub" {
   source = "../jupyterhub"
 
   name = var.prefix
   namespace = var.namespace
 
+  services = [
+    "dask_gateway"
+  ]
+
   depends_on = [
     kubernetes_namespace.main
+  ]
+}
+
+module "dask-gateway" {
+  source = "../dask-gateway"
+
+  name = var.prefix
+  namespace = var.namespace
+
+  jupyterhub_api_token = module.jupyterhub.api_tokens.dask_gateway
+  jupyterhub_api_url = "${module.jupyterhub.internal_proxy_url}/hub/api"
+
+  depends_on = [
+    kubernetes_namespace.main,
+    module.jupyterhub
   ]
 }

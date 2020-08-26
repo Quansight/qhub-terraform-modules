@@ -34,7 +34,7 @@ resource "kubernetes_service" "proxy_public" {
       target_port = "http"
     }
 
-    type = "ClusterIP"
+    type = "NodePort"
   }
 }
 

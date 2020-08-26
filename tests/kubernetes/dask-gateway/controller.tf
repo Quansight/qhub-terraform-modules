@@ -104,10 +104,16 @@ resource "kubernetes_deployment" "controller" {
           app = "dask-gateway-controller"
           "app.kubernetes.io/component" = "controller"
         }
+
+        annotations = {
+          # This lets us autorestart when the secret changes!
+          "checksum/config-map" = sha256(jsonencode(kubernetes_config_map.controller.data))
+        }
       }
 
       spec {
         service_account_name = kubernetes_service_account.controller.metadata.0.name
+        automount_service_account_token = true
 
         volume {
           name = "configmap"
@@ -123,6 +129,7 @@ resource "kubernetes_deployment" "controller" {
           command = [
             "dask-gateway-server",
             "kube-controller",
+            "--config",
             "/etc/dask-gateway/dask_gateway_config.py"
           ]
 

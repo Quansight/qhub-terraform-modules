@@ -7,11 +7,12 @@ resource "random_password" "proxy_secret_token" {
 # requires hex password
 resource "random_password" "hub_secret_cookie" {
   length  = 32
-  upper = false
-  lower = false
-  number = false
-  special = true
-  override_special = "0123456789abcdef"
+}
+
+
+resource "random_password" "api_token" {
+  count = length(var.services)
+  length = 32
 }
 
 
@@ -49,7 +50,12 @@ resource "kubernetes_secret" "hub" {
 
   data = {
     "proxy.token" = random_password.proxy_secret_token.result
-    "hub.cookie-secret" = random_password.hub_secret_cookie.result
+    # must be hex value
+    "hub.cookie-secret" = sha256(random_password.hub_secret_cookie.result)
+    "api-tokens" = jsonencode(zipmap(
+      var.services,
+      [for instance in random_password.api_token: instance.result]
+    ))
   }
 }
 
@@ -143,6 +149,7 @@ resource "kubernetes_deployment" "hub" {
         }
 
         service_account_name = kubernetes_service_account.hub.metadata.0.name
+        automount_service_account_token = true
 
         container {
           name  = "hub"
