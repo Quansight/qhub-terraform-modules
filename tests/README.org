@@ -7,8 +7,8 @@ Delete previous minikube
 #+end_src
 
 #+RESULTS:
-: * Deleting "minikube" from kvm2 ...
-: * The "minikube" cluster has been deleted.
+: * Removing /home/costrouc/.minikube/machines/minikube ...
+: * Removed all traces of the "minikube" cluster.
 
 Start
 
@@ -17,15 +17,6 @@ Start
 #+end_src
 
 #+RESULTS:
-: * minikube v1.2.0 on linux (amd64)
-: * Creating kvm2 VM (CPUs=2, Memory=2048MB, Disk=20000MB) ...
-: * Configuring environment for Kubernetes v1.17.11 on Docker 18.09.6
-: * Downloading kubeadm v1.17.11
-: * Downloading kubelet v1.17.11
-: * Pulling images ...
-: * Launching Kubernetes ...
-: * Verifying: apiserver proxy etcd scheduler controller dns
-: * Done! kubectl is now configured to use "minikube"
 
 #+begin_src shell :results output
   minikube status
@@ -47,8 +38,8 @@ Get kubernetes context
 #+end_src
 
 #+RESULTS:
-| NAME     | STATUS | ROLES  | AGE | VERSION  |
-| minikube | Ready  | master | 17h | v1.17.11 |
+| NAME     | STATUS | ROLES  | AGE   | VERSION  |
+| minikube | Ready  | master | 2m10s | v1.17.11 |
 
 #+begin_src shell :results output
   kubectl get namespaces -A
@@ -66,9 +57,17 @@ Get kubernetes context
 Initialize Terraform
 
 #+begin_src shell :results none :dir kubernetes/deployment
+  rm -rf .terraform
+
   mkdir -p .terraform/plugins/registry.terraform.io/hashicorp/kubernetes-alpha/0.1.0/linux_amd64/
+  mkdir -p .terraform/plugins/registry.terraform.io/-/kubernetes-alpha/0.1.0/linux_amd64/
 
   pushd .terraform/plugins/registry.terraform.io/hashicorp/kubernetes-alpha/0.1.0/linux_amd64/
+  wget https://github.com/hashicorp/terraform-provider-kubernetes-alpha/releases/download/v0.1.0/terraform-provider-kubernetes-alpha_0.1.0_linux_amd64.zip
+  unzip terraform-provider-kubernetes-alpha_0.1.0_linux_amd64.zip
+  popd
+
+  pushd .terraform/plugins/registry.terraform.io/-/kubernetes-alpha/0.1.0/linux_amd64/
   wget https://github.com/hashicorp/terraform-provider-kubernetes-alpha/releases/download/v0.1.0/terraform-provider-kubernetes-alpha_0.1.0_linux_amd64.zip
   unzip terraform-provider-kubernetes-alpha_0.1.0_linux_amd64.zip
   popd
@@ -81,18 +80,21 @@ Initialize Terraform
 #+RESULTS:
 #+begin_example
 .terraform/plugins/
-├── linux_amd64
-├── registry.terraform.io
-│   └── hashicorp
-│       └── kubernetes-alpha
-│           └── 0.1.0
-│               └── linux_amd64
-│                   ├── terraform-provider-kubernetes-alpha
-│                   └── terraform-provider-kubernetes-alpha_0.1.0_linux_amd64.zip
-├── terraform-provider-kubernetes-alpha
-└── terraform-provider-kubernetes-alpha_0.1.0_linux_amd64.zip
+└── registry.terraform.io
+    ├── -
+    │   └── kubernetes-alpha
+    │       └── 0.1.0
+    │           └── linux_amd64
+    │               ├── terraform-provider-kubernetes-alpha
+    │               └── terraform-provider-kubernetes-alpha_0.1.0_linux_amd64.zip
+    └── hashicorp
+        └── kubernetes-alpha
+            └── 0.1.0
+                └── linux_amd64
+                    ├── terraform-provider-kubernetes-alpha
+                    └── terraform-provider-kubernetes-alpha_0.1.0_linux_amd64.zip
 
-6 directories, 4 files
+9 directories, 4 files
 #+end_example
 
 #+begin_src shell :results none :dir kubernetes/deployment

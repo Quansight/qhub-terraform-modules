@@ -5,12 +5,13 @@
 # rather than the pure-python implementations. The default one starts
 # being too slow to make a large number of requests to the proxy API
 # at the rate required.
+from tornado.httpclient import AsyncHTTPClient
 AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
 
 c.JupyterHub.spawner_class = 'kubespawner.KubeSpawner'
 
 # Connect to a proxy running in a different pod
-c.ConfigurableHTTPProxy.api_url = 'http://${proxy.host}:${proxy.port}'
+c.ConfigurableHTTPProxy.api_url = 'http://${proxy_api.host}:${proxy_api.port}'
 c.ConfigurableHTTPProxy.should_start = False
 
 # Do not shut down user pods when hub is restarted
@@ -28,8 +29,8 @@ c.JupyterHub.tornado_settings = {
 c.JupyterHub.db_url = "sqlite:///jupyterhub.sqlite"
 
 # Set jupyterhub proxy ip/hostname
-c.JupyterHub.ip = "${proxy.host}"
-c.JupyterHub.port = ${proxy.port}
+c.JupyterHub.ip = "${proxy_public.host}"
+c.JupyterHub.port = ${proxy_public.port}
 
 # the hub should listen on all interfaces, so the proxy can access it
 c.JupyterHub.hub_ip = '0.0.0.0'

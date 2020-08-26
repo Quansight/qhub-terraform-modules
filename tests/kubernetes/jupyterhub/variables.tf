@@ -33,8 +33,8 @@ variable "proxy-image" {
     tag = string
   })
   default = {
-    image = "jupyterhub/k8s-hub"
-    tag   = "0.9.1"
+    image = "jupyterhub/configurable-http-proxy"
+    tag   = "4.2.1"
   }
 }
 

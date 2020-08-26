@@ -3,6 +3,7 @@ provider "kubernetes" {
 }
 
 provider "kubernetes-alpha" {
+  version = "0.1.0"
   config_path = "~/.kube/config"
   config_context = "minikube"
 }

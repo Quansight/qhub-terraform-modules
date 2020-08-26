@@ -1,6 +1,6 @@
-resource "kubernetes_service" "proxy" {
+resource "kubernetes_service" "proxy_api" {
   metadata {
-    name = "${var.name}-jupyterhub-proxy"
+    name = "${var.name}-jupyterhub-proxy-api"
     namespace = var.namespace
   }
 
@@ -10,13 +10,28 @@ resource "kubernetes_service" "proxy" {
     }
 
     port {
-      name        = "https"
-      port        = 443
+      port        = 8001
+      target_port = "api"
+    }
+  }
+}
+
+
+resource "kubernetes_service" "proxy_public" {
+  metadata {
+    name = "${var.name}-jupyterhub-proxy-public"
+    namespace = var.namespace
+  }
+
+  spec {
+    selector = {
+      "app.kubernetes.io/component" = "jupyterhub-proxy"
     }
 
     port {
       name        = "http"
       port        = 80
+      target_port = "http"
     }
 
     type = "ClusterIP"
@@ -45,6 +60,12 @@ resource "kubernetes_deployment" "proxy" {
           "hub.jupyter.org/network-access-hub" = "true"
           "hub.jupyter.org/network-access-singleuser" = "true"
         }
+
+        annotations = {
+          # This lets us autorestart when the secret changes!
+          "checksum/config-map" = sha256(jsonencode(kubernetes_config_map.hub.data))
+          "checksum/secret" = sha256(jsonencode(kubernetes_secret.hub.data))
+        }
       }
 
       spec {
@@ -59,8 +80,8 @@ resource "kubernetes_deployment" "proxy" {
             "--ip=::",
             "--api-ip=::",
             "--api-port=8001",
-            "--default-target=http://$(HUB_SERVICE_HOST):$(HUB_SERVICE_PORT)",
-            "--error-target=http://$(HUB_SERVICE_HOST):$(HUB_SERVICE_PORT)/hub/error",
+            "--default-target=http://${kubernetes_service.hub.metadata.0.name}:8081",
+            "--error-target=http://${kubernetes_service.hub.metadata.0.name}:8081/hub/error",
             "--port=8000",
             # "--log-level=debug"
           ]
@@ -69,7 +90,7 @@ resource "kubernetes_deployment" "proxy" {
             name  = "CONFIGPROXY_AUTH_TOKEN"
             value_from {
               secret_key_ref {
-                name = "hub-secret"
+                name = kubernetes_secret.hub.metadata.0.name
                 key = "proxy.token"
               }
             }
@@ -82,7 +103,7 @@ resource "kubernetes_deployment" "proxy" {
 
           port {
             name = "api"
-            container_port = 8081
+            container_port = 8001
           }
 
           liveness_probe {

@@ -4,7 +4,18 @@ resource "random_password" "proxy_secret_token" {
 }
 
 
-resource "kubernetes_config_map" "main" {
+# requires hex password
+resource "random_password" "hub_secret_cookie" {
+  length  = 32
+  upper = false
+  lower = false
+  number = false
+  special = true
+  override_special = "0123456789abcdef"
+}
+
+
+resource "kubernetes_config_map" "hub" {
   metadata {
     name = "${var.name}-jupyterhub-hub"
     namespace = var.namespace
@@ -12,13 +23,17 @@ resource "kubernetes_config_map" "main" {
 
   data = {
     "jupyterhub_config.py" = templatefile("${path.module}/templates/jupyterhub_config.py", {
-      proxy = {
-        host = "${kubernetes_service.proxy.metadata.0.name}.${kubernetes_service.proxy.metadata.0.namespace}"
+      proxy_public = {
+        host = kubernetes_service.proxy_public.metadata.0.name
         port = 80
+      }
+      proxy_api = {
+        host = kubernetes_service.proxy_api.metadata.0.name
+        port = 8001
       }
       singleuser = var.singleuser
       hub = {
-        host = "${kubernetes_service.hub.metadata.0.name}.${kubernetes_service.hub.metadata.0.namespace}"
+        host = kubernetes_service.hub.metadata.0.name
         port = 8081
       }
     })
@@ -26,7 +41,7 @@ resource "kubernetes_config_map" "main" {
 }
 
 
-resource "kubernetes_secret" "main" {
+resource "kubernetes_secret" "hub" {
   metadata {
     name = "${var.name}-jupyterhub-hub"
     namespace = var.namespace
@@ -34,11 +49,12 @@ resource "kubernetes_secret" "main" {
 
   data = {
     "proxy.token" = random_password.proxy_secret_token.result
+    "hub.cookie-secret" = random_password.hub_secret_cookie.result
   }
 }
 
 
-resource "kubernetes_persistent_volume_claim" "main" {
+resource "kubernetes_persistent_volume_claim" "hub" {
   metadata {
     name      = "${var.name}-jupyterhub-hub"
     namespace = var.namespace
@@ -67,14 +83,13 @@ resource "kubernetes_service" "hub" {
     }
 
     port {
-      name        = "http"
-      target_port = 8081
+      target_port = "http"
       port        = 8081
     }
   }
 }
 
-resource "kubernetes_deployment" "main" {
+resource "kubernetes_deployment" "hub" {
   metadata {
     name      = "${var.name}-jupyterhub-hub"
     namespace = var.namespace
@@ -97,31 +112,37 @@ resource "kubernetes_deployment" "main" {
           "hub.jupyter.org/network-access-proxy-http" = "true"
           "hub.jupyter.org/network-access-singleuser" = "true"
         }
+
+        annotations = {
+          # This lets us autorestart when the secret changes!
+          "checksum/config-map" = sha256(jsonencode(kubernetes_config_map.hub.data))
+          "checksum/secret" = sha256(jsonencode(kubernetes_secret.hub.data))
+        }
       }
 
       spec {
         volume {
           name = "config"
           config_map {
-            name = kubernetes_config_map.main.metadata.0.name
+            name = kubernetes_config_map.hub.metadata.0.name
           }
         }
 
         volume {
           name = "secret"
           config_map {
-            name = kubernetes_secret.main.metadata.0.name
+            name = kubernetes_secret.hub.metadata.0.name
           }
         }
 
         volume {
           name = "hub-db-dir"
           persistent_volume_claim {
-            claim_name = kubernetes_persistent_volume_claim.main.metadata.0.name
+            claim_name = kubernetes_persistent_volume_claim.hub.metadata.0.name
           }
         }
 
-        service_account_name = kubernetes_service_account.main.metadata.0.name
+        service_account_name = kubernetes_service_account.hub.metadata.0.name
 
         container {
           name  = "hub"
@@ -159,7 +180,7 @@ resource "kubernetes_deployment" "main" {
             name = "JPY_COOKIE_SECRET"
             value_from {
               secret_key_ref {
-                name = "hub-secret"
+                name = kubernetes_secret.hub.metadata.0.name
                 key = "hub.cookie-secret"
               }
             }
@@ -169,7 +190,7 @@ resource "kubernetes_deployment" "main" {
             name = "CONFIGPROXY_AUTH_TOKEN"
             value_from {
               secret_key_ref {
-                name = "hub-secret"
+                name = kubernetes_secret.hub.metadata.0.name
                 key = "proxy.token"
               }
             }
