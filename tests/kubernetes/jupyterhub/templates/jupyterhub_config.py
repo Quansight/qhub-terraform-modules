@@ -1,5 +1,7 @@
 # based on zero to jupyterhub
 # https://github.com/jupyterhub/zero-to-jupyterhub-k8s/blob/master/jupyterhub/files/hub/jupyterhub_config.py
+import json
+import os
 
 # Configure JupyterHub to use the curl backend for making HTTP requests,
 # rather than the pure-python implementations. The default one starts
@@ -42,7 +44,11 @@ c.KubeSpawner.namespace = "${singleuser.namespace}"
 c.JupyterHub.hub_connect_ip = "${hub.host}"
 c.JupyterHub.hub_connect_port = ${hub.port}
 
-c.JupyterHub.services = []
+# convert {"service1": "token1", "service2": "token2"} into
+# [{"name": "service1", "api_token": "token1"}, ...]
+# due to inflexibility of terraform language
+# TODO come up with more elegant way to add services
+c.JupyterHub.services = [{"name": k, "api_token": v} for k, v in json.loads(os.environ['JUPYTERHUB_API_SERVICE_TOKENS']).items()]
 
 # HUB_USER_MAPPING = {{ cookiecutter.security.users }}
 # QHUB_GROUP_MAPPING = {{ cookiecutter.security.groups }}

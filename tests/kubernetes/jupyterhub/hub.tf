@@ -203,12 +203,42 @@ resource "kubernetes_deployment" "hub" {
             }
           }
 
+          env {
+            name = "JUPYTERHUB_API_SERVICE_TOKENS"
+            value_from {
+              secret_key_ref {
+                name = kubernetes_secret.hub.metadata.0.name
+                key = "api-tokens"
+              }
+            }
+          }
+
           port {
             name = "http"
             container_port = 8081
           }
 
-          # TODO: add liveliness/readiness probe
+          # TODO: consider baseUrl
+          liveness_probe {
+            http_get {
+              path = "/hub/health"
+              port = "http"
+            }
+
+            initial_delay_seconds = 60
+            period_seconds        = 10
+          }
+
+          # TODO: consider baseUrl
+          readiness_probe {
+            http_get {
+              path = "/hub/health"
+              port = "http"
+            }
+
+            initial_delay_seconds = 0
+            period_seconds        = 2
+          }
         }
       }
     }
