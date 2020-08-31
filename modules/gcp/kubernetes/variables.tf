@@ -27,7 +27,7 @@ variable "additional_node_group_oauth_scopes" {
 
 variable "node_groups" {
   description = "Node groups to add to GCP Kubernetes Cluster"
-  type = list(map(any))
+  type        = list(map(any))
   default = [
     {
       name      = "general"
@@ -53,11 +53,11 @@ variable "node_groups" {
 variable "node_group_defaults" {
   description = "Node group default values"
   type = object({
-    name               = string
-    instance_type      = string
-    min_size           = number
-    max_size           = number
-    preemtible         = boolean
+    name          = string
+    instance_type = string
+    min_size      = number
+    max_size      = number
+    preemtible    = boolean
     guest_accelerators = list(object({
       type  = string
       count = number
@@ -65,12 +65,12 @@ variable "node_group_defaults" {
 
   })
   default = {
-    name               = "node-group-default"
-    instance           = "n1-standard-2"
-    min_nodes          = 0
-    max_nodes          = 1
-    preemptible        = false
+    name        = "node-group-default"
+    instance    = "n1-standard-2"
+    min_nodes   = 0
+    max_nodes   = 1
+    preemptible = false
     # https://www.terraform.io/docs/providers/google/r/container_cluster.html#guest_accelerator
-    guest_accelerators = [ ]
+    guest_accelerators = []
   }
 }

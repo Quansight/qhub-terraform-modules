@@ -34,7 +34,7 @@ resource "google_container_node_pool" "main" {
   }
 
   node_config {
-    preemptible = var.merged_node_groups[count.index].preemptible
+    preemptible  = var.merged_node_groups[count.index].preemptible
     machine_type = var.merged_node_groups[count.index].instance_type
 
     service_account = google_service_account.main.email
