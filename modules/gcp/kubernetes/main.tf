@@ -43,5 +43,10 @@ resource "google_container_node_pool" "main" {
     metadata = {
       disable-legacy-endpoints = "true"
     }
+
+    guest_accelerator {
+      type  = var.gpu_accelerator
+      count = trimspace(var.gpu_accelerator) != "" ? 1 : 0
+    }
   }
 }

@@ -34,3 +34,9 @@ variable "node_groups" {
     max_size      = number
   }))
 }
+
+variable "gpu_accelerator" {
+  description = "Name of the GPU that needs to be attached to the nodes"
+  type        = string
+  default     = ""
+}
