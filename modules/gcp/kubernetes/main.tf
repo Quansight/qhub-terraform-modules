@@ -15,17 +15,17 @@ resource "google_container_cluster" "main" {
 }
 
 resource "google_container_node_pool" "main" {
-  count = length(var.node_groups)
+  count = length(var.merged_node_groups)
 
-  name     = var.node_groups[count.index].name
+  name     = var.merged_node_groups[count.index].name
   location = var.location
   cluster  = google_container_cluster.main.name
 
-  initial_node_count = min(var.node_groups[count.index].min_size, 1)
+  initial_node_count = min(var.merged_node_groups[count.index].min_size, 1)
 
   autoscaling {
-    min_node_count = var.node_groups[count.index].min_size
-    max_node_count = var.node_groups[count.index].max_size
+    min_node_count = var.merged_node_groups[count.index].min_size
+    max_node_count = var.merged_node_groups[count.index].max_size
   }
 
   management {
@@ -34,7 +34,8 @@ resource "google_container_node_pool" "main" {
   }
 
   node_config {
-    machine_type = var.node_groups[count.index].instance_type
+    preemptible  = var.merged_node_groups[count.index].preemptible
+    machine_type = var.merged_node_groups[count.index].instance_type
 
     service_account = google_service_account.main.email
 
@@ -44,9 +45,13 @@ resource "google_container_node_pool" "main" {
       disable-legacy-endpoints = "true"
     }
 
-    guest_accelerator {
-      type  = var.gpu_accelerator
-      count = trimspace(var.gpu_accelerator) != "" ? 1 : 0
+    dynamic "guest_accelerator" {
+      for_each = var.merged_node_groups[count.index].guest_accelerators
+
+      content {
+        name  = guest_accelerator.name
+        count = guest_accelerator.count
+      }
     }
   }
 }

@@ -10,4 +10,6 @@ locals {
     "https://www.googleapis.com/auth/logging.write",
     "https://www.googleapis.com/auth/monitoring"
   ])
+
+  merged_node_groups = [for node_group in var.node_groups : merge(var.node_group_defaults, node_group)]
 }
