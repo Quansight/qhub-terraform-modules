@@ -27,16 +27,41 @@ variable "additional_node_group_oauth_scopes" {
 
 variable "node_groups" {
   description = "Node groups to add to GCP Kubernetes Cluster"
-  type = list(object({
+  type = list(map(any))
+  default = [
+    {
+      name      = "general"
+      instance  = "n1-standard-2"
+      min_nodes = 1
+      max_nodes = 1
+    },
+    {
+      name      = "user"
+      instance  = "n1-standard-2"
+      min_nodes = 0
+      max_nodes = 2
+    },
+    {
+      name      = "worker"
+      instance  = "n1-standard-2"
+      min_nodes = 0
+      max_nodes = 5
+    }
+  ]
+}
+
+variable "node_group_defaults" {
+  description = "Node group default values"
+  type = object({
     name          = string
     instance_type = string
     min_size      = number
     max_size      = number
-  }))
-}
-
-variable "gpu_accelerator" {
-  description = "Name of the GPU that needs to be attached to the nodes"
-  type        = string
-  default     = ""
+  })
+  default = {
+    name = "node-group-default"
+    instance = "n1-standard-2"
+    min_nodes = 0
+    max_nodes = 1
+  }
 }
