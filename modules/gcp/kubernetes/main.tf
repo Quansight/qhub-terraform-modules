@@ -43,5 +43,14 @@ resource "google_container_node_pool" "main" {
     metadata = {
       disable-legacy-endpoints = "true"
     }
+
+    dynamic "guest_accelerator" {
+      for_each = var.merged_node_groups[count.index].guest_accelerators
+
+      content {
+        name  = guest_accelerator.name
+        count = guest_accelerator.count
+      }
+    }
   }
 }
