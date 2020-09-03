@@ -28,7 +28,7 @@ module "kubernetes-jupyterhub" {
       scheduling = {
         userScheduler = {
           nodeSelector = {
-            "${var.user-node-group.key}" = var.user-node-group.value
+            "${var.general-node-group.key}" = var.general-node-group.value
           }
         }
       }
