@@ -21,7 +21,7 @@ resource "google_container_node_pool" "main" {
   location = var.location
   cluster  = google_container_cluster.main.name
 
-  initial_node_count = min(local.merged_node_groups[count.index].min_size, 1)
+  initial_node_count = local.merged_node_groups[count.index].min_size
 
   autoscaling {
     min_node_count = local.merged_node_groups[count.index].min_size

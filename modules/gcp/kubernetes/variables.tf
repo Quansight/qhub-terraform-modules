@@ -30,22 +30,22 @@ variable "node_groups" {
   type        = any
   default = [
     {
-      name      = "general"
-      instance  = "n1-standard-2"
-      min_nodes = 1
-      max_nodes = 1
+      name          = "general"
+      instance_type = "n1-standard-2"
+      min_size      = 1
+      max_size      = 1
     },
     {
-      name      = "user"
-      instance  = "n1-standard-2"
-      min_nodes = 0
-      max_nodes = 2
+      name          = "user"
+      instance_type = "n1-standard-2"
+      min_size      = 0
+      max_size      = 2
     },
     {
-      name      = "worker"
-      instance  = "n1-standard-2"
-      min_nodes = 0
-      max_nodes = 5
+      name          = "worker"
+      instance_type = "n1-standard-2"
+      min_size      = 0
+      max_size      = 5
     }
   ]
 }
@@ -53,24 +53,24 @@ variable "node_groups" {
 variable "node_group_defaults" {
   description = "Node group default values"
   type = object({
-    name        = string
-    instance    = string
-    min_nodes   = number
-    max_nodes   = number
-    preemptible = bool
+    name          = string
+    instance_type = string
+    min_size      = number
+    max_size      = number
+    preemptible   = bool
     guest_accelerators = list(object({
       type  = string
       count = number
     }))
+
   })
   default = {
-    name        = "node-group-default"
-    instance    = "n1-standard-2"
-    min_nodes   = 0
-    max_nodes   = 1
-    preemptible = false
+    name          = "node-group-default"
+    instance_type = "n1-standard-2"
+    min_size      = 0
+    max_size      = 1
+    preemptible   = false
     # https://www.terraform.io/docs/providers/google/r/container_cluster.html#guest_accelerator
     guest_accelerators = []
   }
 }
- 
