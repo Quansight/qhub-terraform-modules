@@ -20,7 +20,7 @@ variable "region" {
 variable "kubernetes_version" {
   description = "Version of digital ocean kuberentes resource"
   type        = string
-  default     = "1.16.2-do.3"
+  default     = "1.18.8-do.0"
 }
 
 variable "node_groups" {
