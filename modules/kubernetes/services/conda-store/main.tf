@@ -126,7 +126,7 @@ resource "kubernetes_deployment" "main" {
         volume {
           name = "nfs-export-fast"
           persistent_volume_claim {
-            claim_name = kubernetes_persistent_volume_claim.main.metadata.0.name
+            claim_name = "${var.name}-conda-store-storage"
           }
         }
 
