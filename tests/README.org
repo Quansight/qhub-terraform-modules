@@ -7,8 +7,8 @@ Delete previous minikube
 #+end_src
 
 #+RESULTS:
-: * Removing /home/costrouc/.minikube/machines/minikube ...
-: * Removed all traces of the "minikube" cluster.
+: * Deleting "minikube" from kvm2 ...
+: * The "minikube" cluster has been deleted.
 
 Start
 
@@ -17,6 +17,13 @@ Start
 #+end_src
 
 #+RESULTS:
+: * minikube v1.2.0 on linux (amd64)
+: * Creating kvm2 VM (CPUs=2, Memory=2048MB, Disk=20000MB) ...
+: * Configuring environment for Kubernetes v1.17.11 on Docker 18.09.6
+: * Pulling images ...
+: * Launching Kubernetes ...
+: * Verifying: apiserver proxy etcd scheduler controller dns
+: * Done! kubectl is now configured to use "minikube"
 
 #+begin_src shell :results output
   minikube status
@@ -26,7 +33,7 @@ Start
 : host: Running
 : kubelet: Running
 : apiserver: Running
-: kubectl: Correctly Configured: pointing to minikube-vm at 192.168.39.123
+: kubectl: Correctly Configured: pointing to minikube-vm at 192.168.39.127
 
 Get kubernetes context
 
@@ -61,47 +68,6 @@ Get kubernetes context
 Initialize Terraform
 
 #+begin_src shell :results none :dir kubernetes/deployment
-  rm -rf .terraform
-
-  mkdir -p .terraform/plugins/registry.terraform.io/hashicorp/kubernetes-alpha/0.1.0/linux_amd64/
-  mkdir -p .terraform/plugins/registry.terraform.io/-/kubernetes-alpha/0.1.0/linux_amd64/
-
-  pushd .terraform/plugins/registry.terraform.io/hashicorp/kubernetes-alpha/0.1.0/linux_amd64/
-  wget https://github.com/hashicorp/terraform-provider-kubernetes-alpha/releases/download/v0.1.0/terraform-provider-kubernetes-alpha_0.1.0_linux_amd64.zip
-  unzip terraform-provider-kubernetes-alpha_0.1.0_linux_amd64.zip
-  popd
-
-  pushd .terraform/plugins/registry.terraform.io/-/kubernetes-alpha/0.1.0/linux_amd64/
-  wget https://github.com/hashicorp/terraform-provider-kubernetes-alpha/releases/download/v0.1.0/terraform-provider-kubernetes-alpha_0.1.0_linux_amd64.zip
-  unzip terraform-provider-kubernetes-alpha_0.1.0_linux_amd64.zip
-  popd
-#+end_src
-
-#+begin_src shell :results output :dir kubernetes/deployment/
-  tree .terraform/plugins/
-#+end_src
-
-#+RESULTS:
-#+begin_example
-.terraform/plugins/
-└── registry.terraform.io
-    ├── -
-    │   └── kubernetes-alpha
-    │       └── 0.1.0
-    │           └── linux_amd64
-    │               ├── terraform-provider-kubernetes-alpha
-    │               └── terraform-provider-kubernetes-alpha_0.1.0_linux_amd64.zip
-    └── hashicorp
-        └── kubernetes-alpha
-            └── 0.1.0
-                └── linux_amd64
-                    ├── terraform-provider-kubernetes-alpha
-                    └── terraform-provider-kubernetes-alpha_0.1.0_linux_amd64.zip
-
-9 directories, 4 files
-#+end_example
-
-#+begin_src shell :results none :dir kubernetes/deployment
   terraform init
 #+end_src
 
@@ -124,9 +90,12 @@ Check that services are available
 #+end_src
 
 #+RESULTS:
-: NAME               TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                                        AGE
-: qhub-conda-store   ClusterIP   10.105.255.178   <none>        2049/TCP,20048/TCP,111/TCP                     4m35s
-: qhub-traefik       NodePort    10.107.164.226   <none>        8000:32239/TCP,8786:32231/TCP,9000:31820/TCP   4m35s
+: NAME                           TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                                        AGE
+: qhub-conda-store               ClusterIP   10.108.148.195   <none>        2049/TCP,20048/TCP,111/TCP                     2m7s
+: qhub-jupyterhub-hub            ClusterIP   10.101.222.197   <none>        8081/TCP                                       2m7s
+: qhub-jupyterhub-proxy-api      ClusterIP   10.106.105.226   <none>        8001/TCP                                       2m7s
+: qhub-jupyterhub-proxy-public   NodePort    10.105.123.23    <none>        80:31279/TCP                                   2m7s
+: qhub-traefik                   NodePort    10.96.89.153     <none>        8000:32072/TCP,8786:32679/TCP,9000:31824/TCP   2m7s
 
 Check that the namespace now exists
 
@@ -136,11 +105,11 @@ Check that the namespace now exists
 
 #+RESULTS:
 : NAME              STATUS   AGE
-: default           Active   6m31s
-: dev               Active   4m9s
-: kube-node-lease   Active   6m32s
-: kube-public       Active   6m32s
-: kube-system       Active   6m32s
+: default           Active   5m56s
+: dev               Active   2m9s
+: kube-node-lease   Active   5m57s
+: kube-public       Active   5m57s
+: kube-system       Active   5m57s
 
 Check that config files exist
 
@@ -149,15 +118,13 @@ Check that config files exist
 #+end_src
 
 #+RESULTS:
-
-#+begin_src shell :results output :dir kubernetes/deployment
-  kubectl delete clusterrole qhub-traefik
-  kubectl delete clusterrolebinding qhub-traefik
-#+end_src
-
-#+RESULTS:
-: clusterrole.rbac.authorization.k8s.io "qhub-traefik" deleted
-: clusterrolebinding.rbac.authorization.k8s.io "qhub-traefik" deleted
+: NAME                          READY   UP-TO-DATE   AVAILABLE   AGE
+: qhub-conda-store              1/1     1            1           2m20s
+: qhub-daskgateway-controller   1/1     1            1           25s
+: qhub-daskgateway-gateway      1/1     1            1           112s
+: qhub-jupyterhub-hub           1/1     1            1           2m20s
+: qhub-jupyterhub-proxy         1/1     1            1           2m20s
+: qhub-traefik                  1/1     1            1           2m20s
 
 #+begin_src shell :results output :dir kubernetes/deployment
   kubectl version
@@ -165,22 +132,10 @@ Check that config files exist
 
 #+RESULTS:
 : Client Version: version.Info{Major:"1", Minor:"17", GitVersion:"v1.17.5", GitCommit:"e0fccafd69541e3750d460ba0f9743b90336f24f", GitTreeState:"archive", BuildDate:"1970-01-01T00:00:01Z", GoVersion:"go1.13.8", Compiler:"gc", Platform:"linux/amd64"}
-: Server Version: version.Info{Major:"1", Minor:"17", GitVersion:"v1.17.0", GitCommit:"70132b0f130acc0bed193d9ba59dd186f0e634cf", GitTreeState:"clean", BuildDate:"2019-12-07T21:12:17Z", GoVersion:"go1.13.4", Compiler:"gc", Platform:"linux/amd64"}
+: Server Version: version.Info{Major:"1", Minor:"17", GitVersion:"v1.17.11", GitCommit:"ea5f00d93211b7c80247bf607cfa422ad6fb5347", GitTreeState:"clean", BuildDate:"2020-08-13T15:11:47Z", GoVersion:"go1.13.15", Compiler:"gc", Platform:"linux/amd64"}
 
 #+begin_src shell :results none :dir kubernetes/deployment
   terraform destroy -auto-approve
-#+end_src
-
-There is a value.yaml file that is also stored in the configuration
-
-#+begin_src yaml
-auth:
-  github:
-    clientSecret: 321e5a2ff3e5362ea7e0cbb0fccbdaacbbb6b3bb
-hub:
-  services:
-    dask-gateway:
-      apiToken: jNdg9NTJ4z3ZrZrBP2nlGSNSZcWNVlEE
 #+end_src
 
 * Motivation
