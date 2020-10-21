@@ -2,74 +2,130 @@
 
 Delete previous minikube
 
-#+begin_src shell :results output
-  minikube delete
+#+begin_src shell :results output :exports both
+  minikube delete --purge
+  minikube version
 #+end_src
 
 #+RESULTS:
-: * Deleting "minikube" from kvm2 ...
-: * The "minikube" cluster has been deleted.
+: * Removed all traces of the "minikube" cluster.
+: * Successfully purged minikube directory located at - [/home/costrouc/.minikube]
+: minikube version: v1.14.0
+: commit: v1.14.0
 
 Start
 
-#+begin_src shell :results output
-  minikube start --kubernetes-version=v1.17.11 --vm-driver=kvm2
+#+begin_src shell :results output :exports both
+  minikube start --kubernetes-version=v1.19.0 --vm-driver=kvm2
 #+end_src
 
 #+RESULTS:
-: * minikube v1.2.0 on linux (amd64)
-: * Creating kvm2 VM (CPUs=2, Memory=2048MB, Disk=20000MB) ...
-: * Configuring environment for Kubernetes v1.17.11 on Docker 18.09.6
-: * Pulling images ...
-: * Launching Kubernetes ...
-: * Verifying: apiserver proxy etcd scheduler controller dns
-: * Done! kubectl is now configured to use "minikube"
+#+begin_example
+,* minikube v1.14.0 on Nixos "21.03pre-git (Okapi)"
+,* Using the kvm2 driver based on user configuration
+,* Downloading VM boot image ...
+,* Starting control plane node minikube in cluster minikube
+,* Downloading Kubernetes v1.19.0 preload ...
+,* Creating kvm2 VM (CPUs=2, Memory=6000MB, Disk=20000MB) ...
+,* Preparing Kubernetes v1.19.0 on Docker 19.03.12 ...
+,* Verifying Kubernetes components...
+,* Enabled addons: storage-provisioner, default-storageclass
+,* Done! kubectl is now configured to use "minikube" by default
+#+end_example
 
-#+begin_src shell :results output
+Check the status of the minikube cluster and get its local ip address
+within the host.
+
+#+begin_src shell :results output :exports both
   minikube status
+  minikube ip
 #+end_src
 
 #+RESULTS:
+: minikube
+: type: Control Plane
 : host: Running
 : kubelet: Running
 : apiserver: Running
-: kubectl: Correctly Configured: pointing to minikube-vm at 192.168.39.127
+: kubeconfig: Configured
+:
+: 192.168.39.148
 
-Get kubernetes context
+Get kubernetes context and list running nodes and just check that we
+have a sane basic cluster.
 
-#+begin_src shell :results output
+#+begin_src shell :results output :exports both
   kubectl config current-context
 #+end_src
 
 #+RESULTS:
 : minikube
 
-#+begin_src shell
+#+begin_src shell :exports both
   kubectl get nodes
 #+end_src
 
 #+RESULTS:
-| NAME     | STATUS | ROLES  | AGE | VERSION  |
-| minikube | Ready  | master | 15h | v1.17.11 |
+| NAME     | STATUS | ROLES  | AGE | VERSION |
+| minikube | Ready  | master | 66s | v1.19.0 |
 
-#+begin_src shell :results output
+#+begin_src shell :results output :exports both
   kubectl get namespaces -A
 #+end_src
 
 #+RESULTS:
 : NAME              STATUS   AGE
-: default           Active   96s
-: kube-node-lease   Active   97s
-: kube-public       Active   97s
-: kube-system       Active   97s
+: default           Active   80s
+: kube-node-lease   Active   81s
+: kube-public       Active   81s
+: kube-system       Active   81s
 
 ** Terraform Deployment
 
+Ensure that there is not terraform state in the deployment directory
+
+#+begin_src shell :dir kubernetes/deployment :results none
+ rm -rf .terraform terraform.tfstate terraform.tfstate.backup
+#+end_src
+
 Initialize Terraform
 
-#+begin_src shell :results none :dir kubernetes/deployment
+#+begin_src shell :dir kubernetes/deployment :exports both :results output
   terraform init
 #+end_src
+
+#+RESULTS:
+#+begin_example
+[0m[1mInitializing modules...[0m
+
+[0m[1mInitializing the backend...[0m
+
+[0m[1mInitializing provider plugins...[0m
+- Using previously-installed hashicorp/random v3.0.0
+- Using previously-installed hashicorp/kubernetes v1.13.2
+- Using previously-installed hashicorp/kubernetes-alpha v0.2.1
+
+The following providers do not have any version constraints in configuration,
+so the latest version was installed.
+
+To prevent automatic upgrades to new major versions that may contain breaking
+changes, we recommend adding version constraints in a required_providers block
+in your configuration, with the constraint strings suggested below.
+
+,* hashicorp/kubernetes: version = "~> 1.13.2"
+,* hashicorp/kubernetes-alpha: version = "~> 0.2.1"
+,* hashicorp/random: version = "~> 3.0.0"
+
+[0m[1m[32mTerraform has been successfully initialized![0m[32m[0m
+[0m[32m
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.[0m
+#+end_example
 
 Terraform plan
 
@@ -83,7 +139,8 @@ Terraform apply
   terraform apply -auto-approve
 #+end_src
 
-Check that services are available
+Check that services are available. =qhub-jupyterhub-proxy-public= is
+the public traefik url to access cluster.
 
 #+begin_src shell :results output :dir kubernetes/deployment
   kubectl get services -n dev
@@ -91,13 +148,13 @@ Check that services are available
 
 #+RESULTS:
 : NAME                           TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                                        AGE
-: qhub-conda-store               ClusterIP   10.108.148.195   <none>        2049/TCP,20048/TCP,111/TCP                     2m7s
-: qhub-jupyterhub-hub            ClusterIP   10.101.222.197   <none>        8081/TCP                                       2m7s
-: qhub-jupyterhub-proxy-api      ClusterIP   10.106.105.226   <none>        8001/TCP                                       2m7s
-: qhub-jupyterhub-proxy-public   NodePort    10.105.123.23    <none>        80:31279/TCP                                   2m7s
-: qhub-traefik                   NodePort    10.96.89.153     <none>        8000:32072/TCP,8786:32679/TCP,9000:31824/TCP   2m7s
+: qhub-conda-store               ClusterIP   10.110.109.54    <none>        2049/TCP,20048/TCP,111/TCP                     4m16s
+: qhub-jupyterhub-hub            ClusterIP   10.102.246.225   <none>        8081/TCP                                       4m16s
+: qhub-jupyterhub-proxy-api      ClusterIP   10.110.22.128    <none>        8001/TCP                                       4m16s
+: qhub-jupyterhub-proxy-public   NodePort    10.106.107.206   <none>        80:32501/TCP                                   4m16s
+: qhub-traefik                   NodePort    10.102.186.15    <none>        8000:32262/TCP,8786:30616/TCP,9000:30031/TCP   4m16s
 
-Check that the namespace now exists
+Check that the =dev= namespace now exists
 
 #+begin_src shell :results output :dir kubernetes
   kubectl get namespace -A
@@ -119,20 +176,20 @@ Check that config files exist
 
 #+RESULTS:
 : NAME                          READY   UP-TO-DATE   AVAILABLE   AGE
-: qhub-conda-store              1/1     1            1           2m20s
-: qhub-daskgateway-controller   1/1     1            1           25s
-: qhub-daskgateway-gateway      1/1     1            1           112s
-: qhub-jupyterhub-hub           1/1     1            1           2m20s
-: qhub-jupyterhub-proxy         1/1     1            1           2m20s
-: qhub-traefik                  1/1     1            1           2m20s
+: qhub-conda-store              1/1     1            1           6m3s
+: qhub-daskgateway-controller   1/1     1            1           4m30s
+: qhub-daskgateway-gateway      1/1     1            1           4m56s
+: qhub-jupyterhub-hub           1/1     1            1           6m3s
+: qhub-jupyterhub-proxy         1/1     1            1           6m3s
+: qhub-traefik                  1/1     1            1           6m3s
 
 #+begin_src shell :results output :dir kubernetes/deployment
   kubectl version
 #+end_src
 
 #+RESULTS:
-: Client Version: version.Info{Major:"1", Minor:"17", GitVersion:"v1.17.5", GitCommit:"e0fccafd69541e3750d460ba0f9743b90336f24f", GitTreeState:"archive", BuildDate:"1970-01-01T00:00:01Z", GoVersion:"go1.13.8", Compiler:"gc", Platform:"linux/amd64"}
-: Server Version: version.Info{Major:"1", Minor:"17", GitVersion:"v1.17.11", GitCommit:"ea5f00d93211b7c80247bf607cfa422ad6fb5347", GitTreeState:"clean", BuildDate:"2020-08-13T15:11:47Z", GoVersion:"go1.13.15", Compiler:"gc", Platform:"linux/amd64"}
+: Client Version: version.Info{Major:"1", Minor:"19", GitVersion:"v1.19.3", GitCommit:"1e11e4a2108024935ecfcb2912226cedeafd99df", GitTreeState:"archive", BuildDate:"1980-01-01T00:00:00Z", GoVersion:"go1.15.3", Compiler:"gc", Platform:"linux/amd64"}
+: Server Version: version.Info{Major:"1", Minor:"19", GitVersion:"v1.19.0", GitCommit:"e19964183377d0ec2052d1f1fa930c4d7575bd50", GitTreeState:"clean", BuildDate:"2020-08-26T14:23:04Z", GoVersion:"go1.15", Compiler:"gc", Platform:"linux/amd64"}
 
 #+begin_src shell :results none :dir kubernetes/deployment
   terraform destroy -auto-approve
