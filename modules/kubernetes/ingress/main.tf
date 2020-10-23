@@ -28,6 +28,9 @@ resource "helm_release" "ingress" {
       "nginx-ingress" = {
         controller = {
           affinity = local.affinity
+          livenessProbe = {
+            timeoutSeconds = 10
+          }
         }
 
         defaultBackend = {
