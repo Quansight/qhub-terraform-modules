@@ -29,7 +29,7 @@ resource "helm_release" "ingress" {
         controller = {
           affinity = local.affinity
           livenessProbe = {
-            timeoutSeconds = 10
+            timeoutSeconds = 20
           }
         }
 
