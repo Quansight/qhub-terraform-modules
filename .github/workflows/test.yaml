@@ -30,7 +30,16 @@ jobs:
       - name: Start Minikube
         run: |
           minikube start --kubernetes-version=1.19.4 --driver=docker --wait=all
+      - name: Enable Minikube Ingress
+        run: |
+          minikube addons enable ingress
       - name: Versions
         run: |
           minikube version
           kubectl version
+      - name: Basic Kubectl Checks
+        run: |
+          kubectl get nodes
+          kubectl get namespaces
+          kubectl get pods -A
+          kubectl get services -A
