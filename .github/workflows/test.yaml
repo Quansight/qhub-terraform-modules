@@ -1,0 +1,33 @@
+name: 'Kubernetes Version'
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  kubernetes:
+    name: "Kubernetes Tests"
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@master
+      - name: Download and Install Minikube and Kubectl
+        runs:
+          mkdir -p bin
+          pushd bin
+          curl -LO https://github.com/kubernetes/minikube/releases/download/v1.15.0/minikube-linux-amd64
+          chmod +x minikube
+
+          curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.19.0/bin/linux/amd64/kubectl
+          chmod +x kubectl
+
+          echo "$PWD" >> $GITHUB_PATH
+          popd
+      - name: Check versions
+        runs:
+          kubectl version
+          minikube version
