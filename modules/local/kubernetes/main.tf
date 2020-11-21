@@ -1,5 +1,3 @@
-provider "kind" {}
-
-resource "kind_cluster" "default" {
+resource "kind_cluster" "main" {
     name = var.name
 }
