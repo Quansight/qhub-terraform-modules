@@ -1,6 +1,6 @@
 terraform {
   required_providers {
-    kyma-kind = {
+    kind = {
       source = "kyma-incubator/kind"
       version = "0.0.7"
     }

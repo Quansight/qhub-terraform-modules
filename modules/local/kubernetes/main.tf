@@ -1,3 +1,3 @@
-resource "kyma-kind_cluster" "main" {
+resource "kind_cluster" "main" {
     name = var.name
 }
