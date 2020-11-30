@@ -7,5 +7,6 @@ output "credentials" {
     cluster_ca_certificate = kind_cluster.main.cluster_ca_certificate
     kubeconfig = kind_cluster.main.kubeconfig
     kubeconfig_path = kind_cluster.main.kubeconfig_path
+    token = kind_cluster.main.token
   }
 }
