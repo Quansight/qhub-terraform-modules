@@ -9,8 +9,5 @@ resource "kind_cluster" "main" {
         node {
             role =  "worker"
         }
-        node {
-            role =  "worker"
-        }
     }
 }
