@@ -8,15 +8,36 @@ resource "kind_cluster" "main" {
         }
         node {
             role =  "worker"
-            node-group = "general"
+            kubeadm_config_patches = [
+                <<-YAML
+                kind: JoinConfiguration
+                nodeRegistration:
+                  kubeletExtraArgs:
+                    node-labels: "node-group=general"
+                YAML
+            ]
         }
         node {
             role =  "worker"
-            node-group = "user"
+            kubeadm_config_patches = [
+                <<-YAML
+                kind: JoinConfiguration
+                nodeRegistration:
+                  kubeletExtraArgs:
+                    node-labels: "node-group=user"
+                YAML
+            ]
         }
         node {
             role =  "worker"
-            node-group = "worker"
+            kubeadm_config_patches = [
+                <<-YAML
+                kind: JoinConfiguration
+                nodeRegistration:
+                  kubeletExtraArgs:
+                    node-labels: "node-group=worker"
+                YAML
+            ]
         }
     }
 }
