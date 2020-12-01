@@ -8,6 +8,15 @@ resource "kind_cluster" "main" {
         }
         node {
             role =  "worker"
+            node-group = "general"
+        }
+        node {
+            role =  "worker"
+            node-group = "user"
+        }
+        node {
+            role =  "worker"
+            node-group = "worker"
         }
     }
 }
