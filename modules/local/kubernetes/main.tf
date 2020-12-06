@@ -18,6 +18,16 @@ resource "kind_cluster" "main" {
                     node-labels: "node-group=general"
                 YAML
             ]
+            extra_port_mappings = [
+                container_port = 80
+                host_port = 80
+                protocol = "TCP"
+            ]
+            extra_port_mappings = [
+                container_port = 443
+                host_port = 443
+                protocol = "TCP"
+            ]
         }
         node {
             role =  "worker"
