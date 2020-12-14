@@ -943,3 +943,20 @@ resource "kubernetes_deployment" "deployment_ingress_nginx_controller" {
     kubernetes_job.job_ingress_nginx_admission_patch,
   ]
 }
+
+data "kubernetes_service" "ingress" {
+  depends_on = [
+    kubernetes_deployment.deployment_ingress_nginx_controller
+  ]
+  metadata {
+    name      = "ingress-nginx-ingress-controller"
+    namespace = "ingress-nginx"
+  }
+}
+
+resource "null_resource" "dependency_setter" {
+  depends_on = [
+    kubernetes_deployment.deployment_ingress_nginx_controller,
+    # List resource(s) that will be constructed last within the module.
+  ]
+}
