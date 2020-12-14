@@ -949,7 +949,7 @@ data "kubernetes_service" "ingress" {
     kubernetes_deployment.deployment_ingress_nginx_controller
   ]
   metadata {
-    name      = "ingress-nginx-ingress-controller"
+    name      = "ingress-nginx-controller"
     namespace = "ingress-nginx"
   }
 }
