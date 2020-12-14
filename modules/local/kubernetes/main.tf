@@ -7,15 +7,12 @@ resource "kind_cluster" "main" {
         api_version = "kind.x-k8s.io/v1alpha4"
         node {
             role = "control-plane"
-        }
-        node {
-            role =  "worker"
             kubeadm_config_patches = [
                 <<-YAML
-                kind: JoinConfiguration
+                kind: InitConfiguration
                 nodeRegistration:
                   kubeletExtraArgs:
-                    node-labels: "node-group=general"
+                    node-labels: "ingress-ready=true"
                 YAML
             ]
             extra_port_mappings {
@@ -28,6 +25,17 @@ resource "kind_cluster" "main" {
                 host_port = 443
                 protocol = "TCP"
             }
+        }
+        node {
+            role =  "worker"
+            kubeadm_config_patches = [
+                <<-YAML
+                kind: JoinConfiguration
+                nodeRegistration:
+                  kubeletExtraArgs:
+                    node-labels: "node-group=general"
+                YAML
+            ]
         }
         node {
             role =  "worker"
