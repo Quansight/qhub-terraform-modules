@@ -6,7 +6,7 @@ resource "null_resource" "dependency_getter" {
 
 data "helm_repository" "autoscaler" {
   name = "stable"
-  url  = "https://kubernetes-charts.storage.googleapis.com"
+  url  = "https://charts.helm.sh/stable"
 }
 
 resource "helm_release" "autoscaler" {
