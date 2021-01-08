@@ -1,5 +1,5 @@
 module "prefect" {
-  source = "."
+  source = "./"
   dependencies = var.dependencies
   jupyterhub_api_token = var.jupyterhub_api_token
   environment = var.environment
