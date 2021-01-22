@@ -1,7 +1,7 @@
 output "endpoint" {
   description = "Nginx ingress endpoint"
   # might need to use "hostname" for aws
-  value = data.kubernetes_service.ingress.load_balancer_ingress.0
+  value = data.kubernetes_service.ingress.status.0.load_balancer.0.ingress.0
 }
 
 output "depended_on" {
