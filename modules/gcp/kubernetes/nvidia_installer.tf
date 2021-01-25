@@ -74,7 +74,7 @@ resource "kubernetes_daemonset" "nvidia_installer" {
           image = "gcr.io/cos-cloud/cos-gpu-installer@sha256:8d86a652759f80595cafed7d3dcde3dc53f57f9bc1e33b27bc3cfa7afea8d483"
           name  = "nvidia-driver-installer"
           resources {
-            requests {
+            requests = {
               cpu = 0.15
             }
           }
