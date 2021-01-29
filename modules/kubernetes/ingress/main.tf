@@ -1,6 +1,6 @@
 resource "kubernetes_service_account" "main" {
   metadata {
-    name = "${var.name}-traefik"
+    name      = "${var.name}-traefik"
     namespace = var.namespace
   }
 }
@@ -53,7 +53,7 @@ resource "kubernetes_service" "main" {
   wait_for_load_balancer = true
 
   metadata {
-    name = "${var.name}-traefik"
+    name      = "${var.name}-traefik"
     namespace = var.namespace
   }
 
@@ -63,15 +63,15 @@ resource "kubernetes_service" "main" {
     }
 
     port {
-      name        = "http"
-      protocol    = "TCP"
-      port        = 80
+      name     = "http"
+      protocol = "TCP"
+      port     = 80
     }
 
     port {
-      name        = "https"
-      protocol    = "TCP"
-      port        = 443
+      name     = "https"
+      protocol = "TCP"
+      port     = 443
     }
 
     type = "LoadBalancer"
@@ -81,7 +81,7 @@ resource "kubernetes_service" "main" {
 
 resource "kubernetes_deployment" "main" {
   metadata {
-    name = "${var.name}-traefik"
+    name      = "${var.name}-traefik"
     namespace = var.namespace
   }
 
@@ -102,7 +102,7 @@ resource "kubernetes_deployment" "main" {
       }
 
       spec {
-        service_account_name = kubernetes_service_account.main.metadata.0.name
+        service_account_name             = kubernetes_service_account.main.metadata.0.name
         termination_grace_period_seconds = 60
 
         container {
@@ -114,9 +114,9 @@ resource "kubernetes_deployment" "main" {
               required_during_scheduling_ignored_during_execution {
                 node_selector_term {
                   match_expressions {
-                    key = var.node-group.key
+                    key      = var.node-group.key
                     operator = "In"
-                    values = [var.node-group.value]
+                    values   = [var.node-group.value]
                   }
                 }
               }
@@ -144,7 +144,7 @@ resource "kubernetes_deployment" "main" {
             # Enable debug logging. Useful to work out why something might not be
             # working. Fetch logs of the pod.
             "--log.level=${var.loglevel}",
-          ], var.enable-certificates ? [
+            ], var.enable-certificates ? [
             "--certificatesresolvers.default.acme.tlschallenge",
             "--certificatesresolvers.default.acme.email=${var.acme-email}",
             "--certificatesresolvers.default.acme.storage=acme.json",
@@ -152,17 +152,17 @@ resource "kubernetes_deployment" "main" {
           ] : [])
 
           port {
-            name = "http"
+            name           = "http"
             container_port = 80
           }
 
           port {
-            name = "https"
+            name           = "https"
             container_port = 443
           }
 
           port {
-            name = "dashboard"
+            name           = "dashboard"
             container_port = 8080
           }
         }
