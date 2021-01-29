@@ -177,8 +177,8 @@ resource "kubernetes_ingress" "dask-gateway" {
     namespace = var.namespace
 
     annotations = {
-      "kubernetes.io/ingress.class" = "traefik"
-      "traefik.ingress.kubernetes.io/router.tls" = "true"
+      "kubernetes.io/ingress.class"                           = "traefik"
+      "traefik.ingress.kubernetes.io/router.tls"              = "true"
       "traefik.ingress.kubernetes.io/router.tls.certresolver" = "default"
     }
   }
