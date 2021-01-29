@@ -177,9 +177,9 @@ resource "kubernetes_ingress" "dask-gateway" {
     namespace = var.namespace
 
     annotations = {
-      "cert-manager.io/cluster-issuer"              = "letsencrypt-production"
-      "kubernetes.io/ingress.class"                 = "nginx"
-      "nginx.ingress.kubernetes.io/proxy-body-size" = "0"
+      "kubernetes.io/ingress.class" = "traefik"
+      "traefik.ingress.kubernetes.io/router.tls" = "true"
+      "traefik.ingress.kubernetes.io/router.tls.certresolver" = "default"
     }
   }
 

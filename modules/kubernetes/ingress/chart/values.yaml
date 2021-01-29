@@ -1,8 +1,0 @@
-cert-manager:
-  ingressShim:
-    defaultIssuerName: letsencrypt-production
-    defaultIssuerKind: ClusterIssuer
-
-clusterissuer:
-  email: costrouchov@quansight.com
-  server: https://acme-v02.api.letsencrypt.org/directory
