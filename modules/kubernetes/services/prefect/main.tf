@@ -1,3 +1,11 @@
+//module "prefect" {
+//  source = ""
+//  dependencies = var.dependencies
+//  jupyterhub_api_token = var.jupyterhub_api_token
+//  environment = var.environment
+//  prefect_token = var.prefect_token
+//}
+
 resource "null_resource" "dependency_getter" {
   triggers = {
     my_dependencies = join(",", var.dependencies)
@@ -7,7 +15,7 @@ resource "null_resource" "dependency_getter" {
 resource "helm_release" "prefect" {
   name      = "prefect"
   namespace = var.environment
-  chart     = "../charts/prefect"
+  chart     = "${path.module}/chart"
 
   set_sensitive {
     name  = "prefectToken"
@@ -30,3 +38,4 @@ resource "null_resource" "dependency_setter" {
     # List resource(s) that will be constructed last within the module.
   ]
 }
+
