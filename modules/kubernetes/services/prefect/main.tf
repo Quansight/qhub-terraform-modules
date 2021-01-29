@@ -6,8 +6,8 @@ resource "null_resource" "dependency_getter" {
 
 resource "helm_release" "prefect" {
   name      = "prefect"
-  namespace = var.environment
-  chart     = "../charts/prefect"
+  namespace = var.namespace
+  chart     = "${path.module}/chart"
 
   set_sensitive {
     name  = "prefectToken"
@@ -26,7 +26,7 @@ resource "helm_release" "prefect" {
 
 resource "null_resource" "dependency_setter" {
   depends_on = [
-    helm_release.jupyterhub
     # List resource(s) that will be constructed last within the module.
   ]
 }
+
