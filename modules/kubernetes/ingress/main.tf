@@ -105,23 +105,23 @@ resource "kubernetes_deployment" "main" {
         service_account_name             = kubernetes_service_account.main.metadata.0.name
         termination_grace_period_seconds = 60
 
-        container {
-          image = "${var.traefik-image.image}:${var.traefik-image.tag}"
-          name  = var.name
-
-          affinity {
-            node_affinity {
-              required_during_scheduling_ignored_during_execution {
-                node_selector_term {
-                  match_expressions {
-                    key      = var.node-group.key
-                    operator = "In"
-                    values   = [var.node-group.value]
-                  }
+        affinity {
+          node_affinity {
+            required_during_scheduling_ignored_during_execution {
+              node_selector_term {
+                match_expressions {
+                  key      = var.node-group.key
+                  operator = "In"
+                  values   = [var.node-group.value]
                 }
               }
             }
           }
+        }
+
+        container {
+          image = "${var.traefik-image.image}:${var.traefik-image.tag}"
+          name  = var.name
 
           security_context {
             capabilities {
