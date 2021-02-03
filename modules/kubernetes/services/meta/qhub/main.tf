@@ -185,7 +185,7 @@ resource "kubernetes_ingress" "dask-gateway" {
 
   spec {
     rule {
-      # host = var.external-url
+      host = var.external-url
       http {
         path {
           backend {
