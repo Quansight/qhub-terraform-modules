@@ -894,7 +894,7 @@ resource "kubernetes_deployment" "deployment_ingress_nginx_controller" {
             timeout_seconds       = 1
           }
           resources {
-            requests {
+            requests = {
               cpu    = "100m"
               memory = "90Mi"
             }
