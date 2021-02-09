@@ -1,5 +1,5 @@
 variable "name" {
-  description = "Prefix name to git container registry"
+  description = "Prefix name to azure container registry"
   type        = string
 }
 
