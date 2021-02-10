@@ -2,7 +2,6 @@
 variable "name" {
   description = "Prefix name to assign to azure kubernetes cluster"
   type        = string
-  default     = "Qhub"
 }
 
 variable "tags" {
@@ -21,7 +20,6 @@ variable "node_labels" {
 variable "location" {
   description = "Location for GCP Kubernetes cluster"
   type        = string
-  default     = "Central US"
 }
 
 variable "kubernetes_version" {

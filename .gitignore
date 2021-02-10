@@ -1,3 +1,4 @@
 # Terraform state/modules/plugins
 
 **/.terraform/*
+**/.tfstate
