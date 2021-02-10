@@ -99,7 +99,7 @@ module "kubernetes-dask-gateway" {
   overrides = concat(var.dask-gateway-overrides, [
     jsonencode({
       gateway = {
-        clusterManager = {
+        backend = {
 
           # Since we are using autoscaling nodes and pods take
           # longer to spin up
@@ -189,20 +189,10 @@ resource "kubernetes_ingress" "dask-gateway" {
       http {
         path {
           backend {
-            service_name = "web-public-dask-gateway"
+            service_name = "traefik-dask-gateway"
             service_port = 80
           }
-
           path = "/gateway"
-        }
-
-        path {
-          backend {
-            service_name = "proxy-public"
-            service_port = 80
-          }
-
-          path = "/"
         }
       }
     }
