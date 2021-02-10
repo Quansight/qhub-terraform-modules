@@ -39,16 +39,16 @@ resource "azurerm_kubernetes_cluster" "main" {
 }
 
 # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_cluster_node_pool
-resource "azurerm_kubernetes_cluster_node_pool" "node_pools" {
-  count                 = length(var.node_pools)
-  name                  = var.node_pools[count.index].name
+resource "azurerm_kubernetes_cluster_node_pool" "node_groups" {
+  count                 = length(var.node_groups)
+  name                  = var.node_groups[count.index].name
   kubernetes_cluster_id = azurerm_kubernetes_cluster.main.id
-  vm_size               = var.node_pools[count.index].instance_type
+  vm_size               = var.node_groups[count.index].instance_type
   node_count            = 0
   enable_auto_scaling   = "true"
   mode                  = "User" # "System" or "User", only "User" nodes can scale down to 0
-  min_count             = var.node_pools[count.index].min_size
-  max_count             = var.node_pools[count.index].max_size
+  min_count             = var.node_groups[count.index].min_size
+  max_count             = var.node_groups[count.index].max_size
   tags                  = var.tags
   orchestrator_version  = var.kubernetes_version
 }
