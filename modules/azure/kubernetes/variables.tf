@@ -27,8 +27,8 @@ variable "kubernetes_version" {
   type        = string
 }
 
-variable "node_pools" {
-  description = "Node groups to add to Azure Kubernetes Cluster"
+variable "node_groups" {
+  description = "Node pools to add to Azure Kubernetes Cluster"
   type        = list(map(any))
   # default = [
   #   {
