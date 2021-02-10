@@ -22,27 +22,26 @@ variable "location" {
   type        = string
 }
 
-# variable "kubernetes_version" {
-#   description = "Version of kuberenetes"
-#   type        = string
-#   # default     = "1.18.14"
-# }
+variable "kubernetes_version" {
+  description = "Version of kuberenetes"
+  type        = string
+}
 
 variable "node_pools" {
   description = "Node groups to add to Azure Kubernetes Cluster"
   type        = list(map(any))
-  default = [
-    {
-      name          = "user"
-      instance_type = "Standard_DS2_v2"
-      min_size      = 0
-      max_size      = 2
-    },
-    {
-      name          = "worker"
-      instance_type = "Standard_DS2_v2"
-      min_size      = 0
-      max_size      = 5
-    }
-  ]
+  # default = [
+  #   {
+  #     name          = "user"
+  #     instance_type = "Standard_DS2_v2"
+  #     min_size      = 0
+  #     max_size      = 2
+  #   },
+  #   {
+  #     name          = "worker"
+  #     instance_type = "Standard_DS2_v2"
+  #     min_size      = 0
+  #     max_size      = 5
+  #   }
+  # ]
 }
