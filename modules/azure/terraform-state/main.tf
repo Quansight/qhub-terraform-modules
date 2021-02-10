@@ -8,7 +8,7 @@ resource "azurerm_resource_group" "terraform-resource-group" {
 }
 
 resource "azurerm_storage_account" "terraform-storage-account" {
-  name                     = var.name  # must be unique across the entire Azure service
+  name                     = "${var.name}-storage"  # must be unique across the entire Azure service
   resource_group_name      = azurerm_resource_group.terraform-resource-group.name
   location                 = azurerm_resource_group.terraform-resource-group.location
   account_tier             = "Standard"
