@@ -22,11 +22,11 @@ variable "location" {
   type        = string
 }
 
-variable "kubernetes_version" {
-  description = "Version of kuberenetes"
-  type        = string
-  # default     = "1.18.14"
-}
+# variable "kubernetes_version" {
+#   description = "Version of kuberenetes"
+#   type        = string
+#   # default     = "1.18.14"
+# }
 
 variable "node_pools" {
   description = "Node groups to add to Azure Kubernetes Cluster"
