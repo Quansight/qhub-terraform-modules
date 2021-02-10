@@ -50,7 +50,7 @@ resource "kubernetes_cluster_role_binding" "main" {
 
 
 resource "kubernetes_service" "main" {
-  wait_for_load_balancer = true
+  # wait_for_load_balancer = true
 
   metadata {
     name      = "${var.name}-traefik"
