@@ -22,14 +22,14 @@ resource "azurerm_kubernetes_cluster" "main" {
     name                 = "general"
     node_count           = 1
     vm_size              = "Standard_D2_v2"
-    # enable_auto_scaling  = "true"
-    # min_count            = 1
-    # max_count            = 1
+    enable_auto_scaling  = "true"
+    min_count            = 1
+    max_count            = 1
     # node_labels          = var.node_labels
     # orchestrator_version = var.kubernetes_version
-    # tags = {
-    #   "azure-node-pool" = "general"
-    # }
+    tags = {
+      "azure-node-pool" = "general"
+    }
   }
 
   sku_tier = "Free" # "Free" [Default] or "Paid"
@@ -52,8 +52,8 @@ resource "azurerm_kubernetes_cluster_node_pool" "node_groups" {
   mode                  = "User" # "System" or "User", only "User" nodes can scale down to 0
   min_count             = var.node_groups[count.index].min_size
   max_count             = var.node_groups[count.index].max_size
-  # tags                  = {
-  #     "azure-node-pool" = var.node_groups[count.index].name
-  #   }
+  tags                  = {
+      "azure-node-pool" = var.node_groups[count.index].name
+    }
   # orchestrator_version  = var.kubernetes_version
 }
