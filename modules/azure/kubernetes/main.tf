@@ -52,7 +52,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "node_groups" {
   mode                  = "User" # "System" or "User", only "User" nodes can scale down to 0
   min_count             = var.node_groups[count.index].min_size
   max_count             = var.node_groups[count.index].max_size
-  tags                  = {
+  node_labels                  = {
       "azure-node-pool" = var.node_groups[count.index].name
     }
   # orchestrator_version  = var.kubernetes_version
