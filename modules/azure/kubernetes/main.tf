@@ -38,7 +38,7 @@ resource "azurerm_kubernetes_cluster" "main" {
     type = "SystemAssigned" # "UserAssigned" or "SystemAssigned".  SystemAssigned identity lifecycles are tied to the AKS Cluster.
   }
 
-  tags = var.tags
+  # tags = var.tags
 }
 
 # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_cluster_node_pool
