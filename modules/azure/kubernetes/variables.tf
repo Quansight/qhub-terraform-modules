@@ -10,6 +10,12 @@ variable "location" {
   type        = string
 }
 
+variable "environment" {
+  description = "Location for GCP Kubernetes cluster"
+  type        = string
+}
+
+
 variable "node_groups" {
   description = "Node pools to add to Azure Kubernetes Cluster"
   type        = list(map(any))
