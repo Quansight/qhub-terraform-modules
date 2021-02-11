@@ -4,26 +4,9 @@ variable "name" {
   type        = string
 }
 
-variable "tags" {
-  description = "Additional tags to apply to each kuberentes resource"
-  type        = map
-  default     = {}
-}
-
-variable "node_labels" {
-  description = "Additional tags to apply to each node pool"
-  type        = map
-  default     = {}
-}
-
 # `az account list-locations`
 variable "location" {
   description = "Location for GCP Kubernetes cluster"
-  type        = string
-}
-
-variable "kubernetes_version" {
-  description = "Version of kuberenetes"
   type        = string
 }
 
@@ -45,3 +28,24 @@ variable "node_groups" {
   #   }
   # ]
 }
+
+# variable "node_labels" {
+#   description = "Additional tags to apply to each node pool"
+#   type        = map
+#   default     = {}
+# }
+
+
+# unused
+# variable "tags" {
+#   description = "Additional tags to apply to each kuberentes resource"
+#   type        = map
+#   default     = {}
+# }
+
+# unused
+# variable "kubernetes_version" {
+#   description = "Version of kuberenetes"
+#   type        = string
+# }
+
