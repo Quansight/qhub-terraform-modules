@@ -52,7 +52,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "user_node_group" {
   min_count             = var.node_groups[1].min_size
   max_count             = var.node_groups[1].max_size
   node_labels           = {
-      "azure-node-pool" = var.node_groups[count.index].name
+      "azure-node-pool" = var.node_groups[1].name
     }
   orchestrator_version  = var.kubernetes_version
 }
@@ -67,7 +67,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "worker_node_group" {
   min_count             = var.node_groups[2].min_size
   max_count             = var.node_groups[2].max_size
   node_labels           = {
-      "azure-node-pool" = var.node_groups[count.index].name
+      "azure-node-pool" = var.node_groups[2].name
     }
   orchestrator_version  = var.kubernetes_version
 }
