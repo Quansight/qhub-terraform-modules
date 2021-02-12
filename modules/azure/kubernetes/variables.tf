@@ -10,6 +10,11 @@ variable "location" {
   type        = string
 }
 
+variable "kubernetes_version" {
+  description = "Version of kuberenetes"
+  type        = string
+}
+
 variable "environment" {
   description = "Location for GCP Kubernetes cluster"
   type        = string
@@ -47,11 +52,5 @@ variable "node_groups" {
 #   description = "Additional tags to apply to each kuberentes resource"
 #   type        = map
 #   default     = {}
-# }
-
-# unused
-# variable "kubernetes_version" {
-#   description = "Version of kuberenetes"
-#   type        = string
 # }
 
