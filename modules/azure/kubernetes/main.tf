@@ -26,7 +26,7 @@ resource "azurerm_kubernetes_cluster" "main" {
     min_count            = 1
     max_count            = 1
     # node_labels          = var.node_labels
-    # orchestrator_version = var.kubernetes_version
+    orchestrator_version = var.kubernetes_version
     node_labels          = {
       "azure-node-pool" = "general"
     }
@@ -42,18 +42,32 @@ resource "azurerm_kubernetes_cluster" "main" {
 }
 
 # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_cluster_node_pool
-resource "azurerm_kubernetes_cluster_node_pool" "node_groups" {
-  count                 = length(var.node_groups)
-  name                  = var.node_groups[count.index].name
+resource "azurerm_kubernetes_cluster_node_pool" "user_node_group" {
+  name                  = var.node_groups[1].name
   kubernetes_cluster_id = azurerm_kubernetes_cluster.main.id
-  vm_size               = var.node_groups[count.index].instance_type
+  vm_size               = var.node_groups[1].instance_type
   node_count            = 0
   enable_auto_scaling   = "true"
   mode                  = "User" # "System" or "User", only "User" nodes can scale down to 0
-  min_count             = var.node_groups[count.index].min_size
-  max_count             = var.node_groups[count.index].max_size
+  min_count             = var.node_groups[1].min_size
+  max_count             = var.node_groups[1].max_size
   node_labels           = {
       "azure-node-pool" = var.node_groups[count.index].name
     }
-  # orchestrator_version  = var.kubernetes_version
+  orchestrator_version  = var.kubernetes_version
+}
+
+resource "azurerm_kubernetes_cluster_node_pool" "worker_node_group" {
+  name                  = var.node_groups[2].name
+  kubernetes_cluster_id = azurerm_kubernetes_cluster.main.id
+  vm_size               = var.node_groups[2].instance_type
+  node_count            = 0
+  enable_auto_scaling   = "true"
+  mode                  = "User" # "System" or "User", only "User" nodes can scale down to 0
+  min_count             = var.node_groups[2].min_size
+  max_count             = var.node_groups[2].max_size
+  node_labels           = {
+      "azure-node-pool" = var.node_groups[count.index].name
+    }
+  orchestrator_version  = var.kubernetes_version
 }
