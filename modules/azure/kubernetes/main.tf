@@ -19,16 +19,16 @@ resource "azurerm_kubernetes_cluster" "main" {
   # Azure requires that a new, non-existent Resource Group is used, as otherwise the provisioning of the Kubernetes Service will fail.
   node_resource_group = "node_resource_group" # optional
   default_node_pool {
-    name                = "general"
+    name                = var.node_groups[0].name
     node_count          = 1
-    vm_size             = "Standard_D2_v2"
+    vm_size             = var.node_groups[0].instance_type
     enable_auto_scaling = "true"
     min_count           = 1
     max_count           = 1
     # node_labels          = var.node_labels
     orchestrator_version = var.kubernetes_version
     node_labels = {
-      "azure-node-pool" = "general"
+      "azure-node-pool" = var.node_groups[0].name
     }
   }
 
