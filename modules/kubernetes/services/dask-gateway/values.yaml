@@ -214,7 +214,7 @@ traefik:
 
   # Additional configuration for the traefik service
   service:
-    type: LoadBalancer
+    type: ClusterIP
     annotations: {}
     spec: {}
     ports:
