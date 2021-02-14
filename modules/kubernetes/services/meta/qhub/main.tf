@@ -194,6 +194,13 @@ resource "kubernetes_ingress" "dask-gateway" {
           }
           path = "/gateway"
         }
+        path {
+          backend {
+            service_name = "proxy-public"
+            service_port = 80
+          }
+          path = "/"
+        }
       }
     }
 
