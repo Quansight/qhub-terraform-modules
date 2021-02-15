@@ -26,12 +26,6 @@ variable "node_groups" {
   type        = list(map(any))
 }
 
-variable "storage_account_postfix" {
-  description = "random characters appended to storage account name to facilitate global uniqueness"
-  type        = string
-}
-
-
 # variable "node_labels" {
 #   description = "Additional tags to apply to each node pool"
 #   type        = map
