@@ -7,8 +7,8 @@ output "config" {
   description = "Dask gateway /etc/dask/dask-gateway.yaml configuration"
   value = {
     gateway = {
-      address        = "http://traefik-${var.name}"
-      public-address = var.external_endpoint
+      address        = "http://traefik-${var.name}/services/dask-gateway"
+      public-address = "${var.external_endpoint}/services/dask-gateway"
       auth = {
         type = "jupyterhub"
       }

@@ -19,7 +19,7 @@ gateway:
   # Path prefix to serve dask-gateway api requests under
   # This prefix will be added to all routes the gateway manages
   # in the traefik proxy.
-  prefix: /
+  prefix: /services/dask-gateway
 
   # The gateway server log level
   loglevel: INFO
