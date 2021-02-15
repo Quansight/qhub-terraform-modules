@@ -23,7 +23,7 @@ module "kubernetes-jupyterhub" {
             apiToken = module.kubernetes-dask-gateway.jupyterhub_api_token
             # url will make jupyterhub configure its own proxy to route
             # "/services/dask-gateway" to this destination.
-            url      = "http://traefik-dask-gateway.dev"
+            url = "http://traefik-dask-gateway.dev"
           }
         }
       }
