@@ -20,7 +20,7 @@ resource "helm_release" "jupyterhub" {
 
   repository = data.helm_repository.jupyterhub.metadata[0].name
   chart      = "jupyterhub"
-  version    = "0.9.0-beta.3"
+  version    = "0.11.1"
 
   values = concat([
     file("${path.module}/values.yaml"),
