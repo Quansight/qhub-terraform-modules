@@ -24,21 +24,13 @@ variable "environment" {
 variable "node_groups" {
   description = "Node pools to add to Azure Kubernetes Cluster"
   type        = list(map(any))
-  # default = [
-  #   {
-  #     name          = "user"
-  #     instance_type = "Standard_DS2_v2"
-  #     min_size      = 0
-  #     max_size      = 2
-  #   },
-  #   {
-  #     name          = "worker"
-  #     instance_type = "Standard_DS2_v2"
-  #     min_size      = 0
-  #     max_size      = 5
-  #   }
-  # ]
 }
+
+variable "storage_account_postfix" {
+  description = "random characters appended to storage account name to facilitate global uniqueness"
+  type        = string
+}
+
 
 # variable "node_labels" {
 #   description = "Additional tags to apply to each node pool"
