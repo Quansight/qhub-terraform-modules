@@ -109,6 +109,7 @@ module "kubernetes-dask-gateway" {
           workerStartTimeout  = 300 # 5 minutes
 
           image = var.dask-worker-image
+          affinity = local.affinity.general-nodegroup
 
           scheduler = {
             extraContainerConfig = {
