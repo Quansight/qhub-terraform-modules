@@ -68,6 +68,8 @@ resource "kubernetes_deployment" "main" {
         }
       }
 
+      affinity = local.affinity.nodegroup
+
       spec {
         container {
           name  = "conda-store"

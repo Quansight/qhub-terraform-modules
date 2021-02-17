@@ -19,3 +19,11 @@ variable "environments" {
   type        = map(any)
   default     = {}
 }
+
+variable "node-group" {
+  description = "Node key value pair for bound general resources"
+  type = object({
+    key   = string
+    value = string
+  })
+}
