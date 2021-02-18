@@ -70,6 +70,22 @@ resource "kubernetes_deployment" "main" {
       }
 
       spec {
+        affinity {
+          node_affinity {
+            required_during_scheduling_ignored_during_execution {
+              node_selector_term {
+                match_expressions {
+                  key      = var.node-group.key
+                  operator = "In"
+                  values = [
+                    var.node-group.value
+                  ]
+                }
+              }
+            }
+          }
+        }
+
         container {
           name  = "nfs-server"
           image = "gcr.io/google_containers/volume-nfs:0.8"
