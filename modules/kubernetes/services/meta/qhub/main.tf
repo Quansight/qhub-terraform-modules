@@ -101,7 +101,14 @@ module "kubernetes-dask-gateway" {
 
   overrides = concat(var.dask-gateway-overrides, [
     jsonencode({
+      controller = {
+        affinity = local.affinity.general-nodegroup
+      }
+      traefik = {
+        affinity = local.affinity.general-nodegroup
+      }
       gateway = {
+        affinity = local.affinity.general-nodegroup
         backend = {
 
           # Since we are using autoscaling nodes and pods take
