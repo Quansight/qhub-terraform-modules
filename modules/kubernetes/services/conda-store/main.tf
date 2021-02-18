@@ -68,9 +68,23 @@ resource "kubernetes_deployment" "main" {
         }
       }
 
-      affinity = local.affinity.nodegroup
-
       spec {
+        affinity {
+          node_affinity {
+            required_during_scheduling_ignored_during_execution {
+              node_selector_term {
+                match_expressions {
+                  key      = var.node-group.key
+                  operator = "In"
+                  values = [
+                    var.node-group.value
+                  ]
+                }
+              }
+            }
+          }
+        }
+
         container {
           name  = "conda-store"
           image = "quansight/conda-store:e2051a36e60bd3abd9aa44105f240b359ee6bab7"
