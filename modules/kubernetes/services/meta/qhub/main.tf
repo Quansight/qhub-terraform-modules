@@ -21,6 +21,9 @@ module "kubernetes-jupyterhub" {
         services = {
           "dask-gateway" = {
             apiToken = module.kubernetes-dask-gateway.jupyterhub_api_token
+            # url will make jupyterhub configure its own proxy to route
+            # "/services/dask-gateway" to this destination.
+            url = "http://traefik-dask-gateway.dev"
           }
         }
       }
@@ -98,8 +101,15 @@ module "kubernetes-dask-gateway" {
 
   overrides = concat(var.dask-gateway-overrides, [
     jsonencode({
+      controller = {
+        affinity = local.affinity.general-nodegroup
+      }
+      traefik = {
+        affinity = local.affinity.general-nodegroup
+      }
       gateway = {
-        clusterManager = {
+        affinity = local.affinity.general-nodegroup
+        backend = {
 
           # Since we are using autoscaling nodes and pods take
           # longer to spin up
@@ -189,19 +199,16 @@ resource "kubernetes_ingress" "dask-gateway" {
       http {
         path {
           backend {
-            service_name = "web-public-dask-gateway"
+            service_name = "traefik-dask-gateway"
             service_port = 80
           }
-
           path = "/gateway"
         }
-
         path {
           backend {
             service_name = "proxy-public"
             service_port = 80
           }
-
           path = "/"
         }
       }

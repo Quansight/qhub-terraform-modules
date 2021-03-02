@@ -30,7 +30,7 @@ resource "helm_release" "dask-gateway" {
 
   repository = data.helm_repository.dask-gateway.metadata[0].name
   chart      = "dask-gateway"
-  version    = "0.6.1"
+  version    = "0.9.0"
 
   values = concat([
     file("${path.module}/values.yaml")
