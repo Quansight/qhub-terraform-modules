@@ -1,9 +1,3 @@
-resource "null_resource" "dependency_getter" {
-  triggers = {
-    my_dependencies = join(",", var.dependencies)
-  }
-}
-
 resource "helm_release" "prefect" {
   name      = "prefect"
   namespace = var.namespace
@@ -18,15 +12,4 @@ resource "helm_release" "prefect" {
     name  = "jupyterHubToken"
     value = var.jupyterhub_api_token
   }
-
-  depends_on = [
-    null_resource.dependency_getter
-  ]
 }
-
-resource "null_resource" "dependency_setter" {
-  depends_on = [
-    # List resource(s) that will be constructed last within the module.
-  ]
-}
-

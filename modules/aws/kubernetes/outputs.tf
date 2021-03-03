@@ -11,7 +11,3 @@ output "credentials" {
 output "node_groups_arn" {
   value = aws_eks_node_group.main[*].arn
 }
-
-output "depended_on" {
-  value = "${null_resource.dependency_setter.id}-${timestamp()}"
-}
