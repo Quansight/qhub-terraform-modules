@@ -5,7 +5,7 @@ resource "aws_vpc" "main" {
   enable_dns_hostnames = true
   enable_classiclink   = false
 
-  tags       = merge({ Name = var.name }, var.tags, var.vpc_tags)
+  tags = merge({ Name = var.name }, var.tags, var.vpc_tags)
 }
 
 resource "aws_subnet" "main" {
@@ -16,13 +16,13 @@ resource "aws_subnet" "main" {
   vpc_id                  = aws_vpc.main.id
   map_public_ip_on_launch = true
 
-  tags       = merge({ Name = "${var.name}-subnet-${count.index}" }, var.tags, var.subnet_tags)
+  tags = merge({ Name = "${var.name}-subnet-${count.index}" }, var.tags, var.subnet_tags)
 }
 
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 
-  tags       = merge({ Name = var.name }, var.tags)
+  tags = merge({ Name = var.name }, var.tags)
 }
 
 resource "aws_route_table" "main" {
@@ -33,7 +33,7 @@ resource "aws_route_table" "main" {
     gateway_id = aws_internet_gateway.main.id
   }
 
-  tags       = merge({ Name = var.name }, var.tags)
+  tags = merge({ Name = var.name }, var.tags)
 }
 
 resource "aws_route_table_association" "main" {
@@ -63,5 +63,5 @@ resource "aws_security_group" "main" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags       = merge({ Name = var.name }, var.tags, var.security_group_tags)
+  tags = merge({ Name = var.name }, var.tags, var.security_group_tags)
 }

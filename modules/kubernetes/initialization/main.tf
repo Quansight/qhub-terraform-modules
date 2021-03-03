@@ -18,5 +18,5 @@ resource "kubernetes_secret" "main" {
 
   data = var.secrets[count.index].data
 
-  type       = "Opaque"
+  type = "Opaque"
 }
