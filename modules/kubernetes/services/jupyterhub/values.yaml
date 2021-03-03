@@ -27,7 +27,7 @@ singleuser:
     tag: 73a577b006b4
   profileList:
     - display_name: "Small Instance"
-      description: "Stable environment with 0.25 cpu / 0.5GB ram"
+      description: "Stable environment with 1 cpu / 1GB ram"
       default: true
   storage:
     type: static
@@ -48,8 +48,8 @@ singleuser:
         - mountPath: "/mnt"
           name: home
   cpu:
-    limit: 0.25
-    guarantee: 0.25
+    limit: 1
+    guarantee: 1
   memory:
-    limit: "0.5G"
-    guarantee: "0.5G"
+    limit: "1G"
+    guarantee: "1G"
