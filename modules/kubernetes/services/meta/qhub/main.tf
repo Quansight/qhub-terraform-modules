@@ -157,9 +157,10 @@ module "kubernetes-dask-gateway" {
     })
   ])
 
-  depends_on = [
-    module.kubernetes-jupyterhub
-  ]
+  ## Causes cyclic dependency need to rewrite module
+  # depends_on = [
+  #   module.kubernetes-jupyterhub
+  # ]
 }
 
 resource "kubernetes_config_map" "dask-etc" {
