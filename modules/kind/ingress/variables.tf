@@ -3,3 +3,8 @@ variable "dependencies" {
   type        = list(any)
   default     = []
 }
+
+variable "namespace" {
+  description = "Namespace to deploy kubernetes ingress"
+  type        = string
+}
