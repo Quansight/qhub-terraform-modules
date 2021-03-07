@@ -112,7 +112,7 @@ resource "kubernetes_deployment" "main" {
                 match_expressions {
                   key      = "ingress-ready"
                   operator = "Equal"
-                  values   = "true"
+                  values   = ["true"]
                 }
               }
             }
