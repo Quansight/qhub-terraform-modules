@@ -9,15 +9,6 @@ variable "namespace" {
   type        = string
 }
 
-variable "node-group" {
-  description = "Node group to associate ingress deployment"
-  type = object({
-    key   = string
-    value = string
-  })
-
-}
-
 variable "traefik-image" {
   description = "traefik image to use"
   type = object({
