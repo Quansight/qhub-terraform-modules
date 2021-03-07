@@ -25,6 +25,11 @@ resource "kind_cluster" "main" {
         host_port      = 443
         protocol       = "TCP"
       }
+      extra_port_mappings {
+        container_port = 8080
+        host_port      = 8080
+        protocol       = "TCP"
+      }
     }
     node {
       role = "worker"
