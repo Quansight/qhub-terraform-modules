@@ -74,7 +74,7 @@ resource "kubernetes_service" "main" {
       port     = 443
     }
 
-    type = "ClusterIP"
+    type = "NodePort"
   }
 }
 
