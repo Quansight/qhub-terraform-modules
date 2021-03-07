@@ -5,7 +5,6 @@ resource "kubernetes_service_account" "main" {
   }
 }
 
-
 resource "kubernetes_cluster_role" "main" {
   metadata {
     name = "${var.name}-traefik"
@@ -77,7 +76,6 @@ resource "kubernetes_service" "main" {
     type = "LoadBalancer"
   }
 }
-
 
 resource "kubernetes_deployment" "main" {
   metadata {

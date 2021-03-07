@@ -1,9 +1,9 @@
-# output "endpoint" {
-#   description = "Nginx ingress endpoint"
-#   # might need to use "hostname" for aws
-#   value = data.kubernetes_service.ingress.load_balancer_ingress.0
-# }
+locals {
+  ingress = kubernetes_service.main.status.0.load_balancer.0.ingress
+}
 
-output "depended_on" {
-  value = "${null_resource.dependency_setter.id}-${timestamp()}"
+output "endpoint" {
+  description = "traefik load balancer endpoint"
+  //  handles the case when ingress is empty list
+  value = length(local.ingress) == 0 ? null : local.ingress.0
 }
