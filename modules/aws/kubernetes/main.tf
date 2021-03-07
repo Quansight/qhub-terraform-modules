@@ -1,9 +1,3 @@
-resource "null_resource" "dependency_getter" {
-  triggers = {
-    my_dependencies = join(",", var.dependencies)
-  }
-}
-
 resource "aws_eks_cluster" "main" {
   name     = var.name
   role_arn = aws_iam_role.cluster.arn
@@ -15,7 +9,6 @@ resource "aws_eks_cluster" "main" {
 
   depends_on = [
     aws_iam_role_policy_attachment.cluster-policy,
-    null_resource.dependency_getter
   ]
 
   tags = merge({ Name = var.name }, var.tags)
@@ -43,7 +36,6 @@ resource "aws_eks_node_group" "main" {
   # properly delete EC2 Instances and Elastic Network Interfaces.
   depends_on = [
     aws_iam_role_policy_attachment.node-group-policy,
-    null_resource.dependency_getter
   ]
 
   tags = merge({
@@ -53,11 +45,4 @@ resource "aws_eks_node_group" "main" {
 
 data "aws_eks_cluster_auth" "main" {
   name = aws_eks_cluster.main.name
-}
-
-resource "null_resource" "dependency_setter" {
-  depends_on = [
-    aws_eks_node_group.main
-    # List resource(s) that will be constructed last within the module.
-  ]
 }

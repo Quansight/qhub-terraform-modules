@@ -1,9 +1,3 @@
-resource "null_resource" "dependency_getter" {
-  triggers = {
-    my_dependencies = join(",", var.dependencies)
-  }
-}
-
 module "kubernetes-jupyterhub" {
   source = "../../jupyterhub"
 
@@ -21,6 +15,9 @@ module "kubernetes-jupyterhub" {
         services = {
           "dask-gateway" = {
             apiToken = module.kubernetes-dask-gateway.jupyterhub_api_token
+            # url will make jupyterhub configure its own proxy to route
+            # "/services/dask-gateway" to this destination.
+            url = "http://traefik-dask-gateway.dev"
           }
         }
       }
@@ -85,8 +82,6 @@ module "kubernetes-jupyterhub" {
       }
     })
   ])
-
-  dependencies = var.dependencies
 }
 
 module "kubernetes-dask-gateway" {
@@ -98,8 +93,15 @@ module "kubernetes-dask-gateway" {
 
   overrides = concat(var.dask-gateway-overrides, [
     jsonencode({
+      controller = {
+        affinity = local.affinity.general-nodegroup
+      }
+      traefik = {
+        affinity = local.affinity.general-nodegroup
+      }
       gateway = {
-        clusterManager = {
+        affinity = local.affinity.general-nodegroup
+        backend = {
 
           # Since we are using autoscaling nodes and pods take
           # longer to spin up
@@ -155,7 +157,10 @@ module "kubernetes-dask-gateway" {
     })
   ])
 
-  dependencies = concat(var.dependencies, [module.kubernetes-jupyterhub.depended_on])
+  ## Causes cyclic dependency need to rewrite module
+  # depends_on = [
+  #   module.kubernetes-jupyterhub
+  # ]
 }
 
 resource "kubernetes_config_map" "dask-etc" {
@@ -168,7 +173,6 @@ resource "kubernetes_config_map" "dask-etc" {
     "gateway.yaml"   = jsonencode(module.kubernetes-dask-gateway.config)
     "dashboard.yaml" = jsonencode({})
   }
-  depends_on = [null_resource.dependency_getter]
 }
 
 resource "kubernetes_ingress" "dask-gateway" {
@@ -177,9 +181,9 @@ resource "kubernetes_ingress" "dask-gateway" {
     namespace = var.namespace
 
     annotations = {
-      "cert-manager.io/cluster-issuer"              = "letsencrypt-production"
-      "kubernetes.io/ingress.class"                 = "nginx"
-      "nginx.ingress.kubernetes.io/proxy-body-size" = "0"
+      "kubernetes.io/ingress.class"                           = "traefik"
+      "traefik.ingress.kubernetes.io/router.tls"              = "true"
+      "traefik.ingress.kubernetes.io/router.tls.certresolver" = "default"
     }
   }
 
@@ -189,19 +193,16 @@ resource "kubernetes_ingress" "dask-gateway" {
       http {
         path {
           backend {
-            service_name = "web-public-dask-gateway"
+            service_name = "traefik-dask-gateway"
             service_port = 80
           }
-
           path = "/gateway"
         }
-
         path {
           backend {
             service_name = "proxy-public"
             service_port = 80
           }
-
           path = "/"
         }
       }
@@ -212,12 +213,4 @@ resource "kubernetes_ingress" "dask-gateway" {
       hosts       = [var.external-url]
     }
   }
-
-  depends_on = [null_resource.dependency_getter]
-}
-
-resource "null_resource" "dependency_setter" {
-  depends_on = [
-    # List resource(s) that will be constructed last within the module.
-  ]
 }
