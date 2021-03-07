@@ -111,7 +111,7 @@ resource "kubernetes_deployment" "main" {
               node_selector_term {
                 match_expressions {
                   key      = "ingress-ready"
-                  operator = "Equal"
+                  operator = "In"
                   values   = ["true"]
                 }
               }
