@@ -84,6 +84,6 @@ variable "dask-gateway-overrides" {
 
 variable "annotations" {
   description = "ingress annotations"
-  type        = "map"
+  type        = map(string)
   default     = {}
 }

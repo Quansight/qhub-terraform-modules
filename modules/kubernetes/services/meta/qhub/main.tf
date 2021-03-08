@@ -203,9 +203,9 @@ resource "kubernetes_ingress" "dask-gateway" {
       }
     }
 
-    # tls {
-    #   secret_name = "qhub-cert"
-    #   hosts       = [var.external-url]
-    # }
+    tls {
+      secret_name = "qhub-cert"
+      hosts       = [var.external-url]
+    }
   }
 }
