@@ -1,3 +1,9 @@
+resource "null_resource" "dependency_getter" {
+  triggers = {
+    my_dependencies = join(",", var.dependencies)
+  }
+}
+
 data "helm_repository" "ingress-nginx" {
   name = "ingress-nginx"
   url  = "https://kubernetes.github.io/ingress-nginx"
@@ -9,7 +15,7 @@ resource "helm_release" "ingress-nginx" {
   repository = data.helm_repository.ingress-nginx.metadata[0].name
   chart      = "ingress-nginx"
   values = [
-    file("${path.module}/values.yaml"),
+    file("${path.module}/ingress-nginx-values.yaml"),
   ]
   depends_on = [
     null_resource.dependency_getter,

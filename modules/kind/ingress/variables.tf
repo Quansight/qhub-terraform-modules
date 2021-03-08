@@ -1,45 +1,18 @@
-variable "name" {
-  description = "name prefix to assign to traefik"
-  type        = string
-  default     = "terraform-traefik"
-}
-
 variable "namespace" {
-  description = "namespace to deploy traefik"
+  description = "Namespace to deploy kubernetes ingress"
   type        = string
 }
 
-variable "traefik-image" {
-  description = "traefik image to use"
+variable "node-group" {
+  description = "Node group to associate ingress deployment"
   type = object({
-    image = string
-    tag   = string
+    key   = string
+    value = string
   })
-  default = {
-    image = "traefik"
-    tag   = "2.4.0"
-  }
 }
 
-variable "loglevel" {
-  description = "traefik log level"
-  default     = "WARN"
-}
-
-variable "enable-certificates" {
-  description = "Enable certificates"
-  default     = false
-}
-
-variable "acme-email" {
-  description = "ACME server email"
-  default     = "costrouchov@quansight.com"
-}
-
-variable "acme-server" {
-  description = "ACME server"
-  # for testing use the letencrypt staging server
-  #  - staging:    https://acme-staging-v02.api.letsencrypt.org/directory
-  #  - production: https://acme-v02.api.letsencrypt.org/directory
-  default = "https://acme-staging-v02.api.letsencrypt.org/directory"
+variable "dependencies" {
+  description = "A list of module dependencies to be injected in the module"
+  type        = list(any)
+  default     = []
 }
