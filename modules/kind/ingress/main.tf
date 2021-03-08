@@ -1,5 +1,5 @@
 module "metallb" {
-  source  = "github.com/brl0/terraform-kubernetes-metallb/?ref=kind_affinity"
+  source  = "github.com/brl0/terraform-kubernetes-metallb//?ref=kind_affinity"
 }
 
 
