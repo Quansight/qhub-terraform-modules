@@ -1,6 +1,5 @@
 module "metallb" {
-  source  = "colinwilson/metallb/kubernetes"
-  version = "0.1.5"
+  source  = "github.com/brl0/terraform-kubernetes-metallb/?ref=kind_affinity"
 }
 
 
