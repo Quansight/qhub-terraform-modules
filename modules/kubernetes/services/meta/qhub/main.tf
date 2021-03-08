@@ -179,12 +179,7 @@ resource "kubernetes_ingress" "dask-gateway" {
   metadata {
     name      = "dask-gateway"
     namespace = var.namespace
-
-    annotations = {
-      "kubernetes.io/ingress.class"                           = "traefik"
-      "traefik.ingress.kubernetes.io/router.tls"              = "true"
-      "traefik.ingress.kubernetes.io/router.tls.certresolver" = "default"
-    }
+    annotations = module.kubernetes-ingress.annotations
   }
 
   spec {

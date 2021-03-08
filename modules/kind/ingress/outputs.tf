@@ -7,3 +7,10 @@ output "endpoint" {
   //  handles the case when ingress is empty list
   value = length(local.ingress) == 0 ? null : local.ingress.0
 }
+
+output "annotations" {
+  description = "ingress annotations"
+  value = {
+
+  }
+}
