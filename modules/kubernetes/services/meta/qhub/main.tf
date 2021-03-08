@@ -179,7 +179,7 @@ resource "kubernetes_ingress" "dask-gateway" {
   metadata {
     name      = "dask-gateway"
     namespace = var.namespace
-    annotations = module.kubernetes-ingress.annotations
+    annotations = var.annotations
   }
 
   spec {
