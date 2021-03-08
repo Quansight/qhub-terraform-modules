@@ -1,3 +1,9 @@
+module "metallb" {
+  source  = "colinwilson/metallb/kubernetes"
+  version = "0.1.5"
+}
+
+
 resource "kubernetes_service_account" "main" {
   metadata {
     name      = "${var.name}-traefik"
