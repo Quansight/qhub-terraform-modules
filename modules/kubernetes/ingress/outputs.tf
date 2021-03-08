@@ -11,8 +11,8 @@ output "endpoint" {
 output "annotations" {
   description = "ingress annotations"
   value = {
-      "kubernetes.io/ingress.class"                           = "traefik"
-      "traefik.ingress.kubernetes.io/router.tls"              = "true"
-      "traefik.ingress.kubernetes.io/router.tls.certresolver" = "default"
+    "kubernetes.io/ingress.class"                           = "traefik"
+    "traefik.ingress.kubernetes.io/router.tls"              = "true"
+    "traefik.ingress.kubernetes.io/router.tls.certresolver" = "default"
   }
 }

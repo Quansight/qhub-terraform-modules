@@ -10,8 +10,8 @@ data "helm_repository" "ingress-nginx" {
 }
 
 resource "helm_release" "ingress-nginx" {
-  name      = "ingress-nginx"
-  namespace = "dev"
+  name       = "ingress-nginx"
+  namespace  = "dev"
   repository = data.helm_repository.ingress-nginx.metadata[0].name
   chart      = "ingress-nginx"
   values = [
@@ -23,7 +23,7 @@ resource "helm_release" "ingress-nginx" {
 }
 
 resource "time_sleep" "wait_30_seconds" {
-  depends_on = [helm_release.ingress-nginx]
+  depends_on      = [helm_release.ingress-nginx]
   create_duration = "30s"
 }
 

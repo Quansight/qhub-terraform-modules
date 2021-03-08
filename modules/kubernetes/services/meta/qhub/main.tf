@@ -177,8 +177,8 @@ resource "kubernetes_config_map" "dask-etc" {
 
 resource "kubernetes_ingress" "dask-gateway" {
   metadata {
-    name      = "dask-gateway"
-    namespace = var.namespace
+    name        = "dask-gateway"
+    namespace   = var.namespace
     annotations = var.annotations
   }
 
