@@ -7,17 +7,11 @@ output "config" {
   description = "Dask gateway /etc/dask/dask-gateway.yaml configuration"
   value = {
     gateway = {
-      address          = "http://web-public-${var.name}"
-      "proxy-address"  = "scheduler-public-${var.name}:8786"
-      "public-address" = var.external_endpoint
-
+      address        = "http://traefik-${var.name}/services/dask-gateway"
+      public-address = "${var.external_endpoint}/services/dask-gateway"
       auth = {
         type = "jupyterhub"
       }
     }
   }
-}
-
-output "depended_on" {
-  value = "${null_resource.dependency_setter.id}-${timestamp()}"
 }

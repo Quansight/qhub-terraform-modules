@@ -1,9 +1,3 @@
-resource "null_resource" "dependency_getter" {
-  triggers = {
-    my_dependencies = join(",", var.dependencies)
-  }
-}
-
 data "helm_repository" "jupyterhub" {
   name = "jupyterhub"
   url  = "https://jupyterhub.github.io/helm-chart/"
@@ -30,15 +24,4 @@ resource "helm_release" "jupyterhub" {
     name  = "proxy.secretToken"
     value = random_password.proxy_secret_token.result
   }
-
-  depends_on = [
-    null_resource.dependency_getter
-  ]
-}
-
-resource "null_resource" "dependency_setter" {
-  depends_on = [
-    helm_release.jupyterhub
-    # List resource(s) that will be constructed last within the module.
-  ]
 }

@@ -1,9 +1,3 @@
-resource "null_resource" "dependency_getter" {
-  triggers = {
-    my_dependencies = join(",", var.dependencies)
-  }
-}
-
 data "helm_repository" "autoscaler" {
   name = "stable"
   url  = "https://charts.helm.sh/stable"
@@ -32,13 +26,4 @@ resource "helm_release" "autoscaler" {
       }
     })
   ], var.overrides)
-  depends_on = [
-    null_resource.dependency_getter
-  ]
-}
-
-resource "null_resource" "dependency_setter" {
-  depends_on = [
-    # List resource(s) that will be constructed last within the module.
-  ]
 }
