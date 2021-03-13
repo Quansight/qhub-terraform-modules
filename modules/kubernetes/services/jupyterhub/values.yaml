@@ -25,7 +25,7 @@ singleuser:
   image:
     name: jupyter/datascience-notebook
     tag: 73a577b006b4
-  startTimeout: 600
+  startTimeout: 600  # 10 minutes
   profileList:
     - display_name: "Small Instance"
       description: "Stable environment with 1 cpu / 1GB ram"
