@@ -105,8 +105,8 @@ module "kubernetes-dask-gateway" {
 
           # Since we are using autoscaling nodes and pods take
           # longer to spin up
-          clusterStartTimeout = 300 # 5 minutes
-          workerStartTimeout  = 300 # 5 minutes
+          clusterStartTimeout = 600 # 10 minutes
+          workerStartTimeout  = 600 # 10 minutes
 
           image = var.dask-worker-image
 
