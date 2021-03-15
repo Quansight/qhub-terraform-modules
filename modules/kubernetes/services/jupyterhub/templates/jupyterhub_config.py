@@ -37,18 +37,25 @@ c.JupyterHub.port = ${proxy_public.port}
 # the hub should listen on all interfaces, so the proxy can access it
 c.JupyterHub.hub_ip = '0.0.0.0'
 
-# Set default namespace for pods to be launched as
-c.KubeSpawner.namespace = "${singleuser.namespace}"
-
 # Gives spawned containers access to the API of the hub
 # c.JupyterHub.hub_connect_url = "http://${proxy_public.host}:${proxy_public.port}/hub/api"
 c.JupyterHub.hub_connect_ip = "${hub.host}"
 c.JupyterHub.hub_connect_port = ${hub.port}
 
-# convert {"service1": "token1", "service2": "token2"} into
-# [{"name": "service1", "api_token": "token1"}, ...]
-# due to inflexibility of terraform language
-# TODO come up with more elegant way to add services
-c.JupyterHub.services = [{"name": k, "api_token": v} for k, v in json.loads(os.environ['JUPYTERHUB_API_SERVICE_TOKENS']).items()]
+# singleuser notebook defaults
+c.KubeSpawner.namespace = "${singleuser.namespace}"
+c.KubeSpawner.image = "${singleuser.image}"
+c.KubeSpawner.cpu_guarantee = ${singleuser.cpu_guarantee}
+c.KubeSpawner.cpu_limit = ${singleuser.cpu_limit}
+c.KubeSpawner.mem_guarantee = "${singleuser.mem_guarantee}"
+c.KubeSpawner.mem_limit = "${singleuser.mem_limit}"
+c.KubeSpawner.default_url = "${singleuser.default_url}"
+c.KubeSpawner.pod_name_template = "${singleuser.pod_name_template}"
+c.KubeSpawner.node_selector = {"${jupyterlab-node-group.key}": "${jupyterlab-node-group.value}"}
+
+# jupyterhub services
+c.JupyterHub.services = [
+${join("\n", formatlist("    {'name': '%s', 'api_token': '%s'},", service.names, service.api_tokens))}
+]
 
 ${extraConfig}

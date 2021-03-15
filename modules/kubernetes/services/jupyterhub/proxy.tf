@@ -69,6 +69,20 @@ resource "kubernetes_deployment" "proxy" {
       }
 
       spec {
+        affinity {
+          node_affinity {
+            required_during_scheduling_ignored_during_execution {
+              node_selector_term {
+                match_expressions {
+                  key      = var.proxy-node-group.key
+                  operator = "In"
+                  values   = [var.proxy-node-group.value]
+                }
+              }
+            }
+          }
+        }
+
         termination_grace_period_seconds = 60
 
         container {

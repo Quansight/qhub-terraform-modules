@@ -37,6 +37,10 @@ resource "kubernetes_config_map" "hub" {
         host = "${kubernetes_service.hub.metadata.0.name}.${kubernetes_service.hub.metadata.0.namespace}"
         port = 8081
       }
+      service = {
+        names = var.services
+        api_tokens = random_password.api_token
+      }
       extraConfig = var.extraConfig
     })
   }
@@ -128,6 +132,20 @@ resource "kubernetes_deployment" "hub" {
       }
 
       spec {
+        affinity {
+          node_affinity {
+            required_during_scheduling_ignored_during_execution {
+              node_selector_term {
+                match_expressions {
+                  key      = var.hub-node-group.key
+                  operator = "In"
+                  values   = [var.hub-node-group.value]
+                }
+              }
+            }
+          }
+        }
+
         volume {
           name = "config"
           config_map {
