@@ -26,7 +26,7 @@ variable "traefik-image" {
   })
   default = {
     image = "traefik"
-    tag   = "2.4.0"
+    tag   = "2.4.8"
   }
 }
 
