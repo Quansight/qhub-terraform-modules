@@ -135,6 +135,7 @@ resource "kubernetes_deployment" "main" {
             "--api.dashboard",
             # Specify that we want to use Traefik as an Ingress Controller.
             "--providers.kubernetesingress",
+            "--providers.kubernetesingress.namespaces=${var.namespace}",
             "--providers.kubernetesingress.ingressclass=traefik",
             # Define two entrypoint ports, and setup a redirect from HTTP to HTTPS.
             "--entryPoints.web.address=:80",
