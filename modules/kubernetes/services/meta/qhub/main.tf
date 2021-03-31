@@ -25,20 +25,20 @@ module "kubernetes-jupyterhub" {
       scheduling = {
         userScheduler = {
           nodeSelector = {
-            "${var.general-node-group.key}" = var.general-node-group.value
+            var.general-node-group.key = var.general-node-group.value
           }
         }
       }
 
       proxy = {
         nodeSelector = {
-          "${var.general-node-group.key}" = var.general-node-group.value
+          var.general-node-group.key = var.general-node-group.value
         }
       }
 
       singleuser = {
         nodeSelector = {
-          "${var.user-node-group.key}" = var.user-node-group.value
+          var.user-node-group.key = var.user-node-group.value
         }
 
         image = var.jupyterlab-image
