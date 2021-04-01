@@ -61,6 +61,9 @@ resource "kubernetes_service" "main" {
   metadata {
     name      = "${var.name}-traefik-ingress"
     namespace = var.namespace
+    annotations = {
+      "networking.gke.io/load-balancer-type" = "Internal"
+    }
   }
 
   spec {
