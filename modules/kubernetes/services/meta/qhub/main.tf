@@ -1,3 +1,9 @@
+resource "random_password" "jupyterhub_api_token" {
+  length  = 32
+  special = false
+}
+
+
 module "kubernetes-jupyterhub" {
   source = "../../jupyterhub"
 
@@ -14,10 +20,7 @@ module "kubernetes-jupyterhub" {
 
         services = {
           "dask-gateway" = {
-            apiToken = module.kubernetes-dask-gateway.jupyterhub_api_token
-            # url will make jupyterhub configure its own proxy to route
-            # "/services/dask-gateway" to this destination.
-            url = "http://traefik-dask-gateway.dev"
+            apiToken = random_password.jupyterhub_api_token.result
           }
         }
       }
@@ -84,84 +87,31 @@ module "kubernetes-jupyterhub" {
   ])
 }
 
+
 module "kubernetes-dask-gateway" {
   source = "../../dask-gateway"
 
   namespace = var.namespace
+  jupyterhub_api_token = random_password.jupyterhub_api_token.result
+  jupyterhub_api_url = "http://proxy-public.${var.namespace}/hub/api"
 
-  external_endpoint = "https://${var.external-url}"
+  cluster-image = var.dask-worker-image
 
-  overrides = concat(var.dask-gateway-overrides, [
-    jsonencode({
-      controller = {
-        affinity = local.affinity.general-nodegroup
-      }
-      traefik = {
-        affinity = local.affinity.general-nodegroup
-      }
-      gateway = {
-        affinity = local.affinity.general-nodegroup
-        backend = {
-
-          # Since we are using autoscaling nodes and pods take
-          # longer to spin up
-          clusterStartTimeout = 600 # 10 minutes
-          workerStartTimeout  = 600 # 10 minutes
-
-          image = var.dask-worker-image
-
-          scheduler = {
-            extraContainerConfig = {
-              volumeMounts = [
-                {
-                  name      = "conda-store"
-                  mountPath = "/home/conda"
-                }
-              ]
-            }
-            extraPodConfig = {
-              affinity = local.affinity.worker-nodegroup
-              volumes = [
-                {
-                  name = "conda-store"
-                  persistentVolumeClaim = {
-                    claimName = var.conda-store-pvc
-                  }
-                }
-              ]
-            }
-          }
-          worker = {
-            extraContainerConfig = {
-              volumeMounts = [
-                {
-                  name      = "conda-store"
-                  mountPath = "/home/conda"
-                }
-              ]
-            }
-            extraPodConfig = {
-              affinity = local.affinity.worker-nodegroup
-              volumes = [
-                {
-                  name = "conda-store"
-                  persistentVolumeClaim = {
-                    claimName = var.conda-store-pvc
-                  }
-                }
-              ]
-            }
-          }
-        }
-      }
-    })
-  ])
-
-  ## Causes cyclic dependency need to rewrite module
-  # depends_on = [
-  #   module.kubernetes-jupyterhub
-  # ]
+  general-node-group = var.general-node-group
+  worker-node-group = var.worker-node-group
 }
+
+
+module "kubernetes-jupyterhub-ssh" {
+  source = "../../jupyterhub-ssh"
+
+  namespace = var.namespace
+  jupyterhub_api_url = "http://proxy-public.${var.namespace}"
+
+  node-group = var.general-node-group
+  persistent_volume_claim = var.home-pvc
+}
+
 
 resource "kubernetes_config_map" "dask-etc" {
   metadata {
@@ -174,6 +124,7 @@ resource "kubernetes_config_map" "dask-etc" {
     "dashboard.yaml" = jsonencode({})
   }
 }
+
 
 resource "kubernetes_ingress" "dask-gateway" {
   metadata {
@@ -193,19 +144,74 @@ resource "kubernetes_ingress" "dask-gateway" {
       http {
         path {
           backend {
-            service_name = "traefik-dask-gateway"
+            service_name = "proxy-public"
             service_port = 80
           }
-          path = "/gateway"
+          path = "/hub"
         }
         path {
           backend {
             service_name = "proxy-public"
             service_port = 80
           }
-          path = "/"
+          path = "/user"
         }
       }
+    }
+  }
+}
+
+resource "kubernetes_manifest" "jupyterhub-ssh-ingress" {
+  provider = kubernetes-alpha
+
+  manifest = {
+    apiVersion = "traefik.containo.us/v1alpha1"
+    kind = "IngressRouteTCP"
+    metadata = {
+      name = "jupyterhub-ssh-ingress"
+      namespace = var.namespace
+    }
+    spec = {
+      entryPoints = ["ssh"]
+      routes = [
+        {
+          match = "HostSNI(`*`)"
+          services = [
+            {
+              name = "qhub-jupyterhub-ssh"
+              port = 8022
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+
+
+resource "kubernetes_manifest" "jupyterhub-sftp-ingress" {
+  provider = kubernetes-alpha
+
+  manifest = {
+    apiVersion = "traefik.containo.us/v1alpha1"
+    kind = "IngressRouteTCP"
+    metadata = {
+      name = "jupyterhub-sftp-ingress"
+      namespace = var.namespace
+    }
+    spec = {
+      entryPoints = ["sftp"]
+      routes = [
+        {
+          match = "HostSNI(`*`)"
+          services = [
+            {
+              name = "qhub-jupyterhub-sftp"
+              port = 8023
+            }
+          ]
+        }
+      ]
     }
   }
 }
