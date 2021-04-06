@@ -8,7 +8,7 @@ hub:
 proxy:
   secretToken: "<placeholder>"
   service:
-    type: NodePort
+    type: ClusterIP
 
 scheduling:
   userScheduler:

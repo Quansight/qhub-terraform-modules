@@ -1,14 +1,9 @@
-output "jupyterhub_api_token" {
-  description = "API token to enable in jupyterhub server"
-  value       = random_password.jupyterhub_api_token.result
-}
-
 output "config" {
-  description = "Dask gateway /etc/dask/dask-gateway.yaml configuration"
+  description = "dask gateway /etc/dask/dask-gateway.yaml configuration"
   value = {
     gateway = {
-      address        = "http://traefik-${var.name}/services/dask-gateway"
-      public-address = "${var.external_endpoint}/services/dask-gateway"
+      address         = "http://${kubernetes_service.gateway.metadata.0.name}.${kubernetes_service.gateway.metadata.0.namespace}:8000"
+
       auth = {
         type = "jupyterhub"
       }

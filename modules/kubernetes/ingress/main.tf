@@ -1,6 +1,6 @@
 resource "kubernetes_service_account" "main" {
   metadata {
-    name      = "${var.name}-traefik"
+    name      = "${var.name}-traefik-ingress"
     namespace = var.namespace
   }
 }
@@ -8,7 +8,7 @@ resource "kubernetes_service_account" "main" {
 
 resource "kubernetes_cluster_role" "main" {
   metadata {
-    name = "${var.name}-traefik"
+    name = "${var.name}-traefik-ingress"
   }
 
   rule {
@@ -28,12 +28,18 @@ resource "kubernetes_cluster_role" "main" {
     resources  = ["ingresses/status"]
     verbs      = ["update"]
   }
+
+  rule {
+    api_groups = ["traefik.containo.us"]
+    resources  = ["ingressroutes", "ingressroutetcps", "ingressrouteudps", "middlewares", "tlsoptions", "tlsstores", "traefikservices", "serverstransports"]
+    verbs      = ["get", "list", "watch"]
+  }
 }
 
 
 resource "kubernetes_cluster_role_binding" "main" {
   metadata {
-    name = "${var.name}-traefik"
+    name = "${var.name}-traefik-ingress"
   }
 
   role_ref {
@@ -53,25 +59,41 @@ resource "kubernetes_service" "main" {
   wait_for_load_balancer = true
 
   metadata {
-    name      = "${var.name}-traefik"
+    name      = "${var.name}-traefik-ingress"
     namespace = var.namespace
   }
 
   spec {
     selector = {
-      "app.kubernetes.io/component" = "traefik"
+      "app.kubernetes.io/component" = "traefik-ingress"
     }
 
     port {
-      name     = "http"
-      protocol = "TCP"
-      port     = 80
+      name        = "http"
+      protocol    = "TCP"
+      port        = 80
+      target_port = 80
     }
 
     port {
-      name     = "https"
-      protocol = "TCP"
-      port     = 443
+      name        = "https"
+      protocol    = "TCP"
+      port        = 443
+      target_port = 443
+    }
+
+    port {
+      name        = "ssh"
+      protocol    = "TCP"
+      port        = 8022
+      target_port = 8022
+    }
+
+    port {
+      name        = "sftp"
+      protocol    = "TCP"
+      port        = 8023
+      target_port = 8023
     }
 
     type = "LoadBalancer"
@@ -81,7 +103,7 @@ resource "kubernetes_service" "main" {
 
 resource "kubernetes_deployment" "main" {
   metadata {
-    name      = "${var.name}-traefik"
+    name      = "${var.name}-traefik-ingress"
     namespace = var.namespace
   }
 
@@ -90,14 +112,14 @@ resource "kubernetes_deployment" "main" {
 
     selector {
       match_labels = {
-        "app.kubernetes.io/component" = "traefik"
+        "app.kubernetes.io/component" = "traefik-ingress"
       }
     }
 
     template {
       metadata {
         labels = {
-          "app.kubernetes.io/component" = "traefik"
+          "app.kubernetes.io/component" = "traefik-ingress"
         }
       }
 
@@ -131,15 +153,34 @@ resource "kubernetes_deployment" "main" {
           }
 
           args = concat([
-            "--api.insecure",
-            "--api.dashboard",
-            # Specify that we want to use Traefik as an Ingress Controller.
+            # Do not send usage stats
+            "--global.checknewversion=false",
+            "--global.sendanonymoususage=false",
+            # allow access to the dashboard directly through the port
+            # TODO: eventually needs to be tied into traefik middle
+            # security possibly using jupyterhub auth this is not a
+            # security risk at the moment since this port is not
+            # externally accessible
+            "--api.insecure=true",
+            "--api.dashboard=true",
+            "--ping=true",
+            # Start the Traefik Kubernetes Ingress Controller Provider
             "--providers.kubernetesingress",
             "--providers.kubernetesingress.namespaces=${var.namespace}",
             "--providers.kubernetesingress.ingressclass=traefik",
+            "--providers.kubernetesingress.throttleduration=2s",
+            # Start the Traefik Kubernetes CRD Controller Provider
+            "--providers.kubernetescrd",
+            "--providers.kubernetescrd.namespaces=${var.namespace}",
+            "--providers.kubernetescrd.throttleduration=2s",
+            "--providers.kubernetescrd.allowcrossnamespace=false",
             # Define two entrypoint ports, and setup a redirect from HTTP to HTTPS.
             "--entryPoints.web.address=:80",
             "--entryPoints.websecure.address=:443",
+            "--entrypoints.ssh.address=:8022",
+            "--entrypoints.sftp.address=:8023",
+            "--entryPoints.tcp.address=:8000",
+            "--entryPoints.traefik.address=:9000",
             "--entrypoints.web.http.redirections.entryPoint.to=websecure",
             "--entrypoints.web.http.redirections.entryPoint.scheme=https",
             # Enable debug logging. Useful to work out why something might not be
@@ -163,8 +204,34 @@ resource "kubernetes_deployment" "main" {
           }
 
           port {
-            name           = "dashboard"
-            container_port = 8080
+            name           = "traefik"
+            container_port = 9000
+          }
+
+          liveness_probe {
+            http_get {
+              path = "/ping"
+              port = "traefik"
+            }
+
+            initial_delay_seconds = 10
+            timeout_seconds       = 2
+            period_seconds        = 10
+            failure_threshold     = 3
+            success_threshold     = 1
+          }
+
+          readiness_probe {
+            http_get {
+              path = "/ping"
+              port = "traefik"
+            }
+
+            initial_delay_seconds = 10
+            timeout_seconds       = 2
+            period_seconds        = 10
+            failure_threshold     = 1
+            success_threshold     = 1
           }
         }
       }
