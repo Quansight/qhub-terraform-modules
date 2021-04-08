@@ -105,32 +105,32 @@ resource "kubernetes_deployment" "jupyterhub-ssh" {
         }
 
         container {
-          name = "jupyterhub-ssh"
-          image = "${var.jupyterhub-ssh-image.name}:${var.jupyterhub-ssh-image.tag}"
+          name              = "jupyterhub-ssh"
+          image             = "${var.jupyterhub-ssh-image.name}:${var.jupyterhub-ssh-image.tag}"
           image_pull_policy = "Always"
 
           security_context {
             allow_privilege_escalation = false
-            run_as_non_root = true
-            run_as_user = 1000
+            run_as_non_root            = true
+            run_as_user                = 1000
           }
 
           volume_mount {
-            name = "secrets"
+            name       = "secrets"
             mount_path = "/etc/jupyterhub-ssh/secrets"
-            read_only = true
+            read_only  = true
           }
 
           volume_mount {
-            name = "config"
+            name       = "config"
             mount_path = "/etc/jupyterhub-ssh/config"
-            read_only = true
+            read_only  = true
           }
 
           port {
-            name = "ssh"
+            name           = "ssh"
             container_port = 8022
-            protocol = "TCP"
+            protocol       = "TCP"
           }
         }
       }

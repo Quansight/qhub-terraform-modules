@@ -91,24 +91,26 @@ module "kubernetes-jupyterhub" {
 module "kubernetes-dask-gateway" {
   source = "../../dask-gateway"
 
-  namespace = var.namespace
+  namespace            = var.namespace
   jupyterhub_api_token = random_password.jupyterhub_api_token.result
-  jupyterhub_api_url = "http://proxy-public.${var.namespace}/hub/api"
+  jupyterhub_api_url   = "http://proxy-public.${var.namespace}/hub/api"
+
+  external-url = var.external-url
 
   cluster-image = var.dask-worker-image
 
   general-node-group = var.general-node-group
-  worker-node-group = var.worker-node-group
+  worker-node-group  = var.worker-node-group
 }
 
 
 module "kubernetes-jupyterhub-ssh" {
   source = "../../jupyterhub-ssh"
 
-  namespace = var.namespace
+  namespace          = var.namespace
   jupyterhub_api_url = "http://proxy-public.${var.namespace}"
 
-  node-group = var.general-node-group
+  node-group              = var.general-node-group
   persistent_volume_claim = var.home-pvc
 }
 
@@ -126,36 +128,32 @@ resource "kubernetes_config_map" "dask-etc" {
 }
 
 
-resource "kubernetes_ingress" "dask-gateway" {
-  metadata {
-    name      = "dask-gateway"
-    namespace = var.namespace
+resource "kubernetes_manifest" "jupyterhub" {
+  provider = kubernetes-alpha
 
-    annotations = {
-      "kubernetes.io/ingress.class"                           = "traefik"
-      "traefik.ingress.kubernetes.io/router.tls"              = "true"
-      "traefik.ingress.kubernetes.io/router.tls.certresolver" = "default"
+  manifest = {
+    apiVersion = "traefik.containo.us/v1alpha1"
+    kind       = "IngressRoute"
+    metadata = {
+      name      = "jupyterhub"
+      namespace = var.namespace
     }
-  }
-
-  spec {
-    rule {
-      host = var.external-url
-      http {
-        path {
-          backend {
-            service_name = "proxy-public"
-            service_port = 80
-          }
-          path = "/hub"
+    spec = {
+      entryPoints = ["websecure"]
+      routes = [
+        {
+          kind  = "Rule"
+          match = "Host(`${var.external-url}`) && (Path(`/`) || PathPrefix(`/hub`) || PathPrefix(`/user`))"
+          services = [
+            {
+              name = "proxy-public"
+              port = 80
+            }
+          ]
         }
-        path {
-          backend {
-            service_name = "proxy-public"
-            service_port = 80
-          }
-          path = "/user"
-        }
+      ]
+      tls = {
+        certResolver = "default"
       }
     }
   }
@@ -166,9 +164,9 @@ resource "kubernetes_manifest" "jupyterhub-ssh-ingress" {
 
   manifest = {
     apiVersion = "traefik.containo.us/v1alpha1"
-    kind = "IngressRouteTCP"
+    kind       = "IngressRouteTCP"
     metadata = {
-      name = "jupyterhub-ssh-ingress"
+      name      = "jupyterhub-ssh-ingress"
       namespace = var.namespace
     }
     spec = {
@@ -194,9 +192,9 @@ resource "kubernetes_manifest" "jupyterhub-sftp-ingress" {
 
   manifest = {
     apiVersion = "traefik.containo.us/v1alpha1"
-    kind = "IngressRouteTCP"
+    kind       = "IngressRouteTCP"
     metadata = {
-      name = "jupyterhub-sftp-ingress"
+      name      = "jupyterhub-sftp-ingress"
       namespace = var.namespace
     }
     spec = {

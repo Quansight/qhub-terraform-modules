@@ -95,8 +95,8 @@ resource "kubernetes_deployment" "jupyterhub-sftp" {
         }
 
         container {
-          name = "jupyterhub-sftp"
-          image = "${var.jupyterhub-sftp-image.name}:${var.jupyterhub-sftp-image.tag}"
+          name              = "jupyterhub-sftp"
+          image             = "${var.jupyterhub-sftp-image.name}:${var.jupyterhub-sftp-image.tag}"
           image_pull_policy = "Always"
 
           security_context {
@@ -104,27 +104,27 @@ resource "kubernetes_deployment" "jupyterhub-sftp" {
           }
 
           volume_mount {
-            name = "home"
+            name       = "home"
             mount_path = "/mnt/home"
-            sub_path = "home"
+            sub_path   = "home"
           }
 
           volume_mount {
-            name = "config"
+            name       = "config"
             mount_path = "/etc/jupyterhub-ssh/config"
-            read_only = true
+            read_only  = true
           }
 
           volume_mount {
-            name = "secrets"
+            name       = "secrets"
             mount_path = "/etc/jupyterhub-sftp/config"
-            read_only = true
+            read_only  = true
           }
 
           port {
-            name = "sftp"
+            name           = "sftp"
             container_port = 22
-            protocol = "TCP"
+            protocol       = "TCP"
           }
         }
       }
