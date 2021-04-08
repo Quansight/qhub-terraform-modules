@@ -19,6 +19,11 @@ variable "jupyterhub_api_url" {
   type        = string
 }
 
+variable "external-url" {
+  description = "External public url that dask-gateway cluster is accessible"
+  type        = string
+}
+
 variable "gateway-image" {
   description = "dask gateway image to use for gateway"
   type = object({

@@ -8,7 +8,7 @@ resource "kubernetes_manifest" "ingress_route" {
       name = "ingressroutes.traefik.containo.us"
     }
     spec = {
-      group   = "traefik.containo.us"
+      group = "traefik.containo.us"
       names = {
         kind     = "IngressRoute"
         plural   = "ingressroutes"
@@ -17,8 +17,8 @@ resource "kubernetes_manifest" "ingress_route" {
       scope = "Namespaced"
       versions = [
         {
-          name = "v1alpha1"
-          served = true
+          name    = "v1alpha1"
+          served  = true
           storage = true
           schema = {
             openAPIV3Schema = {
@@ -30,7 +30,7 @@ resource "kubernetes_manifest" "ingress_route" {
                     routes = {
                       type = "array"
                       items = {
-                        type = "object"
+                        type     = "object"
                         required = ["match", "kind"]
                         properties = {
                           match = {
@@ -46,7 +46,7 @@ resource "kubernetes_manifest" "ingress_route" {
                           services = {
                             type = "array"
                             items = {
-                              type = "object"
+                              type     = "object"
                               required = ["name", "port"]
                               properties = {
                                 name = {
@@ -84,7 +84,7 @@ resource "kubernetes_manifest" "ingress_route" {
                                 }
                                 port = {
                                   x-kubernetes-int-or-string = true
-                                  pattern = "^[1-9]\\d*$"
+                                  pattern                    = "^[1-9]\\d*$"
                                 }
                                 scheme = {
                                   type = "string"
@@ -114,7 +114,7 @@ resource "kubernetes_manifest" "ingress_route" {
                           middlewares = {
                             type = "array"
                             items = {
-                              type = "object"
+                              type     = "object"
                               required = ["name", "namespace"]
                               properties = {
                                 name = {
@@ -142,7 +142,7 @@ resource "kubernetes_manifest" "ingress_route" {
                           type = "string"
                         }
                         options = {
-                          type = "object"
+                          type     = "object"
                           required = ["name", "namespace"]
                           properties = {
                             name = {
@@ -154,7 +154,7 @@ resource "kubernetes_manifest" "ingress_route" {
                           }
                         }
                         store = {
-                          type = "object"
+                          type     = "object"
                           required = ["name", "namespace"]
                           properties = {
                             name = {
@@ -209,7 +209,7 @@ resource "kubernetes_manifest" "ingress_route_tcp" {
       name = "ingressroutetcps.traefik.containo.us"
     }
     spec = {
-      group   = "traefik.containo.us"
+      group = "traefik.containo.us"
       names = {
         kind     = "IngressRouteTCP"
         plural   = "ingressroutetcps"
@@ -218,8 +218,8 @@ resource "kubernetes_manifest" "ingress_route_tcp" {
       scope = "Namespaced"
       versions = [
         {
-          name = "v1alpha1"
-          served = true
+          name    = "v1alpha1"
+          served  = true
           storage = true
           schema = {
             openAPIV3Schema = {
@@ -239,7 +239,7 @@ resource "kubernetes_manifest" "ingress_route_tcp" {
                           services = {
                             type = "array"
                             items = {
-                              type = "object"
+                              type     = "object"
                               required = ["name", "port"]
                               properties = {
                                 name = {
@@ -250,7 +250,7 @@ resource "kubernetes_manifest" "ingress_route_tcp" {
                                 }
                                 port = {
                                   x-kubernetes-int-or-string = true
-                                  pattern = "^[1-9]\\d*$"
+                                  pattern                    = "^[1-9]\\d*$"
                                 }
                                 weight = {
                                   type = "integer"
@@ -259,11 +259,11 @@ resource "kubernetes_manifest" "ingress_route_tcp" {
                                   type = "integer"
                                 }
                                 proxyProtocol = {
-                                  type = "object"
+                                  type     = "object"
                                   required = ["version"]
                                   properties = {
                                     version = {
-                                      type = "integer"
+                                      type    = "integer"
                                       minimum = 1
                                       maximum = 2
                                     }
@@ -291,7 +291,7 @@ resource "kubernetes_manifest" "ingress_route_tcp" {
                           type = "boolean"
                         }
                         options = {
-                          type = "object"
+                          type     = "object"
                           required = ["name", "namespace"]
                           properties = {
                             name = {
@@ -303,7 +303,7 @@ resource "kubernetes_manifest" "ingress_route_tcp" {
                           }
                         }
                         store = {
-                          type = "object"
+                          type     = "object"
                           required = ["name", "namespace"]
                           properties = {
                             name = {
@@ -320,7 +320,7 @@ resource "kubernetes_manifest" "ingress_route_tcp" {
                         domains = {
                           type = "array"
                           items = {
-                            type = "object"
+                            type     = "object"
                             required = ["main"]
                             properties = {
                               main = {
@@ -359,7 +359,7 @@ resource "kubernetes_manifest" "ingress_route_udp" {
       name = "ingressrouteudps.traefik.containo.us"
     }
     spec = {
-      group   = "traefik.containo.us"
+      group = "traefik.containo.us"
       names = {
         kind     = "IngressRouteUDP"
         plural   = "ingressrouteudps"
@@ -368,8 +368,8 @@ resource "kubernetes_manifest" "ingress_route_udp" {
       scope = "Namespaced"
       versions = [
         {
-          name = "v1alpha1"
-          served = true
+          name    = "v1alpha1"
+          served  = true
           storage = true
           schema = {
             openAPIV3Schema = {
@@ -386,7 +386,7 @@ resource "kubernetes_manifest" "ingress_route_udp" {
                           services = {
                             type = "array"
                             items = {
-                              type = "object"
+                              type     = "object"
                               required = ["name"]
                               properties = {
                                 name = {
@@ -397,7 +397,7 @@ resource "kubernetes_manifest" "ingress_route_udp" {
                                 }
                                 port = {
                                   x-kubernetes-int-or-string = true
-                                  pattern = "^[1-9]\\d*$"
+                                  pattern                    = "^[1-9]\\d*$"
                                 }
                                 weight = {
                                   type = "integer"
@@ -436,7 +436,7 @@ resource "kubernetes_manifest" "middleware" {
       name = "middlewares.traefik.containo.us"
     }
     spec = {
-      group   = "traefik.containo.us"
+      group = "traefik.containo.us"
       names = {
         kind     = "Middleware"
         plural   = "middlewares"
@@ -445,8 +445,8 @@ resource "kubernetes_manifest" "middleware" {
       scope = "Namespaced"
       versions = [
         {
-          name = "v1alpha1"
-          served = true
+          name    = "v1alpha1"
+          served  = true
           storage = true
           schema = {
             openAPIV3Schema = {
@@ -455,6 +455,28 @@ resource "kubernetes_manifest" "middleware" {
                 spec = {
                   type = "object"
                   properties = {
+                    addPrefix = {
+                      type = "object"
+                      properties = {
+                        prefix = {
+                          type = "string"
+                        }
+                      }
+                    }
+                    stripPrefix = {
+                      type = "object"
+                      properties = {
+                        prefixes = {
+                          type = "array"
+                          items = {
+                            type = "string"
+                          }
+                        }
+                        forceSlash = {
+                          type = "boolean"
+                        }
+                      }
+                    }
                     stripPrefixRegex = {
                       type = "object"
                       properties = {
@@ -463,6 +485,576 @@ resource "kubernetes_manifest" "middleware" {
                           items = {
                             type = "string"
                           }
+                        }
+                      }
+                    }
+                    replacePath = {
+                      type = "object"
+                      properties = {
+                        path = {
+                          type = "string"
+                        }
+                      }
+                    }
+                    replacePathRegex = {
+                      type = "object"
+                      properties = {
+                        regex = {
+                          type = "string"
+                        }
+                        replacement = {
+                          type = "string"
+                        }
+                      }
+                    }
+                    chain = {
+                      type = "object"
+                      properties = {
+                        middlewares = {
+                          type = "array"
+                          items = {
+                            type     = "object"
+                            required = ["name", "namespace"]
+                            properties = {
+                              name = {
+                                type = "string"
+                              }
+                              namespace = {
+                                type = "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    ipWhiteList = {
+                      type = "object"
+                      properties = {
+                        sourceRange = {
+                          type = "array"
+                          items = {
+                            type = "string"
+                          }
+                        }
+                        ipStrategy = {
+                          type = "object"
+                          properties = {
+                            depth = {
+                              type = "integer"
+                            }
+                            excludedIPs = {
+                              type = "array"
+                              items = {
+                                type = "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    headers = {
+                      type = "object"
+                      properties = {
+                        customRequestHeaders = {
+                          type = "object"
+                        }
+                        customResponseHeaders = {
+                          type = "object"
+                        }
+                        accessControlAllowCredentials = {
+                          type = "boolean"
+                        }
+                        accessControlAllowHeaders = {
+                          type = "array"
+                          items = {
+                            type = "string"
+                          }
+                        }
+                        accessControlAllowMethods = {
+                          type = "array"
+                          items = {
+                            type = "string"
+                          }
+                        }
+                        accessControlAllowOrigin = {
+                          type = "string"
+                        }
+                        accessControlAllowOriginList = {
+                          type = "array"
+                          items = {
+                            type = "string"
+                          }
+                        }
+                        accessControlExposeHeaders = {
+                          type = "array"
+                          items = {
+                            type = "string"
+                          }
+                        }
+                        accessControlMaxAge = {
+                          type = "integer"
+                        }
+                        addVaryHeader = {
+                          type = "boolean"
+                        }
+                        allowedHosts = {
+                          type = "array"
+                          items = {
+                            type = "string"
+                          }
+                        }
+                        hostsProxyHeaders = {
+                          type = "array"
+                          items = {
+                            type = "string"
+                          }
+                        }
+                        sslRedirect = {
+                          type = "boolean"
+                        }
+                        sslTemporaryRedirect = {
+                          type = "boolean"
+                        }
+                        sslHost = {
+                          type = "string"
+                        }
+                        sslProxyHeaders = {
+                          type = "object"
+                        }
+                        sslForceHost = {
+                          type = "boolean"
+                        }
+                        stsSeconds = {
+                          type = "integer"
+                        }
+                        stsIncludeSubdomains = {
+                          type = "boolean"
+                        }
+                        stsPreload = {
+                          type = "boolean"
+                        }
+                        forceSTSheader = {
+                          type = "boolean"
+                        }
+                        frameDeny = {
+                          type = "boolean"
+                        }
+                        customFrameOptionsValue = {
+                          type = "string"
+                        }
+                        contentTypeNosniff = {
+                          type = "boolean"
+                        }
+                        browserXssFilter = {
+                          type = "boolean"
+                        }
+                        customBrowserXSSValue = {
+                          type = "string"
+                        }
+                        contentSecurityPolicy = {
+                          type = "string"
+                        }
+                        publicKey = {
+                          type = "string"
+                        }
+                        referrerPolicy = {
+                          type = "string"
+                        }
+                        featurePolicy = {
+                          type = "string"
+                        }
+                        isDevelopment = {
+                          type = "boolean"
+                        }
+                      }
+                    }
+                    errors = {
+                      type = "object"
+                      properties = {
+                        status = {
+                          type = "array"
+                          items = {
+                            type = "string"
+                          }
+                        }
+                        service = {
+                          type = "object"
+                          properties = {
+                            sticky = {
+                              type = "object"
+                              properties = {
+                                cookie = {
+                                  type = "object"
+                                  properties = {
+                                    name = {
+                                      type = "string"
+                                    }
+                                    secure = {
+                                      type = "boolean"
+                                    }
+                                    httpOnly = {
+                                      type = "boolean"
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                            namespace = {
+                              type = "string"
+                            }
+                            kind = {
+                              type = "string"
+                            }
+                            name = {
+                              type = "string"
+                            }
+                            weight = {
+                              type = "integer"
+                            }
+                            responseForwarding = {
+                              type = "object"
+                              properties = {
+                                flushInterval = {
+                                  type = "string"
+                                }
+                              }
+                            }
+                            passHostHeader = {
+                              type = "boolean"
+                            }
+                            healthCheck = {
+                              type = "object"
+                              properties = {
+                                path = {
+                                  type = "string"
+                                }
+                                host = {
+                                  type = "string"
+                                }
+                                scheme = {
+                                  type = "string"
+                                }
+                                intervalSeconds = {
+                                  type = "integer"
+                                }
+                                timeoutSeconds = {
+                                  type = "integer"
+                                }
+                                headers = {
+                                  type = "object"
+                                }
+                              }
+                            }
+                            strategy = {
+                              type = "string"
+                            }
+                            scheme = {
+                              type = "string"
+                            }
+                            port = {
+                              type = "integer"
+                            }
+                          }
+                        }
+                        query = {
+                          type = "string"
+                        }
+                      }
+                    }
+                    rateLimit = {
+                      type = "object"
+                      properties = {
+                        average = {
+                          type = "integer"
+                        }
+                        burst = {
+                          type = "integer"
+                        }
+                        sourceCriterion = {
+                          type = "object"
+                          properties = {
+                            ipStrategy = {
+                              type = "object"
+                              properties = {
+                                depth = {
+                                  type = "integer"
+                                }
+                                excludedIPs = {
+                                  type = "array"
+                                  items = {
+                                    type = "string"
+                                  }
+                                }
+                              }
+                            }
+                            requestHeaderName = {
+                              type = "string"
+                            }
+                            requestHost = {
+                              type = "boolean"
+                            }
+                          }
+                        }
+                      }
+                    }
+                    redirectRegex = {
+                      type = "object"
+                      properties = {
+                        regex = {
+                          type = "string"
+                        }
+                        replacement = {
+                          type = "string"
+                        }
+                        permanent = {
+                          type = "boolean"
+                        }
+                      }
+                    }
+                    redirectScheme = {
+                      type = "object"
+                      properties = {
+                        scheme = {
+                          type = "string"
+                        }
+                        port = {
+                          type = "string"
+                        }
+                        permanent = {
+                          type = "boolean"
+                        }
+                      }
+                    }
+                    basicAuth = {
+                      type = "object"
+                      properties = {
+                        secret = {
+                          type = "string"
+                        }
+                        realm = {
+                          type = "string"
+                        }
+                        removeHeader = {
+                          type = "boolean"
+                        }
+                        headerField = {
+                          type = "string"
+                        }
+                      }
+                    }
+                    digestAuth = {
+                      type = "object"
+                      properties = {
+                        secret = {
+                          type = "string"
+                        }
+                        removeHeader = {
+                          type = "boolean"
+                        }
+                        realm = {
+                          type = "string"
+                        }
+                        headerField = {
+                          type = "string"
+                        }
+                      }
+                    }
+                    forwardAuth = {
+                      type = "object"
+                      properties = {
+                        address = {
+                          type = "string"
+                        }
+                        trustForwardHeader = {
+                          type = "boolean"
+                        }
+                        authResponseHeaders = {
+                          type = "array"
+                          items = {
+                            type = "string"
+                          }
+                        }
+                        tls = {
+                          type = "object"
+                          properties = {
+                            caSecret = {
+                              type = "string"
+                            }
+                            caOptional = {
+                              type = "boolean"
+                            }
+                            certSecret = {
+                              type = "string"
+                            }
+                            insecureSkipVerify = {
+                              type = "boolean"
+                            }
+                          }
+                        }
+                      }
+                    }
+                    inFlightReq = {
+                      type = "object"
+                      properties = {
+                        amount = {
+                          type = "integer"
+                        }
+                        sourceCriterion = {
+                          type = "object"
+                          properties = {
+                            ipStrategy = {
+                              type = "object"
+                              properties = {
+                                depth = {
+                                  type = "integer"
+                                }
+                                excludedIPs = {
+                                  type = "array"
+                                  items = {
+                                    type = "string"
+                                  }
+                                }
+                              }
+                            }
+                            requestHeaderName = {
+                              type = "string"
+                            }
+                            requestHost = {
+                              type = "boolean"
+                            }
+                          }
+                        }
+                      }
+                    }
+                    buffering = {
+                      type = "object"
+                      properties = {
+                        maxRequestBodyBytes = {
+                          type = "integer"
+                        }
+                        memRequestBodyBytes = {
+                          type = "integer"
+                        }
+                        maxResponseBodyBytes = {
+                          type = "integer"
+                        }
+                        memResponseBodyBytes = {
+                          type = "integer"
+                        }
+                        retryExpression = {
+                          type = "string"
+                        }
+                      }
+                    }
+                    circuitBreaker = {
+                      type = "object"
+                      properties = {
+                        expression = {
+                          type = "string"
+                        }
+                      }
+                    }
+                    compress = {
+                      type = "object"
+                      properties = {
+                        excludedContentTypes = {
+                          type = "array"
+                          items = {
+                            type = "string"
+                          }
+                        }
+                      }
+                    }
+                    passTLSClientCert = {
+                      type = "object"
+                      properties = {
+                        pem = {
+                          type = "boolean"
+                        }
+                        info = {
+                          type = "object"
+                          properties = {
+                            notAfter = {
+                              type = "boolean"
+                            }
+                            notBefore = {
+                              type = "boolean"
+                            }
+                            sans = {
+                              type = "boolean"
+                            }
+                            subject = {
+                              type = "object"
+                              properties = {
+                                country = {
+                                  type = "boolean"
+                                }
+                                province = {
+                                  type = "boolean"
+                                }
+                                locality = {
+                                  type = "boolean"
+                                }
+                                organization = {
+                                  type = "boolean"
+                                }
+                                commonName = {
+                                  type = "boolean"
+                                }
+                                serialNumber = {
+                                  type = "boolean"
+                                }
+                                domainComponent = {
+                                  type = "boolean"
+                                }
+                              }
+                            }
+                            issuer = {
+                              type = "object"
+                              properties = {
+                                country = {
+                                  type = "boolean"
+                                }
+                                province = {
+                                  type = "boolean"
+                                }
+                                locality = {
+                                  type = "boolean"
+                                }
+                                organization = {
+                                  type = "boolean"
+                                }
+                                commonName = {
+                                  type = "boolean"
+                                }
+                                serialNumber = {
+                                  type = "boolean"
+                                }
+                                domainComponent = {
+                                  type = "boolean"
+                                }
+                              }
+                            }
+                            serialNumber = {
+                              type = "boolean"
+                            }
+                          }
+                        }
+                      }
+                    }
+                    retry = {
+                      type = "object"
+                      properties = {
+                        attempts = {
+                          type = "integer"
+                        }
+                      }
+                    }
+                    contentType = {
+                      type = "object"
+                      properties = {
+                        autoDetect = {
+                          type = "boolean"
                         }
                       }
                     }
@@ -488,7 +1080,7 @@ resource "kubernetes_manifest" "serverstransports" {
       name = "serverstransports.traefik.containo.us"
     }
     spec = {
-      group   = "traefik.containo.us"
+      group = "traefik.containo.us"
       names = {
         kind     = "ServersTransport"
         plural   = "serverstransports"
@@ -497,8 +1089,8 @@ resource "kubernetes_manifest" "serverstransports" {
       scope = "Namespaced"
       versions = [
         {
-          name = "v1alpha1"
-          served = true
+          name    = "v1alpha1"
+          served  = true
           storage = true
           schema = {
             openAPIV3Schema = {
@@ -533,15 +1125,15 @@ resource "kubernetes_manifest" "serverstransports" {
                       properties = {
                         dialTimeout = {
                           x-kubernetes-int-or-string = true
-                          pattern = "^[1-9](\\d+)?(ns|us|µs|μs|ms|s|m|h)?$"
+                          pattern                    = "^[1-9](\\d+)?(ns|us|µs|μs|ms|s|m|h)?$"
                         }
                         responseHeaderTimeout = {
                           x-kubernetes-int-or-string = true
-                          pattern = "^[1-9](\\d+)?(ns|us|µs|μs|ms|s|m|h)?$"
+                          pattern                    = "^[1-9](\\d+)?(ns|us|µs|μs|ms|s|m|h)?$"
                         }
                         idleConnTimeout = {
                           x-kubernetes-int-or-string = true
-                          pattern = "^[1-9](\\d+)?(ns|us|µs|μs|ms|s|m|h)?$"
+                          pattern                    = "^[1-9](\\d+)?(ns|us|µs|μs|ms|s|m|h)?$"
                         }
                       }
                     }
@@ -567,7 +1159,7 @@ resource "kubernetes_manifest" "tls_option" {
       name = "tlsoptions.traefik.containo.us"
     }
     spec = {
-      group   = "traefik.containo.us"
+      group = "traefik.containo.us"
       names = {
         kind     = "TLSOption"
         plural   = "tlsoptions"
@@ -576,8 +1168,8 @@ resource "kubernetes_manifest" "tls_option" {
       scope = "Namespaced"
       versions = [
         {
-          name = "v1alpha1"
-          served = true
+          name    = "v1alpha1"
+          served  = true
           storage = true
           schema = {
             openAPIV3Schema = {
@@ -647,7 +1239,7 @@ resource "kubernetes_manifest" "tls_stores" {
       name = "tlsstores.traefik.containo.us"
     }
     spec = {
-      group   = "traefik.containo.us"
+      group = "traefik.containo.us"
       names = {
         kind     = "TLSStore"
         plural   = "tlsstores"
@@ -656,8 +1248,8 @@ resource "kubernetes_manifest" "tls_stores" {
       scope = "Namespaced"
       versions = [
         {
-          name = "v1alpha1"
-          served = true
+          name    = "v1alpha1"
+          served  = true
           storage = true
           schema = {
             openAPIV3Schema = {
@@ -690,20 +1282,308 @@ resource "kubernetes_manifest" "traefik_service" {
   provider = kubernetes-alpha
 
   manifest = {
-    apiVersion = "apiextensions.k8s.io/v1beta1"
+    apiVersion = "apiextensions.k8s.io/v1"
     kind       = "CustomResourceDefinition"
     metadata = {
       name = "traefikservices.traefik.containo.us"
     }
     spec = {
-      group   = "traefik.containo.us"
-      version = "v1alpha1"
+      group = "traefik.containo.us"
       names = {
         kind     = "TraefikService"
         plural   = "traefikservices"
         singular = "traefikservice"
       }
       scope = "Namespaced"
+      versions = [
+        {
+          name    = "v1alpha1"
+          served  = true
+          storage = true
+          schema = {
+            openAPIV3Schema = {
+              type = "object"
+              properties = {
+                spec = {
+                  type = "object"
+                  properties = {
+                    weighted = {
+                      type = "object"
+                      properties = {
+                        services = {
+                          type = "array"
+                          items = {
+                            type = "object"
+                            properties = {
+                              sticky = {
+                                type = "object"
+                                properties = {
+                                  cookie = {
+                                    type = "object"
+                                    properties = {
+                                      name = {
+                                        type = "string"
+                                      }
+                                      secure = {
+                                        type = "boolean"
+                                      }
+                                      httpOnly = {
+                                        type = "boolean"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                              namespace = {
+                                type = "string"
+                              }
+                              kind = {
+                                type = "string"
+                              }
+                              name = {
+                                type = "string"
+                              }
+                              weight = {
+                                type = "integer"
+                              }
+                              responseForwarding = {
+                                type = "object"
+                                properties = {
+                                  flushInterval = {
+                                    type = "string"
+                                  }
+                                }
+                              }
+                              passHostHeader = {
+                                type = "boolean"
+                              }
+                              healthCheck = {
+                                type = "object"
+                                properties = {
+                                  path = {
+                                    type = "string"
+                                  }
+                                  host = {
+                                    type = "string"
+                                  }
+                                  scheme = {
+                                    type = "string"
+                                  }
+                                  intervalSeconds = {
+                                    type = "integer"
+                                  }
+                                  timeoutSeconds = {
+                                    type = "integer"
+                                  }
+                                  headers = {
+                                    type = "object"
+                                  }
+                                }
+                              }
+                              strategy = {
+                                type = "string"
+                              }
+                              scheme = {
+                                type = "string"
+                              }
+                              port = {
+                                type = "integer"
+                              }
+                            }
+                          }
+                        }
+                        sticky = {
+                          type = "object"
+                          properties = {
+                            cookie = {
+                              type = "object"
+                              properties = {
+                                name = {
+                                  type = "string"
+                                }
+                                secure = {
+                                  type = "boolean"
+                                }
+                                httpOnly = {
+                                  type = "boolean"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    mirroring = {
+                      type = "object"
+                      properties = {
+                        weight = {
+                          type = "integer"
+                        }
+                        responseForwarding = {
+                          type = "object"
+                          properties = {
+                            flushInterval = {
+                              type = "string"
+                            }
+                          }
+                        }
+                        passHostHeader = {
+                          type = "boolean"
+                        }
+                        healthCheck = {
+                          type = "object"
+                          properties = {
+                            path = {
+                              type = "string"
+                            }
+                            host = {
+                              type = "string"
+                            }
+                            scheme = {
+                              type = "string"
+                            }
+                            intervalSeconds = {
+                              type = "integer"
+                            }
+                            timeoutSeconds = {
+                              type = "integer"
+                            }
+                            headers = {
+                              type = "object"
+                            }
+                          }
+                        }
+                        strategy = {
+                          type = "string"
+                        }
+                        scheme = {
+                          type = "string"
+                        }
+                        port = {
+                          type = "integer"
+                        }
+                        sticky = {
+                          type = "object"
+                          properties = {
+                            cookie = {
+                              type = "object"
+                              properties = {
+                                name = {
+                                  type = "string"
+                                }
+                                secure = {
+                                  type = "boolean"
+                                }
+                                httpOnly = {
+                                  type = "boolean"
+                                }
+                              }
+                            }
+                          }
+                        }
+                        namespace = {
+                          type = "string"
+                        }
+                        kind = {
+                          type = "string"
+                        }
+                        name = {
+                          type = "string"
+                        }
+                        mirrors = {
+                          type = "array"
+                          items = {
+                            type = "object"
+                            properties = {
+                              name = {
+                                type = "string"
+                              }
+                              kind = {
+                                type = "string"
+                              }
+                              namespace = {
+                                type = "string"
+                              }
+                              sticky = {
+                                type = "object"
+                                properties = {
+                                  cookie = {
+                                    type = "object"
+                                    properties = {
+                                      name = {
+                                        type = "string"
+                                      }
+                                      secure = {
+                                        type = "boolean"
+                                      }
+                                      httpOnly = {
+                                        type = "boolean"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                              port = {
+                                type = "integer"
+                              }
+                              scheme = {
+                                type = "string"
+                              }
+                              strategy = {
+                                type = "string"
+                              }
+                              healthCheck = {
+                                type = "object"
+                                properties = {
+                                  path = {
+                                    type = "string"
+                                  }
+                                  host = {
+                                    type = "string"
+                                  }
+                                  scheme = {
+                                    type = "string"
+                                  }
+                                  intervalSeconds = {
+                                    type = "integer"
+                                  }
+                                  timeoutSeconds = {
+                                    type = "integer"
+                                  }
+                                  headers = {
+                                    type = "object"
+                                  }
+                                }
+                              }
+                              passHostHeader = {
+                                type = "boolean"
+                              }
+                              responseForwarding = {
+                                type = "object"
+                                properties = {
+                                  flushInterval = {
+                                    type = "string"
+                                  }
+                                  weight = {
+                                    type = "integer"
+                                  }
+                                  percent = {
+                                    type = "integer"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
     }
   }
 }
