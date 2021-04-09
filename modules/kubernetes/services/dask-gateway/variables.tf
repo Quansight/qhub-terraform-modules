@@ -87,7 +87,7 @@ variable "gateway" {
   })
   default = {
     loglevel = "INFO"
-    prefix   = "/"
+    prefix   = "/gateway"
   }
 }
 
@@ -161,4 +161,9 @@ variable "cluster" {
     image_pull_policy = "IfNotPresent"
     environment       = {}
   }
+}
+
+variable "extra_config" {
+  description = "Additional dask-gateway configuration"
+  default     = ""
 }

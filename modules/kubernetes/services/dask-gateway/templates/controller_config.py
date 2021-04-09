@@ -1,11 +1,11 @@
 c.KubeController.address = ":8000"
-c.KubeController.api_url = 'http://${gatewayName}.${gatewayNamespace}:8000/api'
-c.KubeController.gateway_instance = '${gatewayName}'
+c.KubeController.api_url = 'http://${gateway_service_name}.${gateway_service_namespace}:8000/api'
+c.KubeController.gateway_instance = '${gateway_service_name}'
 c.KubeController.proxy_prefix = "${gateway.prefix}"
 c.KubeController.proxy_web_middlewares = [
   {
-      "name": '${gatewayName}',
-      "namespace": '${gatewayNamespace}'
+      "name": '${gateway_cluster_middleware_name}',
+      "namespace": '${gateway_cluster_middleware_namespace}'
   }
 ]
 c.KubeController.log_level = "${controller.loglevel}"

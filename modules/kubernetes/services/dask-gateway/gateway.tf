@@ -19,12 +19,13 @@ resource "kubernetes_config_map" "gateway" {
   data = {
     "dask_gateway_config.py" = templatefile(
       "${path.module}/templates/gateway_config.py", {
-        gatewayName        = kubernetes_service.gateway.metadata.0.name
-        gatewayNamespace   = kubernetes_service.gateway.metadata.0.namespace
-        jupyterhub_api_url = var.jupyterhub_api_url
-        gateway            = var.gateway
-        cluster            = var.cluster
-        cluster-image      = var.cluster-image
+        gateway_service_name      = kubernetes_service.gateway.metadata.0.name
+        gateway_service_namespace = kubernetes_service.gateway.metadata.0.namespace
+        jupyterhub_api_url        = var.jupyterhub_api_url
+        gateway                   = var.gateway
+        cluster                   = var.cluster
+        cluster-image             = var.cluster-image
+        extra_config              = var.extra_config
     })
   }
 }
