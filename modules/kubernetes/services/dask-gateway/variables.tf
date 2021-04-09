@@ -129,15 +129,15 @@ variable "cluster" {
     scheduler_cores_limit            = number
     scheduler_memory                 = string
     scheduler_memory_limit           = string
-    scheduler_extra_container_config = map(any)
-    scheduler_extra_pod_config       = map(any)
+    scheduler_extra_container_config = any
+    scheduler_extra_pod_config       = any
     # worker configuration
     worker_cores                  = number
     worker_cores_limit            = number
     worker_memory                 = string
     worker_memory_limit           = string
-    worker_extra_container_config = map(any)
-    worker_extra_pod_config       = map(any)
+    worker_extra_container_config = any
+    worker_extra_pod_config       = any
     # additional fields
     image_pull_policy = string
     environment       = map(string)
