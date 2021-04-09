@@ -101,6 +101,8 @@ module "kubernetes-dask-gateway" {
 
   general-node-group = var.general-node-group
   worker-node-group  = var.worker-node-group
+
+  extra_config = var.dask_gateway_extra_config
 }
 
 
@@ -148,6 +150,45 @@ resource "kubernetes_manifest" "jupyterhub" {
             {
               name = "proxy-public"
               port = 80
+            }
+          ]
+        }
+      ]
+      tls = {
+        certResolver = "default"
+      }
+    }
+  }
+}
+
+resource "kubernetes_manifest" "dask-gateway" {
+  provider = kubernetes-alpha
+
+  manifest = {
+    apiVersion = "traefik.containo.us/v1alpha1"
+    kind       = "IngressRoute"
+    metadata = {
+      name      = "dask-gateway"
+      namespace = var.namespace
+    }
+    spec = {
+      entryPoints = ["websecure"]
+      routes = [
+        {
+          kind  = "Rule"
+          match = "Host(`${var.external-url}`) && PathPrefix(`/gateway/`)"
+
+          middlewares = [
+            {
+              name = "qhub-dask-gateway-gateway-api"
+              namespace = var.namespace
+            }
+          ]
+
+          services = [
+            {
+              name = "qhub-dask-gateway-gateway-api"
+              port = 8000
             }
           ]
         }

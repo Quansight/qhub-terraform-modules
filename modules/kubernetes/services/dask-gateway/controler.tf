@@ -7,10 +7,12 @@ resource "kubernetes_config_map" "controller" {
   data = {
     "dask_gateway_config.py" = templatefile(
       "${path.module}/templates/controller_config.py", {
-        gatewayName      = kubernetes_service.gateway.metadata.0.name
-        gatewayNamespace = kubernetes_service.gateway.metadata.0.namespace
-        gateway          = var.gateway
-        controller       = var.controller
+        gateway_service_name                 = kubernetes_service.gateway.metadata.0.name
+        gateway_service_namespace            = kubernetes_service.gateway.metadata.0.namespace
+        gateway_cluster_middleware_name      = kubernetes_manifest.cluster-middleware.manifest.metadata.name
+        gateway_cluster_middleware_namespace = kubernetes_manifest.cluster-middleware.manifest.metadata.namespace
+        gateway                              = var.gateway
+        controller                           = var.controller
     })
   }
 }
@@ -74,29 +76,6 @@ resource "kubernetes_cluster_role_binding" "controller" {
     kind      = "ServiceAccount"
     name      = kubernetes_deployment.controller.metadata.0.name
     namespace = var.namespace
-  }
-}
-
-
-resource "kubernetes_service" "controller" {
-  metadata {
-    name      = "${var.name}-dask-gateway-controller-api"
-    namespace = var.namespace
-  }
-
-  spec {
-    selector = {
-      "app.kubernetes.io/component" = "dask-gateway-controller"
-    }
-
-    port {
-      name        = "api"
-      protocol    = "TCP"
-      port        = 8000
-      target_port = 8000
-    }
-
-    type = "ClusterIP"
   }
 }
 
