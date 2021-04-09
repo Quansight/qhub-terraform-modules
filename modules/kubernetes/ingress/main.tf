@@ -96,6 +96,13 @@ resource "kubernetes_service" "main" {
       target_port = 8023
     }
 
+    port {
+      name        = "tcp"
+      protocol    = "TCP"
+      port        = 8786
+      target_port = 8786
+    }
+
     type = "LoadBalancer"
   }
 }
@@ -174,7 +181,7 @@ resource "kubernetes_deployment" "main" {
             "--entryPoints.websecure.address=:443",
             "--entrypoints.ssh.address=:8022",
             "--entrypoints.sftp.address=:8023",
-            "--entryPoints.tcp.address=:8000",
+            "--entryPoints.tcp.address=:8786",
             "--entryPoints.traefik.address=:9000",
             "--entrypoints.web.http.redirections.entryPoint.to=websecure",
             "--entrypoints.web.http.redirections.entryPoint.scheme=https",
@@ -196,6 +203,21 @@ resource "kubernetes_deployment" "main" {
           port {
             name           = "https"
             container_port = 443
+          }
+
+          port {
+            name           = "ssh"
+            container_port = 8022
+          }
+
+          port {
+            name           = "sftp"
+            container_port = 8023
+          }
+
+          port {
+            name           = "tcp"
+            container_port = 8786
           }
 
           port {
