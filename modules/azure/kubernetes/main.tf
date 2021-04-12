@@ -2,16 +2,16 @@ provider azurerm {
   features {}
 }
 
-resource "azurerm_resource_group" "qhub_resource_group" {
-  name     = "qhub_resource_group"
-  location = var.location
-}
+# resource "azurerm_resource_group" "qhub_resource_group" {
+#   name     = "qhub_resource_group"
+#   location = var.location
+# }
 
 # https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/kubernetes_cluster
 resource "azurerm_kubernetes_cluster" "main" {
   name                = var.name
-  location            = azurerm_resource_group.qhub_resource_group.location
-  resource_group_name = azurerm_resource_group.qhub_resource_group.name
+  location            = var.location #azurerm_resource_group.qhub_resource_group.location
+  resource_group_name = var.resource_group_name #azurerm_resource_group.qhub_resource_group.name
 
   # DNS prefix specified when creating the managed cluster. Changing this forces a new resource to be created.
   dns_prefix = "Qhub" # required

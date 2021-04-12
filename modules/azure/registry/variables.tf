@@ -4,6 +4,11 @@ variable "name" {
 }
 
 variable "location" {
-  description = "Location of container registry resource group"
+  description = "Location of qhub resource group"
+  type        = string
+}
+
+variable "resource_group_name" {
+  description = "name of qhub resource group"
   type        = string
 }
