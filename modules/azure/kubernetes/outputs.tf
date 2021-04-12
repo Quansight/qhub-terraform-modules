@@ -1,4 +1,3 @@
-
 output "credentials" {
   description = "Credentials required for connecting to kubernetes cluster"
   value = {
