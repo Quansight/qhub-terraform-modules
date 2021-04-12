@@ -81,3 +81,9 @@ variable "dask_gateway_extra_config" {
   type        = string
   default     = ""
 }
+
+variable "certificate-secret-name" {
+  description = "tls certificate secret name to use"
+  type        = string
+  default     = ""
+}

@@ -209,9 +209,7 @@ resource "kubernetes_manifest" "jupyterhub" {
           ]
         }
       ]
-      tls = {
-        certResolver = "default"
-      }
+      tls = local.tls
     }
   }
 }
@@ -248,9 +246,7 @@ resource "kubernetes_manifest" "dask-gateway" {
           ]
         }
       ]
-      tls = {
-        certResolver = "default"
-      }
+      tls = local.tls
     }
   }
 }
