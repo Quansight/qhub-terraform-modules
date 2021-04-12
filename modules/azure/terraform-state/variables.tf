@@ -1,4 +1,4 @@
-variable "name" {
+variable "resource_group_name" {
   description = "Prefix name for terraform state"
   type        = string
 }
