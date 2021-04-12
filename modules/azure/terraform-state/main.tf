@@ -9,6 +9,7 @@ resource "azurerm_resource_group" "terraform-resource-group" {
 
 resource "azurerm_storage_account" "terraform-storage-account" {
   name                     = "${var.resource_group_name}${var.storage_account_postfix}" # must be unique across the entire Azure service
+  resource_group_name      = azurerm_resource_group.terraform-resource-group.name
   location                 = azurerm_resource_group.terraform-resource-group.location
   account_tier             = "Standard"
   account_replication_type = "GRS"
