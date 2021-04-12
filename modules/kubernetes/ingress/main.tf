@@ -107,6 +107,8 @@ resource "kubernetes_service" "main" {
     }
 
     type = "LoadBalancer"
+
+    load_balancer_ip = "10.247.11.22"
   }
 }
 
