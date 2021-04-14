@@ -8,8 +8,16 @@ will ever be stored in this module.
 # Providers
 
  - cloud
-   - aws
-   - digitalocean
- - applications
-   - kuberentes
-   - postgresql
+   - Amazon Web Services
+   - Digital Ocean
+   - Google Cloud Provider
+   - Azure
+
+ - Services
+   - Kubernetes
+   - Postgresql
+   - Dask Gateway
+   - jupyterlab-ssh
+   - conda-store
+   - prefect
+   - qhub
