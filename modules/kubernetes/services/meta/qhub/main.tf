@@ -200,7 +200,7 @@ resource "kubernetes_manifest" "jupyterhub" {
       routes = [
         {
           kind  = "Rule"
-          match = "Host(`${var.external-url}`) && (Path(`/`) || PathPrefix(`/hub`) || PathPrefix(`/user`))"
+          match = "Host(`${var.external-url}`) && (Path(`/`) || PathPrefix(`/hub`) || PathPrefix(`/user`) || PathPrefix(`/services`))"
           services = [
             {
               name = "proxy-public"
