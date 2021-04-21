@@ -19,9 +19,9 @@ resource "aws_subnet" "main" {
   tags = merge({ Name = "${var.name}-subnet-${count.index}" }, var.tags, var.subnet_tags)
 
   lifecycle {
-     ignore_changes = [
-       availability_zone
-     ]
+    ignore_changes = [
+      availability_zone
+    ]
   }
 }
 
