@@ -8,6 +8,12 @@ variable "location" {
   type        = string
 }
 
+variable "force_destroy" {
+  description = "force_destroy all bucket contents when bucket is deleted"
+  type        = bool
+  default     = false
+}
+
 variable "versioning" {
   description = "Enable versioning on bucket"
   type        = bool
