@@ -47,6 +47,18 @@ variable "dask-worker-image" {
   })
 }
 
+variable "dask-gateway-image" {
+  description = "Docker image to use for dask gateway image"
+  type = object({
+    name = string
+    tag  = string
+  })
+  default = {
+    name = "daskgateway/dask-gateway-server"
+    tag  = "0.9.0"
+  }
+}
+
 variable "general-node-group" {
   description = "Node key value pair for bound general resources"
   type = object({

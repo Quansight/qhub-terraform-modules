@@ -98,6 +98,8 @@ module "kubernetes-dask-gateway" {
   external-url = var.external-url
 
   cluster-image = var.dask-worker-image
+  gateway-image = var.dask-gateway-image
+  controller-image = var.dask-gateway-image
 
   general-node-group = var.general-node-group
   worker-node-group  = var.worker-node-group
