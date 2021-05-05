@@ -70,8 +70,14 @@ resource "kubernetes_daemonset" "nvidia_installer" {
             path = "/"
           }
         }
+        volume {
+          name = "cos-tools"
+          host_path {
+            path = "/var/lib/cos-tools"
+          }
+        }
         init_container {
-          image = "gcr.io/cos-cloud/cos-gpu-installer@sha256:8d86a652759f80595cafed7d3dcde3dc53f57f9bc1e33b27bc3cfa7afea8d483"
+          image = "cos-nvidia-installer:fixed"
           name  = "nvidia-driver-installer"
           resources {
             requests = {
@@ -101,6 +107,14 @@ resource "kubernetes_daemonset" "nvidia_installer" {
             name  = "ROOT_MOUNT_DIR"
             value = "/root"
           }
+          env {
+            name  = "COS_TOOLS_DIR_HOST"
+            value = "/var/lib/cos-tools"
+          }
+          env {
+            name  = "COS_TOOLS_DIR_CONTAINER"
+            value = "/build/cos-tools"
+          }
           volume_mount {
             name       = "nvidia-install-dir-host"
             mount_path = "/usr/local/nvidia"
@@ -116,6 +130,10 @@ resource "kubernetes_daemonset" "nvidia_installer" {
           volume_mount {
             name       = "root-mount"
             mount_path = "/root"
+          }
+          volume_mount {
+            name       = "cos-tools"
+            mount_path = "/build/cos-tools"
           }
         }
         container {
