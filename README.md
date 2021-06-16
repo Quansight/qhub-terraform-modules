@@ -1,6 +1,8 @@
+**Please submit issues to https://github.com/quansight/qhub/issues**
+
 # QHub Terraform Modules
 
-NOTE *The modules are shortly to be moved into qhub repo directly so this repo may not be in use by the time you are reading this.*
+NOTE *The modules are moved into qhub repo directly so this is for backwards compatability*
 
 Repository to manage deployments of Quansight and customer terraform
 modules. This repository holds the modules (not deployments) to allow
